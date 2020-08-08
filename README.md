@@ -28,12 +28,12 @@ If you don't provide it, it will be run against all built in benchmark, which re
 The available notebook definitions are located in the `./src/notebooks` folder (some of those like the `plotly` and the `fixed-data-tables` need specific configuration as details in the next section to activate the extension):
 
 - [`./src/notebooks/errorOutputs.ts`](./src/notebooks/errorOutputs.ts).
-- [`./src/notebooks/fixedDataTable.ts](./src/notebooks/fixedDataTable.ts).
-- [`./src/notebooks/largePlotly.ts](./src/notebooks/largePlotly.ts).
-- [`./src/notebooks/longOutput.ts](./src/notebooks/longOutput.ts).
-- [`./src/notebooks/manyCells.ts](./src/notebooks/manyCells.ts).    
-- [`./src/notebooks/manyOutputs.ts](./src/notebooks/manyOutputs.ts).
-- [`./src/notebooks/manyPlotly.ts](./src/notebooks/manyPlotly.ts).
+- [`./src/notebooks/fixedDataTable.ts`](./src/notebooks/fixedDataTable.ts).
+- [`./src/notebooks/largePlotly.ts`](./src/notebooks/largePlotly.ts).
+- [`./src/notebooks/longOutput.ts`](./src/notebooks/longOutput.ts).
+- [`./src/notebooks/manyCells.ts`](./src/notebooks/manyCells.ts).    
+- [`./src/notebooks/manyOutputs.ts`](./src/notebooks/manyOutputs.ts).
+- [`./src/notebooks/manyPlotly.ts`](./src/notebooks/manyPlotly.ts).
 
 ## Plotly
 
