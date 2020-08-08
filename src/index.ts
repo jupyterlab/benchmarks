@@ -168,9 +168,10 @@ function writeOutput({
             'window.currentWidget ? window.currentWidget.dispose() : null'
           );
           await startTime();
+          console.log('------------', path);
           id = await page.evaluate(`
             jupyterlab.commands.execute('docmanager:open', {
-              path: ${JSON.stringify(`benchmarks/${path}`)}
+              path: ${JSON.stringify(`${path}`)}
             }).then(widget => {
               window.currentWidget = widget;
               return widget.node.id;
