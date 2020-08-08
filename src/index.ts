@@ -168,7 +168,6 @@ function writeOutput({
             'window.currentWidget ? window.currentWidget.dispose() : null'
           );
           await startTime();
-          console.log('------------', path);
           id = await page.evaluate(`
             jupyterlab.commands.execute('docmanager:open', {
               path: ${JSON.stringify(`${path}`)}
