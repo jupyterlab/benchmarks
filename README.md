@@ -13,6 +13,12 @@ jlpm
 ```
 
 ```bash
+# Define the folder with your JupyterLab source against which
+# the benchmark will be run.
+export JLAB_HOME=<the_folder_with_your_jupyterlab_source>
+```
+
+```bash
 # Run a benchmark passing 2 notebooks that will be opened and switched between.
 env 'BENCHMARK_NOTEBOOKS=["./longOutput", "./manyOutputs"]' jlpm all
 ```

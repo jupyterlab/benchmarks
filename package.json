@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build:jlab": "cd .. && jlpm run build",
+    "build:jlab": "cd $JLAB_HOME && jlpm run build",
     "build:benchmark": "tsc",
-    "start:jlab": "fkill -s :9999 && cd .. && jupyter lab --dev --no-browser --port 9999 --ServerApp.password= --ServerApp.token=",
+    "start:jlab": "fkill -s :9999 && cd $JLAB_HOME && jupyter lab --dev --no-browser --port 9999 --ServerApp.password= --ServerApp.token=",
     "start:benchmark": "wait-on http-get://localhost:9999/lab && node lib/index.js",
     "start:all": "npm-run-all --parallel start:jlab start:benchmark --race",
     "start:analysis": "vl2png analysis.vl.json > analysis.png && open analysis.png",
@@ -20,6 +20,7 @@
     "playwright": "0.11.1"
   },
   "devDependencies": {
+    "@types/node": "14.0.27",
     "fkill-cli": "6.0.1",
     "npm-run-all": "4.1.5",
     "typescript": "~3.7.3",
