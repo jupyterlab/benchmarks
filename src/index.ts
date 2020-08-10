@@ -170,7 +170,7 @@ function writeOutput({
           await startTime();
           id = await page.evaluate(`
             jupyterlab.commands.execute('docmanager:open', {
-              path: ${JSON.stringify(`benchmarks/${path}`)}
+              path: ${JSON.stringify(`${path}`)}
             }).then(widget => {
               window.currentWidget = widget;
               return widget.node.id;

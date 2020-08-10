@@ -1,6 +1,8 @@
 yarn.lock
+yarn-error.log
 node_modules
-data/
+lib
+data
 out.*
 *.csv
 *.png
