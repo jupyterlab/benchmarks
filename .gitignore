@@ -1,8 +1,22 @@
-yarn.lock
-yarn-error.log
-node_modules
-lib
-data
+# Exclude.
+
+.*
 out.*
 *.csv
 *.png
+
+yarn.lock
+yarn-error.log
+
+build
+node_modules
+lib
+data
+
+*.egg-info
+
+# Include.
+
+!**/.*ignore
+!**/.*rc
+!**/.*rc.js
