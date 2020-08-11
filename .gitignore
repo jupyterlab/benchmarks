@@ -13,10 +13,12 @@ node_modules
 lib
 data
 
+__pycache__
 *.egg-info
 
 # Include.
 
+!.readthedocs.yml
 !**/.*ignore
 !**/.*rc
 !**/.*rc.js
