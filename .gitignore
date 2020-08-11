@@ -22,3 +22,4 @@ __pycache__
 !**/.*ignore
 !**/.*rc
 !**/.*rc.js
+!docs/**/*.png
