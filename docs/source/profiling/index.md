@@ -50,7 +50,7 @@ NbClassic takes 20s to load the notebook and suffers from Forced reflow.
 
 JupyterLab takes 33s to load and is more impacted by the Forced reflow than NbClassic is. Those Forced reflow are repetitive.
 
-It sounds like most of the latency is due to codemirror triggering reflows. I will look a bit how to typically solve this, see e.g. [CodeMirror/#/5873](https://github.com/codemirror/CodeMirror/issues/5873).
+It sounds like most of the latency is due to codemirror triggering reflows. We should look how to typically solve this, see e.g. [CodeMirror/#/5873](https://github.com/codemirror/CodeMirror/issues/5873).
 
 ## Single Cell - 1 cell with many DIV outputs
 
