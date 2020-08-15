@@ -7,7 +7,8 @@ We can identify differents stategies for the fixes.
 1. Strategy 3: Virtualized Rendering
 1. Strategy 4: DOM Optimization
 1. Strategy 5: Web Workers
-1. Strategy 6: Others
+1. Strategy 6: React Optimization
+1. Strategy 7: Browser Configuration
 
 Whatever the fix, we want to ensure:
 
@@ -59,6 +60,26 @@ We have updated the [celllist#pushAll](https://github.com/jupyterlab/jupyterlab/
 
 Current attempts have not brought enhancements.
 
+### Adhoc Fix Attempt 3 - Reuse contentFactory in Notebook Model
+
+We may try to benchmark with this patch. At first user try, this does not give sensible change.
+
+```
+diff --git a/packages/notebook/src/model.ts b/packages/notebook/src/model.ts
+index 2efeee7b3..4716ce9f7 100644
+--- a/packages/notebook/src/model.ts
++++ b/packages/notebook/src/model.ts
+@@ -514,7 +514,7 @@ export namespace NotebookModel {
+      *   `codeCellContentFactory` will be used.
+      */
+     createCodeCell(options: CodeCellModel.IOptions): ICodeCellModel {
+-      if (options.contentFactory) {
++      if (!options.contentFactory) {
+         options.contentFactory = this.codeCellContentFactory;
+       }
+       if (this.modelDB) {
+```
+
 ## Strategy 3: Virtualized Rendering
 
 Cocalc has been [using react-virtualized](https://github.com/sagemathinc/cocalc/pull/3969).
@@ -73,10 +94,10 @@ We can think to more generic fixes like using [Intersection Observer API](https:
 
 Useful links.
 
-- [Intersection Observer API - Timing](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API/Timing_element_visibility)  
-- [React Intersection Observer](https://github.com/thebuilder/react-intersection-observer)  
-- https://react-intersection-observer.now.sh  
-
+- [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
+- [Intersection Observer API - Timing](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API/Timing_element_visibility)
+- [React Intersection Observer](https://github.com/thebuilder/react-intersection-observer)
+- https://react-intersection-observer.now.sh
 - https://webdesign.tutsplus.com/tutorials/how-to-intersection-observer--cms-30250
 - https://css-tricks.com/a-few-functional-uses-for-intersection-observer-to-know-when-an-element-is-in-view
 
@@ -96,15 +117,15 @@ An preliminary step is to wrap Notebook into React (see this PR [Try Notebok Rea
 
 Then we could use React virtualisation libraries.
 
-- [Creating More Efficient React Views with Windowing - ForwardJS San Francisco](https://www.youtube.com/watch?v=t4tuhg7b50I)  
-- [Rendering large lists with React Virtualized](https://www.youtube.com/watch?v=UrgfPjX97Yg)  
-- [React Virtualized](https://github.com/bvaughn/react-virtualized)  
-- [React Window](https://github.com/bvaughn/react-window)  
-- [Rendering large lists with react-virtualized or react-window](https://www.youtube.com/watch?v=QhPn6hLGljU)  
-- https://addyosmani.com/blog/react-window  
-- https://github.com/falinsky/tmdb-viewer (react-virtualized) https://tmdb-viewer.surge.sh  
-- https://github.com/giovanni0918/tmdb-viewer (react-window)  
-- [React Virtual](https://github.com/tannerlinsley/react-virtual)  
+- [Creating More Efficient React Views with Windowing - ForwardJS San Francisco](https://www.youtube.com/watch?v=t4tuhg7b50I)
+- [Rendering large lists with React Virtualized](https://www.youtube.com/watch?v=UrgfPjX97Yg)
+- [React Virtualized](https://github.com/bvaughn/react-virtualized)
+- [React Window](https://github.com/bvaughn/react-window)
+- [Rendering large lists with react-virtualized or react-window](https://www.youtube.com/watch?v=QhPn6hLGljU)
+- https://addyosmani.com/blog/react-window
+- https://github.com/falinsky/tmdb-viewer (react-virtualized) https://tmdb-viewer.surge.sh
+- https://github.com/giovanni0918/tmdb-viewer (react-window)
+- [React Virtual](https://github.com/tannerlinsley/react-virtual)
 
 ## Strategy 4: DOM Optimization
 
@@ -112,7 +133,7 @@ DOM optimization backed by libraries or new browser features
 
 ### Shadow DOM
 
-- [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)  
+[Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM) allows `encapsulation — being able to keep the markup structure, style, and behavior hidden and separate from other code on the page so that different parts do not clash, and the code can be kept nice and clean`.
 
 Initial Shadow DOM usage is implemented in [Move CodeMirror HTML tree and related CSS to shadow DOM](https://github.com/jupyterlab/jupyterlab/pull/8584).
 
@@ -133,22 +154,26 @@ We compare `f7b7ee7` vs `1f15fcb` and find that Shadow DOM made switching notebo
 
 We should try the upcoming [content visibility](https://web.dev/content-visibility) (supported in Chromium 85).
 
+See also [Display Locking library](https://github.com/wicg/display-locking) for the related Display Locking spec.
+
 ### Fast DOM
 
-- https://github.com/wilsonpage/fastdom
+[FastDOM](https://github.com/wilsonpage/fastdom) is a libraary that eliminates layout thrashing by batching DOM measurement and mutation tasks.
  
 ## Strategy 5: Web Workers
+
+Web Workers makes it possible to run a script operation in a background thread separate from the main execution thread of a web application. The advantage of this is that laborious processing can be performed in a separate thread, allowing the main (usually the UI) thread to run without being blocked/slowed down.
 
 - [Web Workers API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)  
 - [Service Workers](https://developers.google.com/web/fundamentals/primers/service-workers)  
 - [React and Webworkers](https://github.com/facebook/react/issues/3092#issuecomment-333417970)  
 
-## Strategy 6: Others
+## Strategy 6: React Optimization
 
-### Display Locking
+For React componentts, [React Concurrency](https://reactjs.org/docs/concurrent-mode-intro.html#concurrency) can be used.
 
-- [Display Locking](https://github.com/wicg/display-locking)  
+## Strategy 7: Browser Configuration
 
-### React Concurrency
+From this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674411129).
 
-- [React Concurrency](https://reactjs.org/docs/concurrent-mode-intro.html#concurrency)  
+Webrender for Firefox 79 (for many linux and macos devices, see <https://wiki.mozilla.org/Platform/GFX/WebRender_Where>  can be turned on via a pref. See also <https://www.techrepublic.com/article/how-to-enable-firefox-webrender-for-faster-page-rendering>. Note that windows firefox has had webrender turned on by default in certain cases for a while now.
