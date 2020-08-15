@@ -12,12 +12,6 @@ From the many cells profiling, the Force layout is triggered in codemirror.
 
 The single cell profiling does not highlight the code mirror issue: jupyterlab is nearly as performant as classic notebook as we test with only one cell editor.
 
-## Fix Options
-
-We can think to adhoc fixes. One way to get adhoc fix would be to further look at `updateEditorOnShow` implemented in [jupyterlab/jupyterlab#5700](https://github.com/jupyterlab/jupyterlab/issues/5700), but [is is already set to false...](https://github.com/jupyterlab/jupyterlab/blob/71f07379b184d5b0b8b67b55163d27194a61a0ac/packages/notebook/src/widget.ts#L493).
-
-We can also think to more generic fixes like using [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API).
-
 ## Open vs Switch Tab
 
 The following analysis have been done when opening a notebook. When you switch to an already opened tab, the DOM is already populated and simple hidden with `lm-mod-hidden` and `p-mod-hidden` CSS classes. So when the browser needs to show it again, the cost preliminary steps are not run (so no Forced layout), and the cost is "just": "Recalc Style"->"Layout" all the way down to the Painting and Rasterizing without iteration
@@ -85,29 +79,3 @@ PS: When profiling, classic notebook opens slower than without profiling, which 
 > Comparison
 
 JupyterLab is here 20% slower than Classic Notebook.
-
-## Quick Fix Attempt 1 - Use requestAnimationFrame (non concluding)
-
-Wrapped the cell creation into a requestAnimationFrame call. This produces a different profile pattern (2 heavy sections separated by an inactive one). The Forced layout due to codemirror are still there.
-
-![](images/profiles/89731086-9d4e3100-da44-11ea-9e2b-292f8a14920c.png "")
-
-```javascript
-requestAnimationFrame(() => {
-    const cellDB = this._factory.modelDB!;
-    const cellType = cellDB.createValue(id + '.type');
-    let cell: ICellModel;
-    switch (cellType.get()) {
-        case 'code':
-        cell = this._factory.createCodeCell({ id: id });
-        break;
-        case 'markdown':
-        cell = this._factory.createMarkdownCell({ id: id });
-        break;
-        default:
-        cell = this._factory.createRawCell({ id: id });
-        break;
-    }
-    this._cellMap.set(id, cell);
-});
-```

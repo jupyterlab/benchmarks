@@ -47,9 +47,9 @@ setup(
             "pyyaml",
             "docutils>=0.15",
             "sphinx>=2,<3",
-            "sphinxcontrib-bibtex", 
-            "ipython", 
-            "sphinx-book-theme", 
+            "sphinxcontrib-bibtex",
+            "ipython",
+            "sphinx-book-theme",
             "sphinx_tabs"
         ],
     },
