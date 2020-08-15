@@ -80,6 +80,19 @@ index 2efeee7b3..4716ce9f7 100644
        if (this.modelDB) {
 ```
 
+### Adhoc Fix Attempt 4 - scrollbarStyle: 'null' to the Editor Config
+
+On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): I did some quick experiments, based on some quick profiling results (it seems that the vast majority of time is in browser layout). For example, adding scrollbarStyle: 'null' to the bare editor config in [editor.ts](https://github.com/jupyterlab/jupyterlab/blob/7d1e17381d3ed61c23c189822810e8b4918d57ba/packages/codemirror/src/editor.ts#L1374).
+
+We should benchmark this change.
+
+### Adhoc Fix Attempt 5 - CodeMirror Configuration
+
+We should look how to configure or even update CodeMirror code base to mitigate the numerous Force layout:
+
+- On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): Also editing the codemirror source to avoid measurements (by manually returning what the cached values ended up being) at <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L586> and <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L606> seemed to help a bit. The idea here is that since a single codemirror seems okay, but many codemirrors does not (even when the total number of lines is the same), perhaps we can use measurements from the codemirror to shortcut measurements in all the others, which seem to be causing lots of browser layout time.
+- Read also discussion on [CodeMirror/#/5873](https://github.com/codemirror/CodeMirror/issues/5873).
+
 ## Strategy 3: Virtualized Rendering
 
 Cocalc has been [using react-virtualized](https://github.com/sagemathinc/cocalc/pull/3969).
