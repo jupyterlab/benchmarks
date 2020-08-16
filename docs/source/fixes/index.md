@@ -12,27 +12,27 @@ We can identify differents stategies for the fixes.
 
 Whatever the fix, we want to ensure:
 
-- `Search` functionality is still working like before
+- Searching in the notetbook functionality is still working like before.
+- No negative side-effect should appear.
 
-## Strategy 1: Strip Outputt
+## Strategy 1: Strip Output
 
-We could strip the cell output if too the ouput is too large.
+We could strip the cell output if too the ouput is too large, but this has two limits:
 
-However, tthis does not work for graphical outputs and does not provide any fix for the code editor which is the largest identified performance offender so far.
+1. This does not work for graphical outputs.
+2. This does not provide any fix for the code editor which is the largest identified performance offender so far.
 
 ## Strategy 2: Adhoc Fix
 
-We can think to adhoc fixes.
+We can think to adhoc fixes to bring imporvement that would apply to all or only specific cases.
 
-One way to get adhoc fix would be to further look at `updateEditorOnShow` implemented in [jupyterlab/jupyterlab#5700](https://github.com/jupyterlab/jupyterlab/issues/5700), but [is is already set to false...](https://github.com/jupyterlab/jupyterlab/blob/71f07379b184d5b0b8b67b55163d27194a61a0ac/packages/notebook/src/widget.ts#L493).
+### Update Editor on Show (to be confirmed)
 
-Other adhoc fix to optimize some code sections.
+A candidate fix would be to further look at `updateEditorOnShow` implemented in [jupyterlab/jupyterlab#5700](https://github.com/jupyterlab/jupyterlab/issues/5700), but [is is already set to false...](https://github.com/jupyterlab/jupyterlab/blob/71f07379b184d5b0b8b67b55163d27194a61a0ac/packages/notebook/src/widget.ts#L493).
 
-### Adhoc Fix Attempt 1 - Use requestAnimationFrame (non concluding)
+### Use requestAnimationFrame (non concluding)
 
-Wrapped the cell creation into a requestAnimationFrame call. This produces a different profile pattern (2 heavy sections separated by an inactive one). The Forced layout due to codemirror are still there.
-
-![](images/profiles/89731086-9d4e3100-da44-11ea-9e2b-292f8a14920c.png "")
+Wrapped the cell creation into a requestAnimationFrame call.
 
 ```javascript
 requestAnimationFrame(() => {
@@ -54,13 +54,17 @@ requestAnimationFrame(() => {
 });
 ```
 
-### Adhoc Fix Attempt 2 - Use pushAll cells (non concluding)
+This produces a different profile pattern (2 heavy sections separated by an inactive one). The Forced layout due to codemirror are still there.
+
+![](images/profiles/89731086-9d4e3100-da44-11ea-9e2b-292f8a14920c.png "")
+
+### pushAll cells (non concluding)
 
 We have updated the [celllist#pushAll](https://github.com/jupyterlab/jupyterlab/blob/7d1e17381d3ed61c23c189822810e8b4918d57ba/packages/notebook/src/celllist.ts#L333-L341) code block but it has not brought better performance.
 
 Current attempts have not brought enhancements.
 
-### Adhoc Fix Attempt 3 - Reuse contentFactory in Notebook Model
+### Reuse contentFactory in Notebook Model
 
 We may try to benchmark with this patch. At first user try, this does not give sensible change.
 
@@ -80,32 +84,25 @@ index 2efeee7b3..4716ce9f7 100644
        if (this.modelDB) {
 ```
 
-### Adhoc Fix Attempt 4 - scrollbarStyle: 'null' to the Editor Config
+### scrollbarStyle: 'null' in Editor Config
 
 On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): I did some quick experiments, based on some quick profiling results (it seems that the vast majority of time is in browser layout). For example, adding scrollbarStyle: 'null' to the bare editor config in [editor.ts](https://github.com/jupyterlab/jupyterlab/blob/7d1e17381d3ed61c23c189822810e8b4918d57ba/packages/codemirror/src/editor.ts#L1374).
 
-We should benchmark this change.
+### CodeMirror Configuration
 
-### Adhoc Fix Attempt 5 - CodeMirror Configuration
+We should look how to configure or even update CodeMirror code base to mitigate the numerous Force layout.
 
-We should look how to configure or even update CodeMirror code base to mitigate the numerous Force layout:
+On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): Also editing the codemirror source to avoid measurements (by manually returning what the cached values ended up being) at <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L586> and <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L606> seemed to help a bit. The idea here is that since a single codemirror seems okay, but many codemirrors does not (even when the total number of lines is the same), perhaps we can use measurements from the codemirror to shortcut measurements in all the others, which seem to be causing lots of browser layout time.
 
-- On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): Also editing the codemirror source to avoid measurements (by manually returning what the cached values ended up being) at <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L586> and <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L606> seemed to help a bit. The idea here is that since a single codemirror seems okay, but many codemirrors does not (even when the total number of lines is the same), perhaps we can use measurements from the codemirror to shortcut measurements in all the others, which seem to be causing lots of browser layout time.
-- Read also discussion on [CodeMirror/#/5873](https://github.com/codemirror/CodeMirror/issues/5873).
+Read also the discussion on [CodeMirror/#/5873](https://github.com/codemirror/CodeMirror/issues/5873).
 
 ## Strategy 3: Virtualized Rendering
 
-Cocalc has been [using react-virtualized](https://github.com/sagemathinc/cocalc/pull/3969).
-
-We should look at this to understand how this could help.
-
-Virtualization complexity and potential side-effects (search...) have to be taken into account.
+Cocalc has been [using react-virtualized](https://github.com/sagemathinc/cocalc/pull/3969). We should look at this to understand how this could help Virtualization complexity and potential side-effects (search...) have to be taken into account.
 
 ### Intersection Observer
 
 We can think to more generic fixes like using [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API).
-
-Useful links.
 
 - [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 - [Intersection Observer API - Timing](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API/Timing_element_visibility)
@@ -126,23 +123,24 @@ The strategy would be:
 
 ### React Virtualized / Windowing
 
-An preliminary step is to wrap Notebook into React (see this PR [Try Notebok React component](https://github.com/jupyterlab/benchmarks/issues/15).
-
-Then we could use React virtualisation libraries.
+An preliminary step is to wrap Notebook into React (see this PR [Try Notebok React component](https://github.com/jupyterlab/benchmarks/issues/15)). Then we could use React virtualisation libraries.
 
 - [Creating More Efficient React Views with Windowing - ForwardJS San Francisco](https://www.youtube.com/watch?v=t4tuhg7b50I)
 - [Rendering large lists with React Virtualized](https://www.youtube.com/watch?v=UrgfPjX97Yg)
+
 - [React Virtualized](https://github.com/bvaughn/react-virtualized)
 - [React Window](https://github.com/bvaughn/react-window)
+
 - [Rendering large lists with react-virtualized or react-window](https://www.youtube.com/watch?v=QhPn6hLGljU)
-- https://addyosmani.com/blog/react-window
-- https://github.com/falinsky/tmdb-viewer (react-virtualized) https://tmdb-viewer.surge.sh
-- https://github.com/giovanni0918/tmdb-viewer (react-window)
+- <https://addyosmani.com/blog/react-window>
+- <https://github.com/falinsky/tmdb-viewer> (react-virtualized) https://tmdb-viewer.surge.sh
+- <https://github.com/giovanni0918/tmdb-viewer> (react-window)
+
 - [React Virtual](https://github.com/tannerlinsley/react-virtual)
 
 ## Strategy 4: DOM Optimization
 
-DOM optimization backed by libraries or new browser features
+DOM optimization backed by libraries or new browser features can be considered.
 
 ### Shadow DOM
 
@@ -165,13 +163,11 @@ We compare `f7b7ee7` vs `1f15fcb` and find that Shadow DOM made switching notebo
 
 ### Content Visibility
 
-We should try the upcoming [content visibility](https://web.dev/content-visibility) (supported in Chromium 85).
-
-See also [Display Locking library](https://github.com/wicg/display-locking) for the related Display Locking spec.
+We should try the upcoming [content visibility](https://web.dev/content-visibility) (supported in Chromium 85). See also [Display Locking library](https://github.com/wicg/display-locking) for the related Display Locking spec.
 
 ### Fast DOM
 
-[FastDOM](https://github.com/wilsonpage/fastdom) is a libraary that eliminates layout thrashing by batching DOM measurement and mutation tasks.
+[FastDOM](https://github.com/wilsonpage/fastdom) is a library that eliminates layout thrashing by batching DOM measurement and mutation tasks.
  
 ## Strategy 5: Web Workers
 
@@ -183,10 +179,11 @@ Web Workers makes it possible to run a script operation in a background thread s
 
 ## Strategy 6: React Optimization
 
-For React componentts, [React Concurrency](https://reactjs.org/docs/concurrent-mode-intro.html#concurrency) can be used.
+We can inject more React into the UI components and see if it makes life easier to get better performance.
+
+- For React components, [React Concurrency](https://reactjs.org/docs/concurrent-mode-intro.html#concurrency) can be used.
+- [Try Notebok React component](https://github.com/jupyterlab/benchmarks/issues/15) to wrap the outputs in React.
 
 ## Strategy 7: Browser Configuration
 
-From this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674411129).
-
-Webrender for Firefox 79 (for many linux and macos devices, see <https://wiki.mozilla.org/Platform/GFX/WebRender_Where>  can be turned on via a pref. See also <https://www.techrepublic.com/article/how-to-enable-firefox-webrender-for-faster-page-rendering>. Note that windows firefox has had webrender turned on by default in certain cases for a while now.
+From this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674411129): Webrender for Firefox 79 (for many linux and macos devices, see <https://wiki.mozilla.org/Platform/GFX/WebRender_Where>  can be turned on via a pref. See also <https://www.techrepublic.com/article/how-to-enable-firefox-webrender-for-faster-page-rendering>. Note that windows firefox has had webrender turned on by default in certain cases for a while now.

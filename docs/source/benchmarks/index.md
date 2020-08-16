@@ -27,19 +27,19 @@ env 'BENCHMARK_NOTEBOOKS=["./longOutput", "./manyOutputs"]' jlpm all
 
 `BENCHMARK_NOTEBOOKS` should be a list strings that node can import that return a description of how to create a notebook.
 
-They should have a default export of the type `NotebookType` in [`./src/notebookType.ts`](./src/notebookType.ts).
+They should have a default export of the type `NotebookType` in [`notebookType.ts`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebookType.ts).
 
 If you don't provide it, it will be run against all built in benchmark, which require installing some extensions below. It will keep increasing the `n` until either it reaches a maximum or the time exceeds a certain budget. It will run on both firefox and chrome.
 
-The available notebook definitions are located in the `./src/notebooks` folder (some of those like the `plotly` and the `fixed-data-tables` need specific configuration as details in the next section to activate the extension):
+The available notebook definitions are located in the [/src/notebooks](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/) folder (some of those like the `plotly` and the `fixed-data-tables` need specific configuration as details in the next section to activate the extension):
 
-- [`./src/notebooks/errorOutputs.ts`](./src/notebooks/errorOutputs.ts).
-- [`./src/notebooks/fixedDataTable.ts`](./src/notebooks/fixedDataTable.ts).
-- [`./src/notebooks/largePlotly.ts`](./src/notebooks/largePlotly.ts).
-- [`./src/notebooks/longOutput.ts`](./src/notebooks/longOutput.ts).
-- [`./src/notebooks/manyCells.ts`](./src/notebooks/manyCells.ts).    
-- [`./src/notebooks/manyOutputs.ts`](./src/notebooks/manyOutputs.ts).
-- [`./src/notebooks/manyPlotly.ts`](./src/notebooks/manyPlotly.ts).
+- [`errorOutputs.ts`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/errorOutputs.ts).
+- [`fixedDataTable.ts`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/fixedDataTable.ts).
+- [`largePlotly.ts`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/largePlotly.ts).
+- [`longOutput.ts`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/longOutput.ts).
+- [`manyCells.ts`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/manyCells.ts).    
+- [`manyOutputs.ts`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/manyOutputs.ts).
+- [`manyPlotly.ts`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/manyPlotly.ts).
 
 ## Plotly
 
@@ -48,7 +48,7 @@ how rendering time is impacted by heavier mime render types:
 
 First add the plotly and ipywidgets to the `dev_mode/package.json`:
 
-```json
+```
     "externalExtensions": {
       "@jupyter-widgets/jupyterlab-manager": "2.0.0",
       "plotlywidget": "1.5.4",
@@ -73,7 +73,7 @@ env 'BENCHMARK_NOTEBOOKS=["./largePlotly", "./manyPlotly"]' jlpm all
 We add support for testing against a mime render of [`fixed-data-table-2`](https://github.com/schrodinger/fixed-data-table-2) which
 is an example of a cell output that takes a while to render:
 
-```json
+```
     "externalExtensions": {
       "fdtmime": "file:../benchmarks/extensions/fixed-data-table"
     },
