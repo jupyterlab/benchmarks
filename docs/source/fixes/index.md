@@ -106,12 +106,8 @@ We can think to more generic fixes like using [Intersection Observer API](https:
 
 - [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 - [Intersection Observer API - Timing](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API/Timing_element_visibility)
-- [React Intersection Observer](https://github.com/thebuilder/react-intersection-observer)
-- https://react-intersection-observer.now.sh
-- https://webdesign.tutsplus.com/tutorials/how-to-intersection-observer--cms-30250
-- https://css-tricks.com/a-few-functional-uses-for-intersection-observer-to-know-when-an-element-is-in-view
 
-The strategy would be:
+The strategy for a notebook would be:
 
 - Use an intersection observer to only render cells (input + output) on screen on page load.
 - As there are free cycles, render the rest of the notebook.
@@ -120,6 +116,17 @@ The strategy would be:
 - All non-loaded cells will need a cheap div that takes approx the same amount of space and has clear loading text.
 - Add UI elements to indicate a notebook is still loading so that users don't search and not find something on the page.
 - Do not load any notebook that is not visible (i.e. when you open a workspace and have notebooks that are not visible, they should not be rendered).
+
+Tutorials
+
+- https://webdesign.tutsplus.com/tutorials/how-to-intersection-observer--cms-30250
+- https://css-tricks.com/a-few-functional-uses-for-intersection-observer-to-know-when-an-element-is-in-view
+
+React
+
+- [React Intersection Observer (thebuilder)](https://github.com/thebuilder/react-intersection-observer) ([storybook](https://react-intersection-observer.now.sh))
+- [React Intersection Observer (researchgate)](https://github.com/researchgate/react-intersection-observer) ([storybook](https://researchgate.github.io/react-intersection-observer))
+- [React Cool Inview](https://github.com/wellyshen/react-cool-inview) ([example](https://react-cool-inview.netlify.app))
 
 ### React Virtualized / Windowing
 
@@ -140,7 +147,7 @@ An preliminary step is to wrap Notebook into React (see this PR [Try Notebok Rea
 
 ## Strategy 4: DOM Optimization
 
-DOM optimization backed by libraries or new browser features can be considered.
+DOM optimization backed by libraries (fast dom...) or new browser features (content visibility...) can be considered.
 
 ### Shadow DOM
 
