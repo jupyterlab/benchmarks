@@ -3,11 +3,11 @@
 We can identify differents stategies for the fixes.
 
 1. Strategy 1: Strip Output
-1. Strategy 2: Adhoc Fix
+1. Strategy 2: Adhoc Fixes
 1. Strategy 3: Virtualized Rendering
 1. Strategy 4: DOM Optimization
 1. Strategy 5: Web Workers
-1. Strategy 6: React Optimization
+1. Strategy 6: Core React Optimization
 1. Strategy 7: Browser Configuration
 
 Whatever the fix, we want to ensure:
@@ -22,13 +22,9 @@ We could strip the cell output if too the ouput is too large, but this has two l
 1. This does not work for graphical outputs.
 2. This does not provide any fix for the code editor which is the largest identified performance offender so far.
 
-## Strategy 2: Adhoc Fix
+## Strategy 2: Adhoc Fixes
 
-We can think to adhoc fixes to bring imporvement that would apply to all or only specific cases.
-
-### Update Editor on Show (to be confirmed)
-
-A candidate fix would be to further look at `updateEditorOnShow` implemented in [jupyterlab/jupyterlab#5700](https://github.com/jupyterlab/jupyterlab/issues/5700), but [is is already set to false...](https://github.com/jupyterlab/jupyterlab/blob/71f07379b184d5b0b8b67b55163d27194a61a0ac/packages/notebook/src/widget.ts#L493).
+We can think to adhoc fixes to bring improvements that would apply specific (or all) cases.
 
 ### Use requestAnimationFrame (non concluding)
 
@@ -58,7 +54,11 @@ This produces a different profile pattern (2 heavy sections separated by an inac
 
 ![](images/profiles/89731086-9d4e3100-da44-11ea-9e2b-292f8a14920c.png "")
 
-### pushAll cells (non concluding)
+### Update Editor on Show (to be confirmed)
+
+A candidate fix would be to further look at `updateEditorOnShow` implemented in [jupyterlab/jupyterlab#5700](https://github.com/jupyterlab/jupyterlab/issues/5700), but [is is already set to false...](https://github.com/jupyterlab/jupyterlab/blob/71f07379b184d5b0b8b67b55163d27194a61a0ac/packages/notebook/src/widget.ts#L493).
+
+### Use pushAll cells insted of push (non concluding)
 
 We have updated the [celllist#pushAll](https://github.com/jupyterlab/jupyterlab/blob/7d1e17381d3ed61c23c189822810e8b4918d57ba/packages/notebook/src/celllist.ts#L333-L341) code block but it has not brought better performance.
 
@@ -84,13 +84,15 @@ index 2efeee7b3..4716ce9f7 100644
        if (this.modelDB) {
 ```
 
-### scrollbarStyle: 'null' in Editor Config
+### Use scrollbarStyle: 'null' in Editor Config
 
 On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): I did some quick experiments, based on some quick profiling results (it seems that the vast majority of time is in browser layout). For example, adding scrollbarStyle: 'null' to the bare editor config in [editor.ts](https://github.com/jupyterlab/jupyterlab/blob/7d1e17381d3ed61c23c189822810e8b4918d57ba/packages/codemirror/src/editor.ts#L1374).
 
-### CodeMirror Configuration
+### Further Tune CodeMirror Configuration
 
 We should look how to configure or even update CodeMirror code base to mitigate the numerous Force layout.
+
+### Enhance CodeMirror Code Base
 
 On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): Also editing the codemirror source to avoid measurements (by manually returning what the cached values ended up being) at <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L586> and <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L606> seemed to help a bit. The idea here is that since a single codemirror seems okay, but many codemirrors does not (even when the total number of lines is the same), perhaps we can use measurements from the codemirror to shortcut measurements in all the others, which seem to be causing lots of browser layout time.
 
@@ -119,10 +121,14 @@ The strategy for a notebook would be:
 
 Tutorials
 
-- https://webdesign.tutsplus.com/tutorials/how-to-intersection-observer--cms-30250
-- https://css-tricks.com/a-few-functional-uses-for-intersection-observer-to-know-when-an-element-is-in-view
+- <https://webdesign.tutsplus.com/tutorials/how-to-intersection-observer--cms-30250>
+- <https://css-tricks.com/a-few-functional-uses-for-intersection-observer-to-know-when-an-element-is-in-view>
 
 React
+
+An preliminary step is to wrap Notebook into React (see this PR [Try Notebok React component](https://github.com/jupyterlab/benchmarks/issues/15)).
+
+Then we could use React Intersection Obsever libraries.
 
 - [React Intersection Observer (thebuilder)](https://github.com/thebuilder/react-intersection-observer) ([storybook](https://react-intersection-observer.now.sh))
 - [React Intersection Observer (researchgate)](https://github.com/researchgate/react-intersection-observer) ([storybook](https://researchgate.github.io/react-intersection-observer))
@@ -130,7 +136,9 @@ React
 
 ### React Virtualized / Windowing
 
-An preliminary step is to wrap Notebook into React (see this PR [Try Notebok React component](https://github.com/jupyterlab/benchmarks/issues/15)). Then we could use React virtualisation libraries.
+An preliminary step is to wrap Notebook into React (see this PR [Try Notebok React component](https://github.com/jupyterlab/benchmarks/issues/15)).
+
+Then we could use React virtualisation libraries.
 
 - [Creating More Efficient React Views with Windowing - ForwardJS San Francisco](https://www.youtube.com/watch?v=t4tuhg7b50I)
 - [Rendering large lists with React Virtualized](https://www.youtube.com/watch?v=UrgfPjX97Yg)
@@ -178,15 +186,15 @@ We should try the upcoming [content visibility](https://web.dev/content-visibili
  
 ## Strategy 5: Web Workers
 
-Web Workers makes it possible to run a script operation in a background thread separate from the main execution thread of a web application. The advantage of this is that laborious processing can be performed in a separate thread, allowing the main (usually the UI) thread to run without being blocked/slowed down.
+[Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) makes it possible to run a script operation in a background thread separate from the main execution thread of a web application. The advantage of this is that laborious processing can be performed in a separate thread, allowing the main (usually the UI) thread to run without being blocked/slowed down.
 
-- [Web Workers API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)  
-- [Service Workers](https://developers.google.com/web/fundamentals/primers/service-workers)  
-- [React and Webworkers](https://github.com/facebook/react/issues/3092#issuecomment-333417970)  
+- [Web Workers API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)
+- [Service Workers](https://developers.google.com/web/fundamentals/primers/service-workers)
+- [React and Webworkers](https://github.com/facebook/react/issues/3092#issuecomment-333417970)
 
-## Strategy 6: React Optimization
+## Strategy 6: Rely more on core React Optimization
 
-We can inject more React into the UI components and see if it makes life easier to get better performance.
+We can inject more React into the UI components and see if it makes life easier to get better performance using core React performance features.
 
 - For React components, [React Concurrency](https://reactjs.org/docs/concurrent-mode-intro.html#concurrency) can be used.
 - [Try Notebok React component](https://github.com/jupyterlab/benchmarks/issues/15) to wrap the outputs in React.
