@@ -1,13 +1,13 @@
-# Fixes
+# Fix Strategies
 
-We can identify differents stategies for the fixes.
+Differents stategies can be identified for the fixes.
 
 1. Strategy 1: Strip Output
 1. Strategy 2: Adhoc Fixes
 1. Strategy 3: Virtualized Rendering
 1. Strategy 4: DOM Optimization
 1. Strategy 5: Web Workers
-1. Strategy 6: Core React Optimization
+1. Strategy 6: Core React
 1. Strategy 7: Browser Configuration
 
 Whatever the fix, we want to ensure:
@@ -192,7 +192,7 @@ We should try the upcoming [content visibility](https://web.dev/content-visibili
 - [Service Workers](https://developers.google.com/web/fundamentals/primers/service-workers)
 - [React and Webworkers](https://github.com/facebook/react/issues/3092#issuecomment-333417970)
 
-## Strategy 6: Rely more on core React Optimization
+## Strategy 6: Core React
 
 We can inject more React into the UI components and see if it makes life easier to get better performance using core React performance features.
 

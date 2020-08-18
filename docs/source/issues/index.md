@@ -1,4 +1,4 @@
-# Issues
+# Performance Issues
 
 Some opened issues on [JupyterLab repository](https://github.com/jupyterlab/jupyterlab).
 

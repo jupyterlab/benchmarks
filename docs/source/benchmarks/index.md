@@ -1,4 +1,4 @@
-# Benchmarks
+# Benchmarks Tooling
 
 This package contains some scripts to run benchmarks against JupyterLab.
 

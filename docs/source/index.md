@@ -5,15 +5,15 @@ JupyterLab Benchmarks Documentation
 
 This project goal is a place to make JupyerLab fast. For now, the scope is to optimize:
 
-- Tab loading / switching speed for various content (300-500 ms switch time)
-- Opening a new document
+- Opening a new notebook document.
+- Tab loading and switching speed for various notebook content. An acceptable time is 300-500 ms switch time.
 
 Out of scope (could become later in scope):
 
-- Initial server start
-- Initial page loading
-- Build time
-- Page Save time
+- Initial server start.
+- Initial page loading.
+- Build time.
+- Page Save time.
 
 We iterate in steps:
 
@@ -55,3 +55,12 @@ caption: Fixes
 ---
 fixes/index
 ```
+
+```{toctree}
+---
+maxdepth: 2
+caption: Links
+---
+GitHub repo <https://github.com/jupyterlab/benchmarks>
+```
+

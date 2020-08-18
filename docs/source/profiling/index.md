@@ -1,4 +1,4 @@
-# Profiling
+# Browser Profiling
 
 We invite you reading the [anatomy of a frame](https://aerotwist.com/blog/the-anatomy-of-a-frame/) to understand this figure (taken from a download of [this zip file](https://aerotwist.com/static/blog/the-anatomy-of-a-frame/anatomy-of-a-frame.zip)).
 
