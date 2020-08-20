@@ -42,7 +42,7 @@ setup(
         ],
         # Note: This is only required for internal use
         "rtd": [
-            "myst_parser",
+            "myst_parser==0.11.2",
             "markdown-it-py~=0.4.5",
             "pyyaml",
             "docutils>=0.15",
