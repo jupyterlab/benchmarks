@@ -42,11 +42,10 @@ setup(
         ],
         # Note: This is only required for internal use
         "rtd": [
-            "myst_parser==0.11.2",
-            "markdown-it-py~=0.4.5",
+            "myst_parser",
             "pyyaml",
             "docutils>=0.15",
-            "sphinx>=2,<3",
+            "sphinx",
             "sphinxcontrib-bibtex",
             "ipython",
             "sphinx-book-theme",
