@@ -133,6 +133,7 @@ Then we could use React Intersection Obsever libraries.
 - [React Intersection Observer (thebuilder)](https://github.com/thebuilder/react-intersection-observer) ([storybook](https://react-intersection-observer.now.sh))
 - [React Intersection Observer (researchgate)](https://github.com/researchgate/react-intersection-observer) ([storybook](https://researchgate.github.io/react-intersection-observer))
 - [React Cool Inview](https://github.com/wellyshen/react-cool-inview) ([example](https://react-cool-inview.netlify.app))
+- [react-infinite-grid-scroller](https://github.com/HenrikBechmann/react-infinite-grid-scroller) (horizontal and vertical scrolling)
 
 ### React Virtualized / Windowing
 
