@@ -5,8 +5,8 @@
 import makeNotebook from './../makeNotebook';
 import NotebookType from './../notebookType';
 
-const CELLS_MULTIPLIER = 100;
-const CODE_CELL_RATIO = 0.9;
+export const CELLS_MULTIPLIER = Number(process.env['CELLS_MULTIPLIER'] || 5);  // Default was 100
+export const CODE_CELL_RATIO = Number(process.env['CODE_CELL_RATIO'] || 0.9);
 
 export default {
   label: `n*${CELLS_MULTIPLIER} with 2 LOC and 2 outputs per cell (${CODE_CELL_RATIO * 100}% code)`,
