@@ -23,7 +23,7 @@ jobs:
         PYTHON: [3.8]
         NODEJS: [12.x]
         # JupyterLab [older-commit, newer-commit]
-        JLAB_COMMITS: [f7b7ee7, 1f15fcb]
+        JLAB_COMMITS: [1f15fcb, f7b7ee7]
         # Benchmarks
         # Results in 100/(21 - 1)... n=0,5,10,15...
         BENCHMARK_MAX_N: [100]          # Default is 100
@@ -36,7 +36,7 @@ jobs:
         # manyOutputs.ts
         MANY_OUTPUTS: [100]             # Default is 100
       fail-fast: false
-    timeout-minutes: 40
+    timeout-minutes: 50
     steps:
       - name: Set up Python
         uses: actions/setup-python@v1
@@ -68,7 +68,12 @@ jobs:
         uses: GabrielBB/xvfb-action@v1.2
         with:
           run: jlpm ci
-      - uses: actions/upload-artifact@v2
+      - name: Remove notebook checkpoints and copy to artifacts folder
+        run: |
+          rm -rf data/.ipynb_checkpoints/
+          cp -r ./data ./packages/compare/data
+      - name: Upload benchmark csv and notebook data artifacts
+        uses: actions/upload-artifact@v2
         with:
           name: benchmarks
           path: |
@@ -84,8 +89,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: linux
     env:
-      OLD_JLAB_COMMIT: f7b7ee7
-      NEW_JLAB_COMMIT: 1f15fcb
+      OLD_JLAB_COMMIT: 1f15fcb
+      NEW_JLAB_COMMIT: f7b7ee7
     strategy:
       matrix:
         PYTHON: [3.8]
@@ -109,7 +114,7 @@ jobs:
           npm install
       - name: List python dependencies
         run: pip list
-      - name: Download the output data from previous jobs
+      - name: Download the benchmark data from previous jobs
         uses: actions/download-artifact@v2
         with:
           name: benchmarks
