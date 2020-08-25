@@ -93,13 +93,13 @@ function writeOutput({
      */
     async function waitForNotebook(id: string): Promise<void> {
       await page.waitForSelector(`#${id}`, {
-        visibility: 'visible'
+        state: "visible"
       });
       await page.waitForSelector(`#${id} .jp-Notebook-cell`, {
-        visibility: 'visible'
+        state: "visible"
       });
       await page.waitForSelector(`#${id} .jp-Spinner`, {
-        visibility: 'hidden'
+        state: "hidden"
       });
     }
 
@@ -119,7 +119,7 @@ function writeOutput({
     }
 
     const waitForLaunch = () =>
-      page.waitForSelector('.jp-Launcher', { visibility: 'visible' });
+      page.waitForSelector('.jp-Launcher', { state: "visible" });
     // Go to reset for a new workspace
     await page.goto('http://localhost:9999/lab?reset');
 
@@ -185,6 +185,8 @@ function writeOutput({
           await waitForNotebook(id);
           await waitFor({ widgetID: id, page });
           const time = await endTime();
+          // wait for 2 seconds
+          await page.waitForTimeout(1000);
           console.log(`     time=${time}`);
           await writeOutput({
             mode: 'open',
@@ -203,7 +205,7 @@ function writeOutput({
 
       // Then switch between them repeatedly
       for (let i = 0; i < SWITCHES; i++) {
-        console.log(`   i=${i}/${SWITCHES}`);
+        console.log(`   i=${i}/${SWITCHES - 1}`);
         for (const { type, id } of widgets) {
           console.log(`    type=${type}`);
           await startTime();
@@ -219,6 +221,8 @@ function writeOutput({
               page
             });
           const time = await endTime();
+          // wait for 2 seconds
+          await page.waitForTimeout(1000);
           console.log(`     time=${time}`);
           totalTimes.set(type, (totalTimes.get(type) || 0) + time);
           await writeOutput({
@@ -245,7 +249,22 @@ function writeOutput({
       }`);
       await waitForLaunch();
     }
-    // browserVersions[browserName] = browser.version();
+    // Version is only available on 1.3.0, using 1.0.2 for now
+    let browserVerion: string;
+    try {
+      browserVerion = (browser as any).version();
+    } catch {
+      browserVerion = '';
+    }
+
+    if (!browserVerion) {
+      if (browserName === "chromium") {
+        browserVerion = "84.0.4135.0";
+      } else if (browserName === "firefox"){
+        browserVerion = "76.0b5";
+      }
+    }
+    browserVersions[browserName] = browserVerion;
     await browser.close();
   }
   // Write a metadata file for the run to json file with the same

@@ -18,7 +18,7 @@
     "@stdlib/stdlib": "0.0.92",
     "csv-parser": "2.3.3",
     "neat-csv": "5.2.0",
-    "playwright": "0.11.1",
+    "playwright": "1.0.2",
     "systeminformation": "^4.27.0"
   },
   "devDependencies": {

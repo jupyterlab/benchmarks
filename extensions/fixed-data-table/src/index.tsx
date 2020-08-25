@@ -73,6 +73,7 @@ export class OutputWidget extends ReactWidget implements IRenderMime.IRenderer {
         width={800}
         height={500}
         headerHeight={50}
+        style={{"content-visibility": "auto", "contain-intrinsic-size": "400px"}}
       >
         {columns}
       </Table>
