@@ -1,6 +1,5 @@
 # Exclude.
 
-.*
 out.*
 *.csv
 *.png
@@ -23,3 +22,4 @@ __pycache__
 !**/.*rc
 !**/.*rc.js
 !docs/**/*.png
+.DS_Store

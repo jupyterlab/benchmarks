@@ -5,8 +5,10 @@
 import makeNotebook from './../makeNotebook';
 import NotebookType from './../notebookType';
 
+export const MANY_OUTPUTS = Number(process.env['MANY_OUTPUTS'] || 100);
+
 export default {
-  label: '100 n outputs each of a div',
+  label: `${MANY_OUTPUTS} n outputs each of a div`,
   waitFor: async () => null,
   notebook: (n: number) =>
     makeNotebook([
@@ -14,7 +16,7 @@ export default {
         cell_type: 'code',
         execution_count: 1,
         metadata: {},
-        outputs: Array.from({ length: n * 100 }, (_, i) => ({
+        outputs: Array.from({ length: n * MANY_OUTPUTS }, (_, i) => ({
           data: {
             'text/plain': [
               `'I am a long string which is repeatedly added to the dom in separated divs: ${i}'`
@@ -26,7 +28,7 @@ export default {
         source: [
           'from IPython.display import display\n',
           '\n',
-          `for i in range(${n * 100}):\n`,
+          `for i in range(${n * MANY_OUTPUTS}):\n`,
           "    display('I am a long string which is repeatedly added to the dom in separated divs: %d' % i)"
         ]
       }

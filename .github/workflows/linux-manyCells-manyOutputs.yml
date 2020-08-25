@@ -1,0 +1,139 @@
+name: Linux-manyCells-manyOutputs
+on: push
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    env:
+      JLAB_HOME: '/home/runner/work/benchmarks/jupyterlab'
+      # BENCHMARKS
+      BENCHMARK_NOTEBOOKS: '["./manyCells", "./manyOutputs"]'
+      BENCHMARK_MAX_N: ${{ matrix.BENCHMARK_MAX_N }}
+      BENCHMARK_NUMBER_SAMPLES: ${{ matrix.BENCHMARK_NUMBER_SAMPLES }}
+      BENCHMARK_SWITCHES: ${{ matrix.BENCHMARK_SWITCHES }}
+      BENCHMARK_MAX_TIME: ${{ matrix.BENCHMARK_MAX_TIME }}
+      BENCHMARK_OUTPUT: ${{ matrix.JLAB_COMMITS }}-manyCells-manyOutputs-${{ matrix.CELLS_MULTIPLIER }}-${{ matrix.CODE_CELL_RATIO }}-${{ matrix.MANY_OUTPUTS }}.csv
+      # manyCells.ts
+      CELLS_MULTIPLIER: ${{ matrix.CELLS_MULTIPLIER }}
+      CODE_CELL_RATIO: ${{ matrix.CODE_CELL_RATIO }}
+      # manyOutputs.ts
+      MANY_OUTPUTS: ${{ matrix.MANY_OUTPUTS }}
+    strategy:
+      matrix:
+        PYTHON: [3.8]
+        NODEJS: [12.x]
+        # JupyterLab [older-commit, newer-commit]
+        JLAB_COMMITS: [1f15fcb, f7b7ee7]
+        # Benchmarks
+        # Results in 100/(21 - 1)... n=0,5,10,15...
+        BENCHMARK_MAX_N: [100]          # Default is 100
+        BENCHMARK_NUMBER_SAMPLES: [21]  # Default is 20
+        BENCHMARK_SWITCHES: [10]
+        BENCHMARK_MAX_TIME: [5000]      # Default is 5000
+        # manyCells.ts
+        CELLS_MULTIPLIER: [5]           # Default is 100
+        CODE_CELL_RATIO: [0.9, 0.6]     # Default is 0.9
+        # manyOutputs.ts
+        MANY_OUTPUTS: [100]             # Default is 100
+      fail-fast: false
+    timeout-minutes: 50
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.PYTHON }}
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.NODEJS }}
+      - name: Install JupyterLab
+        run: |
+          cd ..
+          git clone https://github.com/jupyterlab/jupyterlab.git
+          cd jupyterlab
+          git checkout ${{ matrix.JLAB_COMMITS }}
+          pip install -e .
+          jlpm install
+          jlpm run build
+      - name: Install playwright action
+        uses: microsoft/playwright-github-action@v1
+      - name: Checkout benchmarks repository
+        uses: actions/checkout@v2
+      - name: Install benchmarks
+        run: |
+          jlpm
+      - name: List python dependencies
+        run: pip list
+      - name: Run benchmarks
+        uses: GabrielBB/xvfb-action@v1.2
+        with:
+          run: jlpm ci
+      - name: Remove notebook checkpoints and copy to artifacts folder
+        run: |
+          rm -rf data/.ipynb_checkpoints/
+          cp -r ./data ./packages/compare/data
+      - name: Upload benchmark csv and notebook data artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: benchmarks
+          path: |
+            *.csv
+            *.json
+            !analysis.vl.json
+            !comparison.vl.json
+            !package.json
+            !tsconfig.json
+
+  linux-compare:
+    name: Linux
+    runs-on: ubuntu-latest
+    needs: linux
+    env:
+      OLD_JLAB_COMMIT: 1f15fcb
+      NEW_JLAB_COMMIT: f7b7ee7
+    strategy:
+      matrix:
+        PYTHON: [3.8]
+        NODEJS: [12.x]
+      fail-fast: false
+    timeout-minutes: 10
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.PYTHON }}
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.NODEJS }}
+      - name: Checkout benchmarks repository
+        uses: actions/checkout@v2
+      - name: Install compare tools
+        run: |
+          cd packages/compare
+          npm install
+      - name: List python dependencies
+        run: pip list
+      - name: Download the benchmark data from previous jobs
+        uses: actions/download-artifact@v2
+        with:
+          name: benchmarks
+          path: packages/compare
+      - name: Check
+        run: |
+          cd packages/compare
+          ls
+      - name: Run compare python script
+        run: |
+          cd packages/compare
+          python compare.py
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results
+          path: |
+            packages/compare/*.csv
+            packages/compare/*.json
+            packages/compare/*.vl.json
+            !packages/compare/package.json
+            !packages/compare/package-lock.json
+            !packages/compare/tsconfig.json

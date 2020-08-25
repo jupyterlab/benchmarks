@@ -117,3 +117,7 @@ In firefox opening a notebook with one output with 100 n divs where n=0 is betwe
 ```
 
 That's the same information as in the graph, but expressed as English.
+
+## Continuous Integration
+
+Currently we run the `manyCells-ManyOutputs` tests on CI using Github Actions.

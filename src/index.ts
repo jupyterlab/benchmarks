@@ -7,7 +7,10 @@ import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as playwright from 'playwright';
 import * as util from 'util';
+import * as si from 'systeminformation';
 import NotebookType from './notebookType';
+import { CELLS_MULTIPLIER, CODE_CELL_RATIO } from './notebooks/manyCells';
+import { MANY_OUTPUTS } from './notebooks/manyOutputs';
 
 const DATA_PATH = process.env['BENCHMARK_OUTPUT'] || 'out.csv';
 
@@ -16,13 +19,15 @@ const BROWSERS: Array<'firefox' | 'chromium'> = ['firefox', 'chromium'];
 // The maximum N
 const MAX_N = Number(process.env['BENCHMARK_MAX_N'] || 100);
 // The number of different n's to try out
-const NUMBER_SAMPLES = Number(process.env['BENCHMARK_NUMBER_SAMPLES'] || 20);
+const NUMBER_SAMPLES = Number(process.env['BENCHMARK_NUMBER_SAMPLES'] || 21);  // Default is 20
 // How many times to switch between each notebook
 const SWITCHES = Number(process.env['BENCHMARK_SWITCHES'] || 10);
 // Max time to stop testing if mean of previous sample was > this
-const MAX_TIME = Number(process.env['BENCHMARK_MAX_TIME'] || 5 * 1000);
+const MAX_TIME = Number(process.env['BENCHMARK_MAX_TIME'] || 5 * 1000);  // Default is 5 * 1000
 // Selector timeout in milliseconds
 const TIME_OUT = 5 * 60 * 1000;
+
+const browserVersions: any = {};
 
 const notebookEnv = process.env.BENCHMARK_NOTEBOOKS;
 const NOTEBOOK_PACKAGES: Array<string> = notebookEnv
@@ -70,6 +75,7 @@ function writeOutput({
      */
     const tooLong = new Set<string>();
     const browser = await playwright[browserName].launch({ headless: false });
+    // const browserVersion = await browser.version();
     const context = await browser.newContext();
     context.setDefaultTimeout(TIME_OUT);
     const page = await context.newPage();
@@ -163,7 +169,7 @@ function writeOutput({
 
         let id: string;
         for (let i = 0; i < SWITCHES; i++) {
-          console.log(`    i=${i}/${SWITCHES}`);
+          console.log(`    i=${i}/${SWITCHES - 1}`);
           await page.evaluate(
             'window.currentWidget ? window.currentWidget.dispose() : null'
           );
@@ -226,6 +232,7 @@ function writeOutput({
       }
       checkTimes();
       console.log(`  cleaning`);
+
       // dipose directly instead of using `jupyterlab.shell.closeAll()` so that
       // no dialogues will pop up if notebooks are dirty
       await page.evaluate(`{
@@ -238,8 +245,41 @@ function writeOutput({
       }`);
       await waitForLaunch();
     }
+    // browserVersions[browserName] = browser.version();
     await browser.close();
   }
+  // Write a metadata file for the run to json file with the same
+  // prefix as DATA_PATH
+  const cpu = await si.cpu()
+  const mem = await si.mem()
+  const osInfo = await si.osInfo()
+
+  let metadata: any = {
+    browsers: browserVersions,
+    notebookPackages: NOTEBOOK_PACKAGES,
+    benchmark: {
+      BENCHMARK_OUTPUT: DATA_PATH,
+      BENCHMARK_MAX_N: MAX_N,
+      BENCHMARK_NUMBER_SAMPLES: NUMBER_SAMPLES,
+      BENCHMARK_SWITCHES: SWITCHES,
+      BENCHMARK_MAX_TIME: MAX_TIME,
+      TIME_OUT: TIME_OUT
+    },
+    manyCells: {
+      CELLS_MULTIPLIER: CELLS_MULTIPLIER,
+      CODE_CELL_RATIO: CODE_CELL_RATIO
+    },
+    manyOutputs: {
+      MANY_OUTPUTS: MANY_OUTPUTS,
+    },
+    systemInformation: {
+      cpu: cpu,
+      mem: mem,
+      osInfo: osInfo
+    }
+  }
+  const metadataPath: string = DATA_PATH.replace(".csv", ".json");
+  fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 1));
 })()
   .then(() => stream.close())
   .catch(reason => {

@@ -5,19 +5,21 @@
   "scripts": {
     "build:jlab": "cd $JLAB_HOME && jlpm run build",
     "build:benchmark": "tsc",
-    "start:jlab": "fkill -s :9999 && jupyter lab --dev --no-browser --notebook-dir=${PWD} --port 9999 --ServerApp.password= --ServerApp.token=",
+    "start:jlab": "fkill -s :9999 && jupyter lab --dev --no-browser --notebook-dir=${PWD} --port 9999 --ServerApp.password= --ServerApp.token= --LabApp.token=",
     "start:benchmark": "wait-on http-get://localhost:9999/lab && node lib/index.js",
     "start:all": "npm-run-all --parallel start:jlab start:benchmark --race",
     "start:analysis": "vl2png analysis.vl.json > analysis.png && open analysis.png",
     "start:compare": "node lib/compare.js",
     "start:compare-graph": "vl2png comparison.vl.json > comparison.png && open comparison.png",
-    "all": "npm-run-all build:* start:all start:analysis"
+    "all": "npm-run-all build:* start:all start:analysis",
+    "ci": "npm-run-all build:* start:all"
   },
   "dependencies": {
     "@stdlib/stdlib": "0.0.92",
     "csv-parser": "2.3.3",
     "neat-csv": "5.2.0",
-    "playwright": "0.11.1"
+    "playwright": "0.11.1",
+    "systeminformation": "^4.27.0"
   },
   "devDependencies": {
     "@types/node": "14.0.27",
