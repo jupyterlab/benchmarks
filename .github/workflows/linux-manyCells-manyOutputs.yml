@@ -5,8 +5,9 @@ jobs:
     name: Linux
     runs-on: ubuntu-latest
     env:
-      BROWSERS: '["firefox", "chromium"]'
+      BROWSERS: '["chromium"]'
       JLAB_HOME: '/home/runner/work/benchmarks/jupyterlab'
+      JLAB_REPO: "https://github.com/goanpeca/jupyterlab.git"
       # BENCHMARKS
       BENCHMARK_NOTEBOOKS: '["./manyCells", "./manyOutputs"]'
       BENCHMARK_MAX_N: ${{ matrix.BENCHMARK_MAX_N }}
@@ -51,9 +52,10 @@ jobs:
       - name: Install JupyterLab
         run: |
           cd ..
-          git clone https://github.com/jupyterlab/jupyterlab.git
+          git clone $JLAB_REPO
           cd jupyterlab
           git checkout ${{ matrix.JLAB_COMMITS }}
+          pip install plotly==4.5.4 ipywidgets==7.5.1
           pip install -e .
           jlpm install
           jlpm run build

@@ -62,6 +62,8 @@ export class OutputWidget extends ReactWidget implements IRenderMime.IRenderer {
             columnKey: number;
           }) => <Cell {...props}>{this.rows[rowIndex][columnKey]}</Cell>}
           width={100}
+          // style={{"content-visibility": "auto", "contain-intrinsic-size": "400px"}}
+          style={{color: "blue"}}
         />
       );
     }

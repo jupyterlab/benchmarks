@@ -5,8 +5,10 @@ jobs:
     name: Linux
     runs-on: ubuntu-latest
     env:
-      BROWSERS: '["firefox", "chromium"]'
+      BROWSERS: '["chromium"]'
       JLAB_HOME: '/home/runner/work/benchmarks/jupyterlab'
+      # JLAB_REPO: "https://github.com/goanpeca/jupyterlab.git"
+      JLAB_REPO: "https://github.com/jupyterlab/jupyterlab.git"
       # BENCHMARKS
       BENCHMARK_NOTEBOOKS: '["./fixedDataTable", "./longOutput"]'
       BENCHMARK_MAX_N: ${{ matrix.BENCHMARK_MAX_N }}
@@ -22,13 +24,16 @@ jobs:
         NODEJS: [12.x]
         PLAYWRIGTH: ['1.0.2', '1.3.0']
         # JupyterLab [older-commit]
-        JLAB_COMMITS: [1f15fcb]
+        JLAB_COMMITS: [1f15fcb]  # Replace by branch
+        # JLAB_COMMITS: [1f15fcb]
         # Benchmarks
         # Results in 100/(21 - 1)... n=0,5,10,15...
         BENCHMARK_MAX_N: [100]          # Default is 100
         BENCHMARK_NUMBER_SAMPLES: [21]  # Default is 20
         BENCHMARK_SWITCHES: [10]
-        BENCHMARK_MAX_TIME: [5000]      # Default is 5000
+        BENCHMARK_MAX_TIME: [500]      # Default is 5000
+        # fixedDataTable.ts
+        # longOutputs.ts
       fail-fast: false
     timeout-minutes: 50
     steps:
@@ -43,9 +48,10 @@ jobs:
       - name: Install JupyterLab
         run: |
           cd ..
-          git clone https://github.com/jupyterlab/jupyterlab.git
+          git clone $JLAB_REPO
           cd jupyterlab
           git checkout ${{ matrix.JLAB_COMMITS }}
+          pip install plotly==4.5.4 ipywidgets==7.5.1
           pip install -e .
           jlpm install
           jlpm run build
@@ -130,6 +136,7 @@ jobs:
             packages/compare/*.csv
             packages/compare/*.json
             packages/compare/*.vl.json
+            packages/compare/data/*.ipynb
             !packages/compare/package.json
             !packages/compare/package-lock.json
             !packages/compare/tsconfig.json
