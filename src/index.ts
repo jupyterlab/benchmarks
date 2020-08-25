@@ -186,7 +186,7 @@ function writeOutput({
           await waitFor({ widgetID: id, page });
           const time = await endTime();
           // wait for 2 seconds
-          await page.waitForTimeout(1000);
+          // await page.waitForTimeout(1000);
           console.log(`     time=${time}`);
           await writeOutput({
             mode: 'open',
@@ -222,7 +222,7 @@ function writeOutput({
             });
           const time = await endTime();
           // wait for 2 seconds
-          await page.waitForTimeout(1000);
+          // await page.waitForTimeout(1000);
           console.log(`     time=${time}`);
           totalTimes.set(type, (totalTimes.get(type) || 0) + time);
           await writeOutput({
