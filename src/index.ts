@@ -14,7 +14,10 @@ import { MANY_OUTPUTS } from './notebooks/manyOutputs';
 
 const DATA_PATH = process.env['BENCHMARK_OUTPUT'] || 'out.csv';
 
-const BROWSERS: Array<'firefox' | 'chromium'> = ['firefox', 'chromium'];
+const browsersEnv = process.env.BROWSERS;
+const BROWSERS: Array<'firefox' | 'chromium'> = browsersEnv
+? JSON.parse(browsersEnv)
+: ['firefox', 'chromium'];
 
 // The maximum N
 const MAX_N = Number(process.env['BENCHMARK_MAX_N'] || 100);
