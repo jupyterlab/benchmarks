@@ -6,8 +6,9 @@ import subprocess
 # Constants
 OUTPUT_DIR = "packages/compare"
 SKIP_FILES = ['package.json', 'package-lock.json', 'tsconfig.json']
-OLD_JLAB_COMMIT = os.environ.get("OLD_JLAB_COMMIT", "f7b7ee7")
-NEW_JLAB_COMMIT = os.environ.get("NEW_JLAB_COMMIT", "1f15fcb")
+OLD_KEY = os.environ.get("OLD_KEY", "old")
+NEW_KEY = os.environ.get("NEW_KEY", "new")
+KEY_TYPE = os.environ.get("KEY_TYPE", "nokey")
 
 # Paths
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -55,11 +56,11 @@ def main():
 
     # Run `jlpm ci` with the right env variables for each pair of tests
     for test in suffix:
-        diff_path = "diff-{0}-{1}-{2}.csv".format(OLD_JLAB_COMMIT, NEW_JLAB_COMMIT, test)
+        diff_path = "diff-{0}-{1}-{2}-{3}.csv".format(KEY_TYPE, OLD_KEY, NEW_KEY, test)
         new_env = os.environ.copy()
         new_env["BENCHMARK_OUTPUT"] = diff_path
-        new_env["BENCHMARK_INPUT_OLD"] = "{0}-{1}.csv".format(OLD_JLAB_COMMIT, test)
-        new_env["BENCHMARK_INPUT_NEW"] = "{0}-{1}.csv".format(NEW_JLAB_COMMIT, test)
+        new_env["BENCHMARK_INPUT_OLD"] = "{0}-{1}.csv".format(OLD_KEY, test)
+        new_env["BENCHMARK_INPUT_NEW"] = "{0}-{1}.csv".format(NEW_KEY, test)
         print("\n# Running comparison:")
         p = subprocess.Popen(["npm", "run", "ci"], env=new_env)
         p.communicate()

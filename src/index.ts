@@ -11,10 +11,15 @@ import * as si from 'systeminformation';
 import NotebookType from './notebookType';
 import { CELLS_MULTIPLIER, CODE_CELL_RATIO } from './notebooks/manyCells';
 import { MANY_OUTPUTS } from './notebooks/manyOutputs';
+import { DIV_NUMBER } from './notebooks/longOutput';
+import { TABLE_ROWS, TABLE_COLUMNS } from './notebooks/fixedDataTable';
 
 const DATA_PATH = process.env['BENCHMARK_OUTPUT'] || 'out.csv';
-
-const BROWSERS: Array<'firefox' | 'chromium'> = ['firefox', 'chromium'];
+const WAIT_BETWEEN_TESTS: number = 1000;
+const browsersEnv = process.env.BROWSERS;
+const BROWSERS: Array<'firefox' | 'chromium'> = browsersEnv
+? JSON.parse(browsersEnv)
+: ['firefox', 'chromium'];
 
 // The maximum N
 const MAX_N = Number(process.env['BENCHMARK_MAX_N'] || 100);
@@ -66,7 +71,7 @@ function writeOutput({
     )
   ).map(pkg => pkg.default);
   await writeLine('mode,browser,n,type,time');
-  await fs.promises.mkdir('data', { recursive: true });
+  await fs.promises.mkdir('notebooks', { recursive: true });
 
   for (const browserName of BROWSERS) {
     console.log(`browser=${browserName}`);
@@ -93,13 +98,13 @@ function writeOutput({
      */
     async function waitForNotebook(id: string): Promise<void> {
       await page.waitForSelector(`#${id}`, {
-        visibility: 'visible'
+        state: "visible"
       });
       await page.waitForSelector(`#${id} .jp-Notebook-cell`, {
-        visibility: 'visible'
+        state: "visible"
       });
       await page.waitForSelector(`#${id} .jp-Spinner`, {
-        visibility: 'hidden'
+        state: "hidden"
       });
     }
 
@@ -119,7 +124,7 @@ function writeOutput({
     }
 
     const waitForLaunch = () =>
-      page.waitForSelector('.jp-Launcher', { visibility: 'visible' });
+      page.waitForSelector('.jp-Launcher', { state: "visible" });
     // Go to reset for a new workspace
     await page.goto('http://localhost:9999/lab?reset');
 
@@ -157,7 +162,7 @@ function writeOutput({
         }
         // Open each notebook SWITCHES times
         console.log(`   type=${label}`);
-        const path = `data/${label}-${n}.ipynb`;
+        const path = `notebooks/${label}-${n}.ipynb`;
 
         await fs.promises.writeFile(
           path,
@@ -185,6 +190,8 @@ function writeOutput({
           await waitForNotebook(id);
           await waitFor({ widgetID: id, page });
           const time = await endTime();
+          // Wait some time to reduce variance
+          await page.waitForTimeout(WAIT_BETWEEN_TESTS);
           console.log(`     time=${time}`);
           await writeOutput({
             mode: 'open',
@@ -203,7 +210,7 @@ function writeOutput({
 
       // Then switch between them repeatedly
       for (let i = 0; i < SWITCHES; i++) {
-        console.log(`   i=${i}/${SWITCHES}`);
+        console.log(`   i=${i}/${SWITCHES - 1}`);
         for (const { type, id } of widgets) {
           console.log(`    type=${type}`);
           await startTime();
@@ -219,6 +226,8 @@ function writeOutput({
               page
             });
           const time = await endTime();
+          // Wait some time to reduce variance
+          await page.waitForTimeout(WAIT_BETWEEN_TESTS);
           console.log(`     time=${time}`);
           totalTimes.set(type, (totalTimes.get(type) || 0) + time);
           await writeOutput({
@@ -245,7 +254,22 @@ function writeOutput({
       }`);
       await waitForLaunch();
     }
-    // browserVersions[browserName] = browser.version();
+    // Version is only available on 1.3.0, using 1.0.2 for now
+    let browserVerion: string;
+    try {
+      browserVerion = (browser as any).version();
+    } catch {
+      browserVerion = '';
+    }
+
+    if (!browserVerion) {
+      if (browserName === "chromium") {
+        browserVerion = "84.0.4135.0";
+      } else if (browserName === "firefox"){
+        browserVerion = "76.0b5";
+      }
+    }
+    browserVersions[browserName] = browserVerion;
     await browser.close();
   }
   // Write a metadata file for the run to json file with the same
@@ -271,6 +295,13 @@ function writeOutput({
     },
     manyOutputs: {
       MANY_OUTPUTS: MANY_OUTPUTS,
+    },
+    longOutput: {
+      DIV_NUMBER: DIV_NUMBER,
+    },
+    fixedDataTable: {
+      TABLE_COLUMNS: TABLE_COLUMNS,
+      TABLE_ROWS: TABLE_ROWS,
     },
     systemInformation: {
       cpu: cpu,

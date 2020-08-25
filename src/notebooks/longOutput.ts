@@ -5,8 +5,10 @@
 import makeNotebook from './../makeNotebook';
 import NotebookType from './../notebookType';
 
+export const DIV_NUMBER = Number(process.env['DIV_NUMBER'] || 100);
+
 export default {
-  label: 'one output with 100 n divs',
+  label: `one output with ${DIV_NUMBER} n divs`,
   waitFor: async () => null,
   notebook: (n: number) =>
     makeNotebook([
@@ -19,7 +21,7 @@ export default {
             data: {
               'text/html': [
                 `<div>${Array.from(
-                  { length: n * 100 },
+                  { length: n * DIV_NUMBER },
                   (_, i) =>
                     `<div>I am a long string in a div which is repeatedly added to one html object: ${i}</div>`
                 ).join('')}</div>`
@@ -35,7 +37,7 @@ export default {
           'from IPython.display import HTML\n',
           '\n',
           `HTML(f\'<div>{"".join("<div>I am a long string in a div which is repeatedly added to one html object: %d</div>" % i for i in range(${n *
-            100}))}</div>\')`
+            DIV_NUMBER}))}</div>\')`
         ]
       }
     ])

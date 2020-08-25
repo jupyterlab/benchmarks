@@ -5,11 +5,11 @@
 import makeNotebook from './../makeNotebook';
 import NotebookType from './../notebookType';
 
-const ROWS = 5000;
-const COLUMNS = 50;
+export const TABLE_ROWS = Number(process.env['TABLE_ROWS'] || 5000);
+export const TABLE_COLUMNS = Number(process.env['TABLE_COLUMNS'] || 50);
 
 export default {
-  label: `n fixed data table outputs each with ${COLUMNS} columns and ${ROWS} rows`,
+  label: `n fixed data table outputs each with ${TABLE_COLUMNS} columns and ${TABLE_ROWS} rows`,
   waitFor: async () => null,
   notebook: (n: number) =>
     makeNotebook([
@@ -25,7 +25,7 @@ export default {
           "    bundle['text/csv'] = data\n",
           '    display(bundle, raw=True)\n',
           '    \n',
-          `example_data = '\\n'.join(';'.join([str(x) for x in range(${COLUMNS})]) for y in range(${ROWS}))\n`
+          `example_data = '\\n'.join(';'.join([str(x) for x in range(${TABLE_COLUMNS})]) for y in range(${TABLE_ROWS}))\n`
         ]
       },
       ...Array.from({ length: n }, () => ({
@@ -36,9 +36,9 @@ export default {
           {
             data: {
               'text/csv': Array.from(
-                { length: ROWS },
+                { length: TABLE_ROWS },
                 () =>
-                  Array.from({ length: COLUMNS }, (_, i) => i).join(';') + '\n'
+                  Array.from({ length: TABLE_COLUMNS }, (_, i) => i).join(';') + '\n'
               )
             },
             metadata: {},

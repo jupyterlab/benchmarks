@@ -27,7 +27,7 @@ export default async function waitForPlotly({
       // It's 100px originally, then 700px, then finally is recieved to page width
       return width !== '700px' && width !== '100px';
     },
-    {},
-    widgetID
+    widgetID,
+    {}
   );
 }
