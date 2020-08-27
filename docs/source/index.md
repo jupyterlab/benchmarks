@@ -11,9 +11,9 @@ This project goal is a place to make JupyerLab fast. For now, the scope is to op
 Out of scope (could become later in scope):
 
 - Initial server start.
-- Initial page loading.
-- Build time.
+- Initial HTML page loading.
 - Page Save time.
+- Build time.
 
 We iterate in steps:
 
@@ -30,6 +30,7 @@ maxdepth: 2
 caption: Issues
 ---
 issues/index
+issues/solutions
 ```
 
 ```{toctree}
@@ -38,6 +39,7 @@ maxdepth: 2
 caption: Benchmarks
 ---
 benchmarks/index
+benchmarks/ci
 ```
 
 ```{toctree}

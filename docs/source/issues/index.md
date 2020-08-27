@@ -1,5 +1,7 @@
 # Performance Issues
 
+Issues are identified based on user feedbacks collected in the following sources (see also the [solutions per issue](./solutions)).
+
 Some opened issues on [JupyterLab repository](https://github.com/jupyterlab/jupyterlab).
 
 - [Switching to a big notebook in a tab is slow](https://github.com/jupyterlab/jupyterlab/issues/4292)  
