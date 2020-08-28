@@ -67,18 +67,20 @@ export class OutputWidget extends ReactWidget implements IRenderMime.IRenderer {
     }
 
     return (
-      <Table
-        rowHeight={50}
-        rowsCount={this.rows.length}
-        width={800}
-        height={500}
-        headerHeight={50}
-      >
-        {columns}
-      </Table>
+      // @ts-ignore: "content-visibility" property not available (yet)
+      <div style={{"content-visibility": "auto", "contain-intrinsic-size": "400px"}}>
+        <Table
+          rowHeight={50}
+          rowsCount={this.rows.length}
+          width={800}
+          height={500}
+          headerHeight={50}
+        >
+          {columns}
+        </Table>
+      </div>
     );
   }
-
   private _mimeType: string;
 }
 
