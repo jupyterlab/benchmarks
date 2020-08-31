@@ -1,4 +1,4 @@
-name: Linux-fixedDataTable-longOutput
+name: Linux-manyCells-manyOutputs-content-visibility
 on:
   push:
   schedule:
@@ -11,38 +11,37 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BROWSERS: '["chromium"]'
-      PLAYWRIGTH: ${{ matrix.PLAYWRIGTH }}
       JLAB_HOME: '/home/runner/work/benchmarks/jupyterlab'
-      JLAB_REPO: "https://github.com/jupyterlab/jupyterlab.git"
+      JLAB_REPO: "https://github.com/goanpeca/jupyterlab.git"
       # BENCHMARKS
-      BENCHMARK_NOTEBOOKS: '["./fixedDataTable", "./longOutput"]'
+      BENCHMARK_NOTEBOOKS: '["./manyCells", "./manyOutputs"]'
       BENCHMARK_MAX_N: ${{ matrix.BENCHMARK_MAX_N }}
       BENCHMARK_NUMBER_SAMPLES: ${{ matrix.BENCHMARK_NUMBER_SAMPLES }}
       BENCHMARK_SWITCHES: ${{ matrix.BENCHMARK_SWITCHES }}
       BENCHMARK_MAX_TIME: ${{ matrix.BENCHMARK_MAX_TIME }}
-      BENCHMARK_OUTPUT: ${{ matrix.PLAYWRIGTH }}-fixedDataTable-longOutput-${{ matrix.TABLE_ROWS }}-${{ matrix.TABLE_COLUMNS }}-${{ matrix.DIV_NUMBER }}.csv
-      # fixedDataTable.ts
-      TABLE_ROWS: ${{ matrix.TABLE_ROWS }}
-      TABLE_COLUMNS: ${{ matrix.TABLE_COLUMNS }}
-      # longOutputs.ts
-      DIV_NUMBER: ${{ matrix.DIV_NUMBER }}
+      BENCHMARK_OUTPUT: ${{ matrix.PLAYWRIGTH }}-manyCells-manyOutputs-${{ matrix.CELLS_MULTIPLIER }}-${{ matrix.CODE_CELL_RATIO }}-${{ matrix.MANY_OUTPUTS }}.csv
+      # manyCells.ts
+      CELLS_MULTIPLIER: ${{ matrix.CELLS_MULTIPLIER }}
+      CODE_CELL_RATIO: ${{ matrix.CODE_CELL_RATIO }}
+      # manyOutputs.ts
+      MANY_OUTPUTS: ${{ matrix.MANY_OUTPUTS }}
     strategy:
       matrix:
         PYTHON: [3.8]
         NODEJS: [12.x]
         PLAYWRIGTH: ['1.0.2', '1.3.0']
-        # JupyterLab [older-commit]
-        JLAB_COMMITS: [1f15fcb]  # Replace by branch
+        # JupyterLab [older-commit, newer-commit]
+        JLAB_COMMITS: [perf-content-visibility]
         # Benchmarks
         BENCHMARK_MAX_N: [100]          # Default is 100
         BENCHMARK_NUMBER_SAMPLES: [21]  # Default is 20
         BENCHMARK_SWITCHES: [10]
-        BENCHMARK_MAX_TIME: [20000]     # Default is 5000
-        # fixedDataTable.ts
-        TABLE_ROWS: [5000]              # Default is 5000
-        TABLE_COLUMNS: [50]             # Default is 50
-        # longOutputs.ts
-        DIV_NUMBER: [100]               # Default is 100
+        BENCHMARK_MAX_TIME: [5000]      # Default is 5000
+        # manyCells.ts
+        CELLS_MULTIPLIER: [5]           # Default is 100
+        CODE_CELL_RATIO: [0.9, 0.6]     # Default is 0.9
+        # manyOutputs.ts
+        MANY_OUTPUTS: [100]             # Default is 100
       fail-fast: false
     timeout-minutes: 60
     steps:
@@ -62,10 +61,6 @@ jobs:
           git clone $JLAB_REPO
           cd jupyterlab
           git checkout ${{ matrix.JLAB_COMMITS }}
-          cd ..
-          python benchmarks/packages/compare/patch_package_json.py
-          cd jupyterlab
-          pip install plotly==4.5.4 ipywidgets==7.5.1
           pip install -e .
           jlpm install
           jlpm run build
@@ -73,7 +68,6 @@ jobs:
         uses: microsoft/playwright-github-action@v1
       - name: Install benchmarks
         run: |
-          python packages/compare/patch_playwright.py
           jlpm
       - name: List python dependencies
         run: pip list
