@@ -30,7 +30,14 @@ maxdepth: 2
 caption: Issues
 ---
 issues/index
-issues/solutions
+```
+
+```{toctree}
+---
+maxdepth: 2
+caption: Experiments
+---
+experiments/index
 ```
 
 ```{toctree}
@@ -53,9 +60,9 @@ profiling/index
 ```{toctree}
 ---
 maxdepth: 2
-caption: Fixes
+caption: Strategies
 ---
-fixes/index
+strategies/index
 ```
 
 ```{toctree}

@@ -1,10 +1,10 @@
 name: Linux-manyCells-manyOutputs
 on:
-  push:
+  push: 
   schedule:
     # * is a special character in YAML so you have to quote this string
-    # Run every 2 hours.
-    - cron:  '0 */2 * * *'
+    # Run every 6 hours.
+    - cron:  '0 */6 * * *'
 jobs:
   linux:
     name: Linux
@@ -92,9 +92,10 @@ jobs:
         with:
           name: benchmarks
           path: |
-            *.csv
-            *.json
-            notebooks/
+            packages/run/*.csv
+            packages/run/*.json
+            packages/run/*.png
+            packages/run/notebooks/
             !analysis.vl.json
             !comparison.vl.json
             !package.json
@@ -154,6 +155,7 @@ jobs:
             packages/compare/*.csv
             packages/compare/*.json
             packages/compare/*.vl.json
+            packages/compare/*.png
             packages/compare/notebooks/*.ipynb
             !packages/compare/package.json
             !packages/compare/package-lock.json

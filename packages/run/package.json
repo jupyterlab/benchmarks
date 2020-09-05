@@ -1,0 +1,35 @@
+{
+  "name": "@jupyterlab/benchmarks-run",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "build:jlab": "cd $JLAB_HOME && jlpm run build",
+    "clean": "rimraf node_modules lib yarn.lock",
+    "start:jlab": "fkill -s :9999 && jupyter lab --dev --no-browser --notebook-dir=${PWD} --port 9999 --ServerApp.password= --ServerApp.token= --LabApp.token=",
+    "start:benchmark": "wait-on http-get://localhost:9999/lab && node lib/index.js",
+    "start:all": "npm-run-all --parallel start:jlab start:benchmark --race",
+    "start:analysis": "vl2png analysis.vl.json > analysis.png && open analysis.png",
+    "all": "npm-run-all build:* start:all start:analysis"
+  },
+  "dependencies": {
+    "@stdlib/stdlib": "0.0.92",
+    "csv-parser": "2.3.3",
+    "neat-csv": "5.2.0",
+    "playwright": "1.3.0",
+    "systeminformation": "^4.27.0"
+  },
+  "devDependencies": {
+    "@types/node": "14.0.27",
+    "fkill-cli": "6.0.1",
+    "npm-run-all": "4.1.5",
+    "rimraf": "3.0.2",
+    "typescript": "~3.7.3",
+    "vega-cli": "5.13.0",
+    "vega-lite": "4.14.0",
+    "wait-on": "4.0.1"
+  },
+  "bin": {
+    "benchmark": "lib/compare.js"
+  }
+}
