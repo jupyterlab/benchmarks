@@ -21,6 +21,10 @@ old.json
 new.json
 out.json
 
+old.csv
+new.csv
+out.csv
+
 __pycache__
 *.egg-info
 
