@@ -93,7 +93,7 @@ jobs:
           run: jlpm ci
       - name: Remove notebook checkpoints and copy to artifacts folder
         run: |
-          rm -rf notebooks/.ipynb_checkpoints/
+          rm -rf packages/run/notebooks/.ipynb_checkpoints/
       - name: Upload benchmark csv and notebook data artifacts
         uses: actions/upload-artifact@v2
         with:
