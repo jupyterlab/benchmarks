@@ -105,7 +105,7 @@ For the `Nx5 with 2 line of code and 2 outputs per cell`, we have some small imp
 
 We have tried [content visibility](https://web.dev/content-visibility) supported in Chrome 85+ in [this branch](https://github.com/datalayer-contrib/jupyterlab/tree/2.2.x-content-visibility).
 
-Without Shadow DOM, we have clear improvement (10 to 50%) for Chrome.
+Without Shadow DOM, we have clear improvement.
 
 ![](images/content-visibility/content-visiblity-no-shadow-dom.png "")
 
