@@ -10,7 +10,8 @@
     "start:benchmark": "wait-on http-get://localhost:9999/lab && node lib/index.js",
     "start:all": "npm-run-all --parallel start:jlab start:benchmark --race",
     "start:analysis": "vl2png analysis.vl.json > analysis.png && open analysis.png",
-    "all": "npm-run-all build:* start:all start:analysis"
+    "all": "npm-run-all build:* start:all start:analysis",
+    "ci": "npm-run-all build:* start:all"
   },
   "dependencies": {
     "@stdlib/stdlib": "0.0.92",

@@ -16,7 +16,7 @@
     "start:compare": "lerna run --scope @jupyterlab/benchmarks-compare --stream start:compare",
     "start:compare-graph": "lerna run --scope @jupyterlab/benchmarks-compare --stream start:compare-graph",
     "all": "lerna run --scope @jupyterlab/benchmarks-run --stream all",
-    "ci": "lerna run --scope @jupyterlab/benchmarks-compare --stream ci"
+    "ci": "lerna run --scope @jupyterlab/benchmarks-run --stream ci"
   },
   "devDependencies": {
     "lerna": "3.22.1",

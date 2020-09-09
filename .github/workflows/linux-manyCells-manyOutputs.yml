@@ -69,6 +69,7 @@ jobs:
       - name: Install benchmarks
         run: |
           jlpm
+          jlpm run build
       - name: List python dependencies
         run: pip list
       - name: List npm dependencies
