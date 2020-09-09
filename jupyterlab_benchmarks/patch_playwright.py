@@ -4,7 +4,7 @@ import os
 
 # Paths
 HERE = os.path.abspath(os.path.dirname(__file__))
-REPO_ROOT = os.path.dirname(os.path.dirname(HERE))
+REPO_ROOT = os.path.dirname(HERE)
 PACKAGE_JSON = os.path.join(REPO_ROOT, "packages", "run", "package.json")
 PLAYWRIGTH = os.environ.get("PLAYWRIGTH", "1.0.2")
 DEPENDENCIES = {
