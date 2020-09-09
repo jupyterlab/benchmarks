@@ -74,7 +74,7 @@ jobs:
         uses: microsoft/playwright-github-action@v1
       - name: Install benchmarks
         run: |
-          python jupyerlab_benchmarks/patch_playwright.py
+          python jupyterlab_benchmarks/patch_playwright.py
           jlpm
       - name: List python dependencies
         run: pip list
