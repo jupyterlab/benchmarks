@@ -13,7 +13,6 @@ jobs:
       BROWSERS: '["chromium"]'
       PLAYWRIGTH: ${{ matrix.PLAYWRIGTH }}
       JLAB_HOME: '/home/runner/work/benchmarks/jupyterlab'
-      # JLAB_REPO: "https://github.com/goanpeca/jupyterlab.git"
       JLAB_REPO: "https://github.com/jupyterlab/jupyterlab.git"
       # BENCHMARKS
       BENCHMARK_NOTEBOOKS: '["./fixedDataTable", "./longOutput"]'
@@ -38,7 +37,7 @@ jobs:
         BENCHMARK_MAX_N: [100]          # Default is 100
         BENCHMARK_NUMBER_SAMPLES: [21]  # Default is 20
         BENCHMARK_SWITCHES: [10]
-        BENCHMARK_MAX_TIME: [20000]     # Default is 5000
+        BENCHMARK_MAX_TIME: [10000]     # Default is 5000, using 20000
         # fixedDataTable.ts
         TABLE_ROWS: [5000]              # Default is 5000
         TABLE_COLUMNS: [50]             # Default is 50
@@ -104,10 +103,10 @@ jobs:
             packages/run/*.json
             packages/run/*.png
             packages/run/notebooks/
-            !analysis.vl.json
-            !comparison.vl.json
-            !package.json
-            !tsconfig.json
+            !packages/run/analysis.vl.json
+            !packages/run/comparison.vl.json
+            !packages/run/package.json
+            !packages/run/tsconfig.json
 
   linux-compare:
     name: Linux

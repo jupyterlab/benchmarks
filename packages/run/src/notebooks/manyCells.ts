@@ -9,7 +9,7 @@ export const CELLS_MULTIPLIER = Number(process.env['CELLS_MULTIPLIER'] || 5);  /
 export const CODE_CELL_RATIO = Number(process.env['CODE_CELL_RATIO'] || 0.9);
 
 export default {
-  label: `manyCells - ${CELLS_MULTIPLIER}*{N} cells with 2 lines of code and 2 outputs per cell (${Math.round((1-CODE_CELL_RATIO)*100)}% of markdown)`,
+  label: `manyCells - ${CELLS_MULTIPLIER}×{N} cells with 2 lines of code and 2 outputs per cell (${Math.round((1-CODE_CELL_RATIO)*100)}% of markdown)`,
   waitFor: async () => null,
   notebook: (n: number) => {  
     const totalCells = CELLS_MULTIPLIER * n;

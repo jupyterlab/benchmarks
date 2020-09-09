@@ -8,7 +8,7 @@ import NotebookType from './../notebookType';
 export const DIV_NUMBER = Number(process.env['DIV_NUMBER'] || 100);
 
 export default {
-  label: `longOutput - A single output with ${DIV_NUMBER}*{N} divs`,
+  label: `longOutput - A single output with ${DIV_NUMBER}×{N} divs`,
   waitFor: async () => null,
   notebook: (n: number) =>
     makeNotebook([
