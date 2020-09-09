@@ -1,17 +1,29 @@
 # Exclude.
 
+.*
 out.*
 *.csv
+*.diff
 *.png
 
-yarn.lock
-yarn-error.log
+*.lock
+*.log
 
 build
 node_modules
 lib
 data
-notebooks
+dist
+packages/run/notebooks
+*.tsbuildinfo
+
+old.json
+new.json
+out.json
+
+old.csv
+new.csv
+out.csv
 
 __pycache__
 *.egg-info
@@ -19,8 +31,8 @@ __pycache__
 # Include.
 
 !.readthedocs.yml
+!.github
 !**/.*ignore
 !**/.*rc
 !**/.*rc.js
 !docs/**/*.png
-.DS_Store

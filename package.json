@@ -1,18 +1,22 @@
 {
   "name": "@jupyterlab/benchmarks",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
+  "workspaces": [
+    "packages/*",
+    "experiments/*",
+    "extensions/*"
+  ],
   "scripts": {
-    "build:jlab": "cd $JLAB_HOME && jlpm run build",
-    "build:benchmark": "tsc",
-    "start:jlab": "fkill -s :9999 && jupyter lab --dev-mode --no-browser --notebook-dir=${PWD} --port 9999 --ServerApp.password= --ServerApp.token= --LabApp.token=",
-    "start:benchmark": "wait-on http-get://localhost:9999/lab && node lib/index.js",
-    "start:all": "npm-run-all --parallel start:jlab start:benchmark --race",
-    "start:analysis": "vl2png analysis.vl.json > analysis.png && open analysis.png",
-    "start:compare": "node lib/compare.js",
-    "start:compare-graph": "vl2png comparison.vl.json > comparison.png && open comparison.png",
-    "all": "npm-run-all build:* start:all start:analysis",
-    "ci": "npm-run-all build:* start:all"
+    "build": "lerna run build --stream",
+    "clean": "lerna run clean && rimraf node_modules yarn.lock",
+    "start:benchmark": "lerna run --scope @jupyterlab/benchmarks-run start:benchmark",
+    "start:all": "lerna run --scope @jupyterlab/benchmarks-run --stream start:all",
+    "start:analysis": "lerna run --scope @jupyterlab/benchmarks-run --stream start:analysis",
+    "start:compare": "lerna run --scope @jupyterlab/benchmarks-compare --stream start:compare",
+    "start:compare-graph": "lerna run --scope @jupyterlab/benchmarks-compare --stream start:compare-graph",
+    "all": "lerna run --scope @jupyterlab/benchmarks-run --stream all",
+    "ci": "lerna run --scope @jupyterlab/benchmarks-run --stream ci"
   },
   "dependencies": {
     "@stdlib/stdlib": "0.0.92",
@@ -20,17 +24,10 @@
     "neat-csv": "5.2.0",
     "playwright": "1.0.2",
     "systeminformation": "^4.27.0"
+>>>>>>> master
   },
   "devDependencies": {
-    "@types/node": "14.0.27",
-    "fkill-cli": "6.0.1",
-    "npm-run-all": "4.1.5",
-    "typescript": "~3.7.3",
-    "vega-cli": "5.13.0",
-    "vega-lite": "4.14.0",
-    "wait-on": "4.0.1"
-  },
-  "bin": {
-    "benchmark": "lib/compare.js"
+    "lerna": "3.22.1",
+    "rimraf": "3.0.2"
   }
 }

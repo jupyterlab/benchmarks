@@ -1,0 +1,10 @@
+.exp-code-mirrors {
+  width: 100%;
+  /* content-visibility: auto; */
+}
+
+.CodeMirror {
+  border: 1px solid #eee;
+  /* https://codemirror.net/demo/resize.html */
+  height: auto !important;
+}

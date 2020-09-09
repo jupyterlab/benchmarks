@@ -1,10 +1,10 @@
 name: Linux-manyCells-manyOutputs
 on:
-  push:
+  push: 
   schedule:
     # * is a special character in YAML so you have to quote this string
-    # Run every 2 hours.
-    - cron:  '0 */2 * * *'
+    # Run every 6 hours.
+    - cron:  '0 */6 * * *'
 jobs:
   linux:
     name: Linux
@@ -69,6 +69,7 @@ jobs:
       - name: Install benchmarks
         run: |
           jlpm
+          jlpm run build
       - name: List python dependencies
         run: pip list
       - name: List npm dependencies
@@ -86,15 +87,16 @@ jobs:
           run: jlpm ci
       - name: Remove notebook checkpoints and copy to artifacts folder
         run: |
-          rm -rf notebooks/.ipynb_checkpoints/
+          rm -rf packages/run/notebooks/.ipynb_checkpoints/
       - name: Upload benchmark csv and notebook data artifacts
         uses: actions/upload-artifact@v2
         with:
           name: benchmarks
           path: |
-            *.csv
-            *.json
-            notebooks/
+            packages/run/*.csv
+            packages/run/*.json
+            packages/run/*.png
+            packages/run/notebooks/
             !analysis.vl.json
             !comparison.vl.json
             !package.json
@@ -154,6 +156,7 @@ jobs:
             packages/compare/*.csv
             packages/compare/*.json
             packages/compare/*.vl.json
+            packages/compare/*.png
             packages/compare/notebooks/*.ipynb
             !packages/compare/package.json
             !packages/compare/package-lock.json

@@ -1,6 +1,32 @@
 # Performance Issues
 
-Issues are identified based on user feedbacks collected in the following sources (see also the [solutions per issue](./solutions)).
+## Issues
+
+Issues are identified based on [user feedbacks](#User_Reports).
+
+A notebook can present one or multiple of the following issues.
+
+### Many Cell Editors
+
+- Benchmark to run: manyCells, errorOutputs
+- Solution: Content Visibility (chrome85+), Virtual Notebook
+
+### Large Text Output
+
+- Benchmark to run: manyOutputs, longOutput
+- Solution: Strip Output, Virtual Output
+
+### Many Rich Output
+
+- Benchmark to run: largePlotly, manyPlotly
+- Solution: TBD
+
+### Large .ipynb file
+
+- Benchmark to run: manyOutputs, longOutput
+- Solution: Memory cache
+
+## User Reports
 
 Some opened issues on [JupyterLab repository](https://github.com/jupyterlab/jupyterlab).
 
