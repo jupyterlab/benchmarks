@@ -7,7 +7,7 @@ JLAB_HOME = os.environ.get("JLAB_HOME")
 
 # Paths
 HERE = os.path.abspath(os.path.dirname(__file__))
-REPO_ROOT = os.path.dirname(os.path.dirname(HERE))
+REPO_ROOT = os.path.dirname(HERE)
 PACKAGE_JSON = os.path.join(JLAB_HOME, "dev_mode", "package.json")
 FDT_EXTENSION = os.path.join(REPO_ROOT, "extensions", "fixed-data-table")
 EXTENSIONS = {
