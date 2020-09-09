@@ -107,7 +107,7 @@ We have tried [content visibility](https://web.dev/content-visibility) supported
 
 Without Shadow DOM, we have clear improvement (10 to 50%) for Chrome.
 
-![](images/content-visibility/content-visibliity-no-shadow-dom.png "")
+![](images/content-visibility/content-visiblity-no-shadow-dom.png "")
 
 Meanwhile, with Shadow DOM, we have no improvement.
 
