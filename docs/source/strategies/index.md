@@ -134,7 +134,7 @@ We can inject more React into the UI components and see if it makes life easier 
 
 ## Browser Configuration
 
-## Web Render
+### Web Render
 
 From this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674411129): Webrender for Firefox 79 (for many linux and macos devices, see <https://wiki.mozilla.org/Platform/GFX/WebRender_Where>  can be turned on via a pref. See also <https://www.techrepublic.com/article/how-to-enable-firefox-webrender-for-faster-page-rendering>. Note that windows firefox has had webrender turned on by default in certain cases for a while now.
 
