@@ -8,7 +8,7 @@ import NotebookType from './../notebookType';
 export const MANY_OUTPUTS = Number(process.env['MANY_OUTPUTS'] || 100);
 
 export default {
-  label: `manyOutputs - ${MANY_OUTPUTS}*{N} outputs each of a div`,
+  label: `manyOutputs - ${MANY_OUTPUTS}×{N} outputs each of a div`,
   waitFor: async () => null,
   notebook: (n: number) =>
     makeNotebook([

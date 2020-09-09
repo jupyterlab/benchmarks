@@ -4,7 +4,6 @@ import os
 import subprocess
 
 # Constants
-OUTPUT_DIR = "packages/compare"
 SKIP_FILES = ['package.json', 'package-lock.json', 'tsconfig.json']
 OLD_KEY = os.environ.get("OLD_KEY", "old")
 NEW_KEY = os.environ.get("NEW_KEY", "new")
@@ -13,8 +12,8 @@ KEY_TYPE = os.environ.get("KEY_TYPE", "nokey")
 # Paths
 HERE = os.path.abspath(os.path.dirname(__file__))
 REPO_ROOT = os.path.dirname(os.path.dirname(HERE))
-ANALYSIS_PATH = os.path.join(REPO_ROOT, 'analysis.vl.json')
-COMPARISON_PATH = os.path.join(REPO_ROOT, 'comparison.vl.json')
+ANALYSIS_PATH = os.path.join(REPO_ROOT, "packages", "run", "analysis.vl.json")
+COMPARISON_PATH = os.path.join(REPO_ROOT, "packages", "compare", "comparison.vl.json")
 
 
 def main():
@@ -24,7 +23,8 @@ def main():
     # Find json (metadata) files
     json_files = [f for f in os.listdir(HERE) if f.endswith(".json") and not f.endswith(".vl.json")]
     for remove_file in SKIP_FILES:
-        json_files.remove(remove_file)
+        if remove_file in json_files:
+            json_files.remove(remove_file)
 
     print(csv_files)
     print(json_files)
@@ -32,9 +32,19 @@ def main():
     # Check number of files is correct
     prefix = set([f.replace(".csv", "") for f in csv_files])
     prefix2 = set([f.replace(".json", "") for f in json_files])
-    suffix = set(["-".join(f.split("-")[1:]) for f in prefix])
     if prefix != prefix2:
         raise Exception("There should be an equal number of json and csv files!")
+
+    checked = set()
+    suffix = set()
+    for key in sorted([OLD_KEY, NEW_KEY], key=len, reverse=True):
+        for pref in prefix:
+            if pref.startswith(key) and pref not in checked:
+                suffix.add(pref[len(key) + 1:])
+                checked.add(pref)
+                break
+
+    print("SUFFIX", suffix)
 
     # Load template analysis.vl.json
     with open(ANALYSIS_PATH, "r") as fh:
@@ -82,7 +92,8 @@ def clean():
     for fname in os.listdir(HERE):
         fpath = os.path.join(HERE, fname)
         if fname.startswith("diff-") or fname.endswith(".vl.json"):
-            os.remove(fpath)
+            if fname != 'comparison.vl.json':
+                os.remove(fpath)
 
 
 if __name__ == "__main__":
