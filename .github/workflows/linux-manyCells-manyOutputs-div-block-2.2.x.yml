@@ -1,4 +1,4 @@
-name: Linux-manyCells-manyOutputs-content-visibility-2.2.x
+name: Linux-manyCells-manyOutputs-div-block-2.2.x
 on:
   push:
   schedule:

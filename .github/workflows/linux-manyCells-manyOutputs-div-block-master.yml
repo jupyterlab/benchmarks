@@ -1,4 +1,4 @@
-name: Linux-manyCells-manyOutputs-content-visibility-master
+name: Linux-manyCells-manyOutputs-div-block-master
 on:
   push:
   schedule:
