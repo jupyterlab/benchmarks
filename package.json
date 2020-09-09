@@ -5,7 +5,7 @@
   "scripts": {
     "build:jlab": "cd $JLAB_HOME && jlpm run build",
     "build:benchmark": "tsc",
-    "start:jlab": "fkill -s :9999 && jupyter lab --dev --no-browser --notebook-dir=${PWD} --port 9999 --ServerApp.password= --ServerApp.token= --LabApp.token=",
+    "start:jlab": "fkill -s :9999 && jupyter lab --dev-mode --no-browser --notebook-dir=${PWD} --port 9999 --ServerApp.password= --ServerApp.token= --LabApp.token=",
     "start:benchmark": "wait-on http-get://localhost:9999/lab && node lib/index.js",
     "start:all": "npm-run-all --parallel start:jlab start:benchmark --race",
     "start:analysis": "vl2png analysis.vl.json > analysis.png && open analysis.png",
