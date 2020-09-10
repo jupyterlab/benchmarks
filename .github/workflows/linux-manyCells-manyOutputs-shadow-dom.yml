@@ -1,4 +1,4 @@
-name: Linux-manyCells-manyOutputs
+name: Linux-manyCells-manyOutputs-shadow-dom
 on:
   push: 
   schedule:
