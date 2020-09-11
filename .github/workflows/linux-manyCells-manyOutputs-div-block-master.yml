@@ -3,8 +3,8 @@ on:
   push:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    # Run every 1 hours.
-    - cron:  '0 */1 * * *'
+    # Run every 6 hours.
+    - cron:  '0 */6 * * *'
 jobs:
   linux:
     name: Linux
