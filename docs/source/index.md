@@ -47,6 +47,8 @@ caption: Benchmarks
 ---
 benchmarks/index
 benchmarks/ci
+benchmarks/telemetry
+benchmarks/lighthouse
 ```
 
 ```{toctree}
