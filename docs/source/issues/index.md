@@ -2,29 +2,57 @@
 
 ## Issues
 
-Issues are identified based on [user feedbacks](#User_Reports).
+A notebook can present one or multiple issues. Issues are identified based on [user feedbacks](#User_Reports).
 
-A notebook can present one or multiple of the following issues.
+The cause of the issues can be present at different places which constitutes bootlenecks:
 
-### Many Cell Editors
+```
+                         +---> API Endpoint  ------> Content Service <---> Notebook storage
+Client <-------> Proxy --|                                 [D]
+[A] [B]   [C]            |                                          
+                         +--->  Static Content
+```
 
-- Benchmark to run: manyCells, errorOutputs
-- Solution: Content Visibility (chrome85+), Virtual Notebook
+- [A] Browser Rendering
+- [B] Client Parsing
+- [C] Network Transmission
+- [D] Server Read + Validation + Trust + Parsing
 
-### Large Text Output
+The server-related bootlenecks are tracked for now in:
 
-- Benchmark to run: manyOutputs, longOutput
-- Solution: Strip Output, Virtual Output
+- Improving Network Performance <https://github.com/jupyter/jupyter_server/issues/312>
+- Explore transferring content in chunks for incremental loading <https://github.com/jupyter/jupyter_server/issues/308>
 
-### Many Rich Output
+### Issue 1 - Many Cell Editors
 
-- Benchmark to run: largePlotly, manyPlotly
-- Solution: TBD
+- Bootlenecks: [A]
+- Benchmark: manyCells, errorOutputs
+- Solution:
+  - Content Visibility <https://github.com/jupyterlab/jupyterlab/pull/8970>
+  - Box Display <https://github.com/jupyterlab/jupyterlab/pull/8968>
+  - Virtual Notebook <https://github.com/jupyterlab/jupyterlab/pull/8972>
 
-### Large .ipynb file
+### Issue 2 - Large Text Output
 
-- Benchmark to run: manyOutputs, longOutput
-- Solution: Memory cache
+- Bootlenecks: [A]
+- Benchmark to run: `manyOutputs` `longOutput` `50000Errors`
+- Solution
+  - StrippedOutput
+  - VirtualOutput
+
+### Issue 3 - Many Rich Output
+
+- Bootlenecks: [A] [D]
+- Benchmark to run: `largePlotly`, `manyPlotly`
+- Solution:
+ - TBD
+
+### Issue 4 - Large .ipynb file
+
+- Bootlenecks: [A]
+- Benchmark to run: `manyOutputs` `longOutput` `50000Errors`
+- Solution
+ - Server Memory cache
 
 ## User Reports
 
