@@ -30,14 +30,7 @@ maxdepth: 2
 caption: Issues
 ---
 issues/index
-```
-
-```{toctree}
----
-maxdepth: 2
-caption: Experiments
----
-experiments/index
+issues/experiments/
 ```
 
 ```{toctree}
@@ -49,22 +42,16 @@ benchmarks/index
 benchmarks/ci
 benchmarks/telemetry
 benchmarks/lighthouse
+benchmarks/profiling
 ```
 
 ```{toctree}
 ---
 maxdepth: 2
-caption: Profiling
+caption: Fixes
 ---
-profiling/index
-```
-
-```{toctree}
----
-maxdepth: 2
-caption: Strategies
----
-strategies/index
+fixes/index
+fixes/strategies
 ```
 
 ```{toctree}
@@ -74,4 +61,3 @@ caption: Links
 ---
 GitHub repo <https://github.com/jupyterlab/benchmarks>
 ```
-

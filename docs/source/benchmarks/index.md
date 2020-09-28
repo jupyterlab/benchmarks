@@ -10,15 +10,8 @@ To run the benchmarks against notebooks with long outputs and notebooks with man
 ```bash
 # Install dependencies.
 jlpm
-```
-
-```bash
-# Define the folder with your JupyterLab source 
-# against which the benchmark will be run.
+# Define the folder with your JupyterLab source against which the benchmark will be run.
 export JLAB_HOME=<the_folder_with_your_jupyterlab_source>
-```
-
-```bash
 # Run a benchmark passing 2 notebooks that will be opened and switched between.
 env 'BENCHMARK_NOTEBOOKS=["./longOutput", "./manyOutputs"]' jlpm all
 ```
@@ -34,6 +27,7 @@ Optionally, you can launch in separated shell and run the analysis when the benc
 ```bash
 # Shell 1
 jlpm start:jlab
+
 # Shell 2
 env 'BENCHMARK_NOTEBOOKS=["./longOutput", "./manyOutputs"]' jlpm start:benchmark
 # Analyse when benchmark is completed.
