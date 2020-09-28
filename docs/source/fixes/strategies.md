@@ -14,9 +14,7 @@ We could strip the cell output if too the ouput is too large, but this has two l
 
 ## Block Div
 
-We should not use `flex` display CSS layout but rather use a simple `block`. This is implemented in [this branch](https://github.com/datalayer-contrib/jupyterlab/tree/2.2.x-div-block).
-
-![](images/div-block/div-block.png "")
+We should not use `flex` display CSS layout but rather use a simple `block`.
 
 ##  Virtualized Notebook
 
