@@ -1,25 +1,29 @@
-# Issue Types
+# Issue
 
 A notebook can present one or multiple issues. Issues are identified based on [user feedbacks](#User_Reports).
 
-The cause of the issues can be present at different places which constitutes bootlenecks:
+## Bottlenecks
+
+The cause of the issues can be located at different places / bootlenecks.
 
 ```                        
 Browser <--> Client JS <------> API Server Endpoint  <-> Content Service <-> Notebook
   [A]           [B]       [C]                                 [D]
-```
 
 - [A] Browser Rendering
 - [B] Client Parsing
 - [C] Network Transmission
-- [D] Nptebook Read + Parsing + Validation + Trust
+- [D] Notebook Read + Parsing + Validation + Trust
+```
 
 The server-related bootlenecks are tracked for now in:
 
 - Improving Network Performance <https://github.com/jupyter/jupyter_server/issues/312>
 - Explore transferring content in chunks for incremental loading <https://github.com/jupyter/jupyter_server/issues/308>
 
-## Issue 1 - Many Cell Editors
+## Issue Types
+
+### Issue Type 1 - Many Cell Editors
 
 - Bootlenecks: [A]
 - Benchmark: manyCells, errorOutputs
@@ -28,7 +32,7 @@ The server-related bootlenecks are tracked for now in:
   - Box Display <https://github.com/jupyterlab/jupyterlab/pull/8968>
   - Virtual Notebook <https://github.com/jupyterlab/jupyterlab/pull/8972>
 
-## Issue 2 - Large Text Output
+### Issue Type 2 - Large Text Output
 
 - Bootlenecks: [A]
 - Benchmark to run: `manyOutputs` `longOutput` `50000Errors`
@@ -36,14 +40,14 @@ The server-related bootlenecks are tracked for now in:
   - StrippedOutput
   - VirtualOutput
 
-## Issue 3 - Many Rich Output
+### Issue Type 3 - Many Rich Output
 
 - Bootlenecks: [A] [D]
 - Benchmark to run: `largePlotly`, `manyPlotly`
 - Solution:
  - TBD
 
-## Issue 4 - Large .ipynb file
+### Issue Type 4 - Large .ipynb file
 
 - Bootlenecks: [A]
 - Benchmark to run: `manyOutputs` `longOutput` `50000Errors`

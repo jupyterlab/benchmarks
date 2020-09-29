@@ -30,7 +30,7 @@ maxdepth: 2
 caption: Issues
 ---
 issues/index
-issues/experiments/
+issues/experiments
 ```
 
 ```{toctree}
