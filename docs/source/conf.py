@@ -39,13 +39,16 @@ extensions = [
 ]
 
 source_suffix = {
-    '.rst': 'restructuredtext',
-    '.ipynb': 'myst-nb',
-    '.myst': 'myst-nb',
-    '.md': 'myst-nb',
+    ".rst": "restructuredtext",
+    ".ipynb": "myst-nb",
+    ".myst": "myst-nb",
+    ".md": "myst-nb",
 }
 
+# jupyter_execute_notebooks = "force"
 jupyter_execute_notebooks = "off"
+
+html_js_files = ["https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
