@@ -43,6 +43,9 @@ setup(
         # Note: This is only required for internal use
         "rtd": [
             "myst_parser",
+            "myst-nb",
+            "notebook",
+            "jupytext",
             "pyyaml",
             "docutils>=0.15",
             "sphinx",
