@@ -1,3 +1,3 @@
 # JupyterLab Benchmarks
 
-A page with may codemirror editors.
+A page with many CodeMirror editors.

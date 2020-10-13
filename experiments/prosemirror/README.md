@@ -1,3 +1,3 @@
 # JupyterLab Benchmarks
 
-A page with may prosemirror editors.
+A page with many ProseMirror editors.

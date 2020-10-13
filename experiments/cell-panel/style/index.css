@@ -11,7 +11,6 @@ body {
 
 .jp-CodeCell {
   min-height: 50px;
-/*  content-visibility: auto; */
 }
 
 .CodeMirror {
