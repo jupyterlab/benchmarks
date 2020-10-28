@@ -1,4 +1,4 @@
-# fdtmime
+# @jupyterlab-benchmarks/table-render
 
 A JupyterLab extension for rendering table files.
 
@@ -9,7 +9,7 @@ A JupyterLab extension for rendering table files.
 ## Installation
 
 ```bash
-jupyter labextension install fdtmime
+jupyter labextension install @jupyterlab-benchmarks/table-render
 ```
 
 ## Development
