@@ -1,8 +1,9 @@
 {
-  "name": "fdtmime",
+  "name": "@jupyterlab-benchmarks/table-render",
   "version": "0.1.0",
   "description": "A JupyterLab extension for rendering table files.",
   "author": " <>",
+  "private": false,
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "style": "style/index.css",
@@ -24,10 +25,10 @@
     "preinstall": "tsc",
     "prepare": "npm run clean && npm run build",
     "watch": "tsc -w",
-    "extension:install": "jupyter labextension install fdtmime",
-    "extension:uninstall": "jupyter labextension uninstall  fdtmime",
-    "extension:enable": "jupyter labextension enable fdtmime",
-    "extension:disable": "jupyter labextension disable fdtmime"
+    "extension:install": "jupyter labextension install @jupyterlab-benchmarks/table-render",
+    "extension:uninstall": "jupyter labextension uninstall  @jupyterlab-benchmarks/table-render",
+    "extension:enable": "jupyter labextension enable @jupyterlab-benchmarks/table-render",
+    "extension:disable": "jupyter labextension disable @jupyterlab-benchmarks/table-render"
   },
   "dependencies": {
     "@jupyterlab/apputils": "^2.1.1",
