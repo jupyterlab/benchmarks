@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlab-benchmarks/table-render",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A JupyterLab extension for rendering table files.",
   "author": " <>",
   "private": false,
@@ -22,7 +22,6 @@
   "scripts": {
     "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
     "build": "tsc",
-    "preinstall": "tsc",
     "prepare": "npm run clean && npm run build",
     "watch": "tsc -w",
     "extension:install": "jupyter labextension install @jupyterlab-benchmarks/table-render",
