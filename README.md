@@ -5,7 +5,7 @@ This repository is a place to make JupyterLab fast.
 It tracks with benchmarks tooling the performance evolution of [JupyterLab](http://github.com/jupyterlab/jupyterlab). Read more on the [documentation website](https://jupyterlab-benchmarks.readthedocs.io).
 
 ```bash
-# Quick start benchmark.
+# Quick start benchmarks.
 export JLAB_HOME=<the_folder_with_your_jupyterlab_source>
 git clone https://github.com/jupyterlab/benchmarks && \
   cd benchmarks && \

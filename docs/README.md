@@ -8,6 +8,7 @@ git clone https://github.com/jupyterlab/benchmarks && \
   cd benchmarks && \
   pip install -e .[rtd] && \
   cd docs && \
+  rm -fr build && \
   make html && \
   open build/html/index.html
 ```

@@ -53,6 +53,7 @@ setup(
             "docutils>=0.15",
             "sphinx",
             "sphinxcontrib-bibtex",
+            "sphinxcontrib-mermaid",
             "ipython",
             "sphinx-book-theme",
             "sphinx_tabs"

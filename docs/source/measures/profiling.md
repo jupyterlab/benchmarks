@@ -1,24 +1,18 @@
 # Browser Profiling
 
-We invite you reading the [anatomy of a frame](https://aerotwist.com/blog/the-anatomy-of-a-frame/) to understand this figure (taken from a download of [this zip file](https://aerotwist.com/static/blog/the-anatomy-of-a-frame/anatomy-of-a-frame.zip)).
+You are invited to read the [anatomy of a frame](https://aerotwist.com/blog/the-anatomy-of-a-frame/) to understand this figure (taken from a download of [this zip file](https://aerotwist.com/static/blog/the-anatomy-of-a-frame/anatomy-of-a-frame.zip)).
 
 ![](images/anatomy-of-a-frame.svg "")
 
-## TLDR
-
 JupyterLab is hanging out / iterating at the Recalc style / Layout steps and does not produce the needed Tiles to be displayed. This happens when ["Any CSS property that changes an element's geometry, like its width, height, or position; the browser has to check all other elements and redo the layout.."](https://developers.google.com/web/tools/chrome-devtools/rendering-tools#layout).
 
-From the many cells profiling, the Force layout is triggered in codemirror.
+From the many cells profiling, a lot Force layouts are triggered in codemirror. The single cell profiling does not highlight the code mirror issue: jupyterlab is nearly as performant as classic notebook as we test with only one cell editor.
 
-The single cell profiling does not highlight the code mirror issue: jupyterlab is nearly as performant as classic notebook as we test with only one cell editor.
+When you switch to an already opened tab, the DOM is already populated and simple hidden with `lm-mod-hidden` and `p-mod-hidden` CSS classes. So when the browser needs to show it again, the cost preliminary steps are not run (so no Forced layout), and the cost is "just": "Recalc Style"->"Layout" all the way down to the Painting and Rasterizing without iteration
 
-## Open vs Switch Tab
+## Open Many Cells
 
-The following analysis have been done when opening a notebook. When you switch to an already opened tab, the DOM is already populated and simple hidden with `lm-mod-hidden` and `p-mod-hidden` CSS classes. So when the browser needs to show it again, the cost preliminary steps are not run (so no Forced layout), and the cost is "just": "Recalc Style"->"Layout" all the way down to the Painting and Rasterizing without iteration
-
-##  Many Cells - 2 LOC and 2 outputs per cell with 250 cells
-
-> JupyterLab
+### JupyterLab (Open Many Cells)
 
 ![](images/profiles/89726263-e12b4100-da18-11ea-95cf-d7eb0821c10b.png "")
 
@@ -32,7 +26,7 @@ The following analysis have been done when opening a notebook. When you switch t
 
 ![](images/profiles/89726303-42531480-da19-11ea-9201-a477e8a33ee0.png "")
 
-> Classic Notebook
+### Classic Notebook (Open Many Cells)
 
 ![](images/profiles/89726806-03c05880-da1f-11ea-82fb-f267f4e6e9e4.png "")
 
@@ -44,7 +38,7 @@ There are some Forced reflow but less than in lab. They are triggered by codemir
 
 Notebook is displayed and a few more quick actions are taken Notebook _session_started (0.3s)
 
-> Comparison
+### Comparison (Open Many Cells)
 
 NbClassic takes 20s to load the notebook and suffers from Forced reflow.
 
@@ -52,9 +46,9 @@ JupyterLab takes 33s to load and is more impacted by the Forced reflow than NbCl
 
 It sounds like most of the latency is due to codemirror triggering reflows. We should look how to typically solve this, see e.g. [CodeMirror/#/5873](https://github.com/codemirror/CodeMirror/issues/5873).
 
-## Single Cell - 1 cell with many DIV outputs
+## Open Single Cell with many DIV outputs
 
-> JupyterLab
+### JupyterLab (Open Single Cell with many DIV outputs)
 
 ![](images/profiles/89727264-3a986d80-da23-11ea-9ac7-bd0aa5f68484.png "")
 
@@ -64,7 +58,7 @@ It sounds like most of the latency is due to codemirror triggering reflows. We s
 
 Style is Forced recalculated (1.72s) triggered by codemirror further to some lumino messages (note the 0.3s Update tree before and after this)
 
-> Classic Notebook
+### Classic Notebook (Open Single Cell with many DIV outputs)
 
 ![](images/profiles/89726994-3ec38b80-da21-11ea-960b-4891cddbcff6.png "")
 
@@ -76,6 +70,6 @@ Then 0.5s to recalculate the styles and layout.
 
 PS: When profiling, classic notebook opens slower than without profiling, which can be understandable and is not an issue as we want to spot here the bottlenecks.
 
-> Comparison
+### Comparison (Open Single Cell with many DIV outputs)
 
 JupyterLab is here 20% slower than Classic Notebook.

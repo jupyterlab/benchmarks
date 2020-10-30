@@ -3,24 +3,23 @@ JupyterLab Benchmarks Documentation
 
 **Benchmarking tools for JupyterLab**
 
-This project goal is a place to make JupyerLab fast. For now, the scope is to optimize:
+This project is a place to make JupyerLab faster. For now, we want to optimize for various notebook content:
 
-- Opening a new notebook document.
-- Tab loading and switching speed for various notebook content. An acceptable time is 300-500 ms switch time.
+1. Opening a new notebook.
+1. Switching tabs. An acceptable time is 300-500 ms switch time.
 
-Out of scope (could become later in scope):
+The following is out-of-scope, but could become later in-scope:
 
-- Initial server start.
-- Initial HTML page loading.
-- Page Save time.
-- Build time.
+1. Initial server start.
+1. Initial HTML page loading.
+1. Notebok saveing time.
+1. Build time.
 
 We iterate in steps:
 
-1. Identify the perfomance issues.
-1. Run Benchmark to have a baseline and be able to compare with fixes.
-1. Profile the Page rendering to identify where bottlenecks reside.
-1. Implement fixes.
+1. Identify the [types of issue](./issues/types) and measure what is going on with e.g. [experiments](./measures/experiments) and [profiling](./measures/profiling). We also understand the notebook [lifecycle](./measures/lifecycle)
+1. Build [benchmark tooling](./benchmarks/index) to have a baseline and be able to compare with fixes.
+1. Define fix [strategies](./fixes/strategies) and [implement](./fixes/implementations) those fixes.
 
 ## Site Contents
 
@@ -29,8 +28,21 @@ We iterate in steps:
 maxdepth: 2
 caption: Issues
 ---
-issues/index
-issues/experiments
+issues/types
+issues/reports
+```
+
+```{toctree}
+---
+maxdepth: 2
+caption: Measures
+---
+measures/experiments
+measures/lifecycle
+measures/profiling
+measures/telemetry
+measures/jaeger
+measures/lighthouse
 ```
 
 ```{toctree}
@@ -40,9 +52,6 @@ caption: Benchmarks
 ---
 benchmarks/index
 benchmarks/ci
-benchmarks/telemetry
-benchmarks/lighthouse
-benchmarks/profiling
 ```
 
 ```{toctree}
@@ -50,8 +59,8 @@ benchmarks/profiling
 maxdepth: 2
 caption: Fixes
 ---
-fixes/index
 fixes/strategies
+fixes/implementations
 ```
 
 ```{toctree}

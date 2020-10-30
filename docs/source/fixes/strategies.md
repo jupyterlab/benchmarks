@@ -1,4 +1,4 @@
-# Fix Strategies
+# Fixes Strategies
 
 Differents stategies can be identified for the fixes. Whatever the fix, we want to ensure:
 
@@ -211,3 +211,8 @@ We should look how to configure or even update CodeMirror code base to mitigate 
 On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): Also editing the codemirror source to avoid measurements (by manually returning what the cached values ended up being) at <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L586> and <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L606> seemed to help a bit. The idea here is that since a single codemirror seems okay, but many codemirrors does not (even when the total number of lines is the same), perhaps we can use measurements from the codemirror to shortcut measurements in all the others, which seem to be causing lots of browser layout time.
 
 Read also the discussion on [CodeMirror/#/5873](https://github.com/codemirror/CodeMirror/issues/5873).
+
+### Improving Network Performance
+
+https://github.com/jupyter/jupyter_server/issues/312
+
