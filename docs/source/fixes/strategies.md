@@ -72,11 +72,7 @@ Then we could use React virtualisation libraries.
 
 - [React Virtual](https://github.com/tannerlinsley/react-virtual)
 
-## DOM Optimization
-
-DOM optimization backed by libraries (fast dom...) or new browser features (content visibility...) can be considered.
-
-### Shadow DOM
+## Shadow DOM
 
 [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM) allows `encapsulation — being able to keep the markup structure, style, and behavior hidden and separate from other code on the page so that different parts do not clash, and the code can be kept nice and clean`.
 
@@ -99,7 +95,7 @@ For the `Nx5 with 2 line of code and 2 outputs per cell`, we have some small imp
 
 ![](images/shadow-dom/91180448-5a7b9280-e6ad-11ea-8e33-5ffa780126cf.png "")
 
-### Content Visibility
+## Content Visibility
 
 We have tried [content visibility](https://web.dev/content-visibility) supported in Chrome 85+ in [this branch](https://github.com/datalayer-contrib/jupyterlab/tree/2.2.x-content-visibility).
 
@@ -111,7 +107,7 @@ Meanwhile, with Shadow DOM, we have no improvement.
 
 See also [Display Locking library](https://github.com/wicg/display-locking) for the related `Display Locking` specification.
 
-### Fast DOM
+## Fast DOM
 
 [FastDOM](https://github.com/wilsonpage/fastdom) is a library that eliminates layout thrashing by batching DOM measurement and mutation tasks.
  
@@ -130,17 +126,11 @@ We can inject more React into the UI components and see if it makes life easier 
 - For React components, [React Concurrency](https://reactjs.org/docs/concurrent-mode-intro.html#concurrency) can be used.
 - [Try Notebok React component](https://github.com/jupyterlab/benchmarks/issues/15) to wrap the outputs in React.
 
-## Browser Configuration
-
-### Web Render
+## Web Render
 
 From this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674411129): Webrender for Firefox 79 (for many linux and macos devices, see <https://wiki.mozilla.org/Platform/GFX/WebRender_Where>  can be turned on via a pref. See also <https://www.techrepublic.com/article/how-to-enable-firefox-webrender-for-faster-page-rendering>. Note that windows firefox has had webrender turned on by default in certain cases for a while now.
 
-## Adhoc Fixes
-
-We can think to adhoc fixes to bring improvements that would apply specific (or all) cases.
-
-### Use requestAnimationFrame (non concluding)
+## Use requestAnimationFrame (non concluding)
 
 Wrapped the cell creation into a requestAnimationFrame call.
 
@@ -168,17 +158,17 @@ This produces a different profile pattern (2 heavy sections separated by an inac
 
 ![](images/profiles/89731086-9d4e3100-da44-11ea-9e2b-292f8a14920c.png "")
 
-### Update Editor on Show (to be confirmed)
+## Update Editor on Show
 
 A candidate fix would be to further look at `updateEditorOnShow` implemented in [jupyterlab/jupyterlab#5700](https://github.com/jupyterlab/jupyterlab/issues/5700), but [is is already set to false...](https://github.com/jupyterlab/jupyterlab/blob/71f07379b184d5b0b8b67b55163d27194a61a0ac/packages/notebook/src/widget.ts#L493).
 
-### Use pushAll cells insted of push (non concluding)
+## Use pushAll cells insted of push (non concluding)
 
 We have updated the [celllist#pushAll](https://github.com/jupyterlab/jupyterlab/blob/7d1e17381d3ed61c23c189822810e8b4918d57ba/packages/notebook/src/celllist.ts#L333-L341) code block but it has not brought better performance.
 
 Current attempts have not brought enhancements.
 
-### Reuse contentFactory in Notebook Model
+## Reuse contentFactory in Notebook Model
 
 We may try to benchmark with this patch. At first user try, this does not give sensible change.
 
@@ -198,21 +188,28 @@ index 2efeee7b3..4716ce9f7 100644
        if (this.modelDB) {
 ```
 
-### Use scrollbarStyle: 'null' in Editor Config
+## Use scrollbarStyle: 'null' in Editor Config
 
 On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): I did some quick experiments, based on some quick profiling results (it seems that the vast majority of time is in browser layout). For example, adding scrollbarStyle: 'null' to the bare editor config in [editor.ts](https://github.com/jupyterlab/jupyterlab/blob/7d1e17381d3ed61c23c189822810e8b4918d57ba/packages/codemirror/src/editor.ts#L1374).
 
-### Further Tune CodeMirror Configuration
+## Further Tune CodeMirror Configuration
 
 We should look how to configure or even update CodeMirror code base to mitigate the numerous Force layout.
 
-### Enhance CodeMirror Code Base
+## Enhance CodeMirror Code Base
 
 On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): Also editing the codemirror source to avoid measurements (by manually returning what the cached values ended up being) at <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L586> and <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L606> seemed to help a bit. The idea here is that since a single codemirror seems okay, but many codemirrors does not (even when the total number of lines is the same), perhaps we can use measurements from the codemirror to shortcut measurements in all the others, which seem to be causing lots of browser layout time.
 
 Read also the discussion on [CodeMirror/#/5873](https://github.com/codemirror/CodeMirror/issues/5873).
 
-### Improving Network Performance
+## Transfer Content in Chunks
 
-https://github.com/jupyter/jupyter_server/issues/312
+Transfer Content in Chunks for Incremental Loading on <https://github.com/jupyter/jupyter_server/issues/308>
 
+## Server Memory cache
+
+TBD
+
+## Improving Network Performance
+
+<https://github.com/jupyter/jupyter_server/issues/312>

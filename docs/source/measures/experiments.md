@@ -1,10 +1,10 @@
 # Experiments
 
-[Experiments](https://github.com/jupyterlab/benchmarks/tree/master/experiments) to find the root cause of the issues.
+The [experiments](https://github.com/jupyterlab/benchmarks/tree/master/experiments) folder contains code useful to find the root cause of the issues.
 
 ## Editor Comparison
 
-Comparison for `DOMContentLoaded` (seconds) for 1000 editors.
+We compare for different editor technologies the time (in seconds) needed to receive the `DOMContentLoaded` event for 1000 editors.
 
 - 1000 JupyterLab Cells: 50 seconds.
 - 1000 JupyterLab Cells in a Lumino BoxPanel: 10 seconds for DOMContentLoaded, cells are only shown after 140 seconds.
@@ -13,7 +13,7 @@ Comparison for `DOMContentLoaded` (seconds) for 1000 editors.
 - 1000 ProseMirror (basic version): 2 seconds.
 - 1000 ReMirror: 50 seconds.
 
-Time measures from 1 to 1000 CodeMirror editors.
+The time measures from 1 to 1000 CodeMirror editors show an exponential nature.
 
 ![](images/codemirrors.png "")
 
@@ -22,11 +22,3 @@ Time measures from 1 to 1000 CodeMirror editors.
 - https://github.com/jupyterlab/lumino/blob/master/packages/widgets/src/widget.ts#L610  
 - https://github.com/jupyterlab/jupyterlab/search?q=onResize  
 - https://github.com/jupyterlab/lumino/search?q=onResize  
-
-## Transfer content in chunks for incremental loading
-
-<https://github.com/jupyter/jupyter_server/issues/308>
-
-## Server Memory cache
-
-TBD
