@@ -36,6 +36,7 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinxcontrib.bibtex",
     "sphinx_tabs.tabs",
+    "sphinxcontrib.mermaid",
 ]
 
 source_suffix = {
@@ -48,8 +49,6 @@ source_suffix = {
 # jupyter_execute_notebooks = "force"
 jupyter_execute_notebooks = "off"
 
-html_js_files = ["https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"]
-
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
@@ -58,9 +57,6 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-# Prefix document path to section labels, to use:
-# `path/to/file:heading` instead of just `heading`
-autosectionlabel_prefix_document = True
 
 # -- Options for HTML output -------------------------------------------------
 

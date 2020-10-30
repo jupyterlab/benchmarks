@@ -2,6 +2,8 @@
 
 [Experiments](https://github.com/jupyterlab/benchmarks/tree/master/experiments) to find the root cause of the issues.
 
+## Editor Comparison
+
 Comparison for `DOMContentLoaded` (seconds) for 1000 editors.
 
 - 1000 JupyterLab Cells: 50 seconds.
@@ -14,3 +16,17 @@ Comparison for `DOMContentLoaded` (seconds) for 1000 editors.
 Time measures from 1 to 1000 CodeMirror editors.
 
 ![](images/codemirrors.png "")
+
+## Lumino actions on resize
+
+- https://github.com/jupyterlab/lumino/blob/master/packages/widgets/src/widget.ts#L610  
+- https://github.com/jupyterlab/jupyterlab/search?q=onResize  
+- https://github.com/jupyterlab/lumino/search?q=onResize  
+
+## Transfer content in chunks for incremental loading
+
+<https://github.com/jupyter/jupyter_server/issues/308>
+
+## Server Memory cache
+
+TBD
