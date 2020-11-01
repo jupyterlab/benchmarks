@@ -8,7 +8,9 @@ import '../style/index.css';
 
 const NUMBER_OF_CELLS = 1000;
 
-const editorContent = document.querySelector("#editor-content");
+const editorContent = document.querySelector("#editor-content") as Element;
+editorContent.className = 'ExperimentCodeMirrors'
+
 const cells = new Array<CodeCell>();
 
 for (let i = 0; i < NUMBER_OF_CELLS; i++) {
@@ -30,3 +32,9 @@ cells.forEach((cell, index) => {
   editorContent?.append(cell.node);
   console.log(`add ${index} to dom`, performance.now());  
 });
+
+const exp = document.querySelectorAll('.ExperimentCodeMirrors');
+exp.forEach(el => {
+  el.className = 'ExperimentCodeMirrors ExperimentContainNone'
+});
+console.log(performance.now());

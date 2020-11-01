@@ -95,6 +95,16 @@ For the `Nx5 with 2 line of code and 2 outputs per cell`, we have some small imp
 
 ![](images/shadow-dom/91180448-5a7b9280-e6ad-11ea-8e33-5ffa780126cf.png "")
 
+## Tune CodeMirror Configuration
+
+We should look how to configure or even update CodeMirror code base to mitigate the numerous Force layout.
+
+## Enhance CodeMirror Code Base
+
+On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): Also editing the codemirror source to avoid measurements (by manually returning what the cached values ended up being) at <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L586> and <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L606> seemed to help a bit. The idea here is that since a single codemirror seems okay, but many codemirrors does not (even when the total number of lines is the same), perhaps we can use measurements from the codemirror to shortcut measurements in all the others, which seem to be causing lots of browser layout time.
+
+Read also the discussion on [CodeMirror/#/5873](https://github.com/codemirror/CodeMirror/issues/5873).
+
 ## Content Visibility
 
 We have tried [content visibility](https://web.dev/content-visibility) supported in Chrome 85+ in [this branch](https://github.com/datalayer-contrib/jupyterlab/tree/2.2.x-content-visibility).
@@ -116,19 +126,11 @@ See also [Display Locking library](https://github.com/wicg/display-locking) for 
 [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) makes it possible to run a script operation in a background thread separate from the main execution thread of a web application. The advantage of this is that laborious processing can be performed in a separate thread, allowing the main (usually the UI) thread to run without being blocked/slowed down.
 
 - [Web Workers API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)
-- [Service Workers](https://developers.google.com/web/fundamentals/primers/service-workers)
 - [React and Webworkers](https://github.com/facebook/react/issues/3092#issuecomment-333417970)
 
-## Core React
+## Service Workers
 
-We can inject more React into the UI components and see if it makes life easier to get better performance using core React performance features.
-
-- For React components, [React Concurrency](https://reactjs.org/docs/concurrent-mode-intro.html#concurrency) can be used.
-- [Try Notebok React component](https://github.com/jupyterlab/benchmarks/issues/15) to wrap the outputs in React.
-
-## Web Render
-
-From this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674411129): Webrender for Firefox 79 (for many linux and macos devices, see <https://wiki.mozilla.org/Platform/GFX/WebRender_Where>  can be turned on via a pref. See also <https://www.techrepublic.com/article/how-to-enable-firefox-webrender-for-faster-page-rendering>. Note that windows firefox has had webrender turned on by default in certain cases for a while now.
+- [Service Workers](https://developers.google.com/web/fundamentals/primers/service-workers)
 
 ## Use requestAnimationFrame (non concluding)
 
@@ -136,21 +138,21 @@ Wrapped the cell creation into a requestAnimationFrame call.
 
 ```javascript
 requestAnimationFrame(() => {
-    const cellDB = this._factory.modelDB!;
-    const cellType = cellDB.createValue(id + '.type');
-    let cell: ICellModel;
-    switch (cellType.get()) {
-        case 'code':
-        cell = this._factory.createCodeCell({ id: id });
-        break;
-        case 'markdown':
-        cell = this._factory.createMarkdownCell({ id: id });
-        break;
-        default:
-        cell = this._factory.createRawCell({ id: id });
-        break;
-    }
-    this._cellMap.set(id, cell);
+  const cellDB = this._factory.modelDB!;
+  const cellType = cellDB.createValue(id + '.type');
+  let cell: ICellModel;
+  switch (cellType.get()) {
+    case 'code':
+    cell = this._factory.createCodeCell({ id: id });
+    break;
+    case 'markdown':
+    cell = this._factory.createMarkdownCell({ id: id });
+    break;
+    default:
+    cell = this._factory.createRawCell({ id: id });
+    break;
+  }
+  this._cellMap.set(id, cell);
 });
 ```
 
@@ -168,9 +170,16 @@ We have updated the [celllist#pushAll](https://github.com/jupyterlab/jupyterlab/
 
 Current attempts have not brought enhancements.
 
-## Reuse contentFactory in Notebook Model
+## React Concurrency
 
-We may try to benchmark with this patch. At first user try, this does not give sensible change.
+We can inject more React into the UI components and see if it makes life easier to get better performance using core React performance features.
+
+- For React components, [React Concurrency](https://reactjs.org/docs/concurrent-mode-intro.html#concurrency) can be used.
+- [Try Notebok React component](https://github.com/jupyterlab/benchmarks/issues/15) to wrap the outputs in React.
+
+## Reuse contentFactory
+
+Reuse contentFactory in Notebook Model. We may try to benchmark with this patch. At first user try, this does not give sensible change.
 
 ```
 diff --git a/packages/notebook/src/model.ts b/packages/notebook/src/model.ts
@@ -192,16 +201,6 @@ index 2efeee7b3..4716ce9f7 100644
 
 On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): I did some quick experiments, based on some quick profiling results (it seems that the vast majority of time is in browser layout). For example, adding scrollbarStyle: 'null' to the bare editor config in [editor.ts](https://github.com/jupyterlab/jupyterlab/blob/7d1e17381d3ed61c23c189822810e8b4918d57ba/packages/codemirror/src/editor.ts#L1374).
 
-## Further Tune CodeMirror Configuration
-
-We should look how to configure or even update CodeMirror code base to mitigate the numerous Force layout.
-
-## Enhance CodeMirror Code Base
-
-On this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674419945): Also editing the codemirror source to avoid measurements (by manually returning what the cached values ended up being) at <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L586> and <https://github.com/codemirror/CodeMirror/blob/83b9f82f411274407755f80f403a48448faf81d0/src/measurement/position_measurement.js#L606> seemed to help a bit. The idea here is that since a single codemirror seems okay, but many codemirrors does not (even when the total number of lines is the same), perhaps we can use measurements from the codemirror to shortcut measurements in all the others, which seem to be causing lots of browser layout time.
-
-Read also the discussion on [CodeMirror/#/5873](https://github.com/codemirror/CodeMirror/issues/5873).
-
 ## Transfer Content in Chunks
 
 Transfer Content in Chunks for Incremental Loading on <https://github.com/jupyter/jupyter_server/issues/308>
@@ -212,4 +211,9 @@ TBD
 
 ## Improving Network Performance
 
-<https://github.com/jupyter/jupyter_server/issues/312>
+- [Improving Network Performance](https://github.com/jupyter/jupyter_server/issues/312).
+
+## Web Render
+
+From this [comment](https://github.com/jupyterlab/jupyterlab/issues/4292#issuecomment-674411129): Webrender for Firefox 79 (for many linux and macos devices, see <https://wiki.mozilla.org/Platform/GFX/WebRender_Where>  can be turned on via a pref. See also <https://www.techrepublic.com/article/how-to-enable-firefox-webrender-for-faster-page-rendering>. Note that windows firefox has had webrender turned on by default in certain cases for a while now.
+

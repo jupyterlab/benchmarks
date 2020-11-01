@@ -30,7 +30,7 @@ for (let i = 0; i < NUMBER_OF_CELLS; i++) {
   }).initializeState();
   cell.activate();
   panel.addWidget(cell);
-  console.log(performance.now());
+  console.log(`addWidget ${i}`, performance.now());  
 }
 /*
 window.addEventListener('resize', () => {
