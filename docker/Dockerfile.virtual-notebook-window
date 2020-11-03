@@ -10,4 +10,4 @@ RUN cd jupyterlab && \
   yarn && \
   yarn build
 
-ENTRYPOINT ["jupyterlab", "--dev-mode", "--notebook-dir=/home/jovyan" ]
+ENTRYPOINT ["jupyter", "lab", "--dev-mode", "--notebook-dir=/home/jovyan" ]
