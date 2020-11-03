@@ -17,3 +17,13 @@ body {
 /* https://codemirror.net/demo/resize.html */
   height: auto !important;
 }
+
+.ExperimentCodeMirrors {
+  width: 100%;
+  height: auto;
+  contain: strict;
+}
+
+.ExperimentContainNone {
+  contain: none !important;
+}

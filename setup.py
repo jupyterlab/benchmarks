@@ -42,6 +42,7 @@ setup(
         ],
         # Note: This is only required for internal use
         "rtd": [
+            "matplotlib",
             "myst_parser",
             "myst-nb",
             "notebook",

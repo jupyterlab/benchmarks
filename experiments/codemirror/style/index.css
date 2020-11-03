@@ -1,9 +1,14 @@
-.exp-code-mirrors {
-  width: 100%;
-  height: auto;
-}
-
 .CodeMirror {
   border: 1px solid #eee;
   height: auto !important; /* https://codemirror.net/demo/resize.html */
+}
+
+.ExperimentCodeMirrors {
+  width: 100%;
+  height: auto;
+  contain: strict;
+}
+
+.ExperimentContainNone {
+  contain: none !important;
 }

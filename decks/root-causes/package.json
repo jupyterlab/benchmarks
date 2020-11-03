@@ -1,0 +1,22 @@
+{
+  "name": "jupyterlab-benchmarks-root-causes",
+  "version": "0.0.1",
+  "description": "",
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jupyterlab/benchmarks"
+  },
+  "scripts": {
+    "start": "mdx-deck root-causes.mdx",
+    "build": "npm run now-build",
+    "vercel-build": "rm -rf dist/ && mdx-deck build root-causes.mdx --no-html && cp -r images dist/ && cp -r snippets dist/",
+    "deploy": "vercel && vercel alias"
+  },
+  "devDependencies": {
+    "mdx-deck": "^1.8.2",
+    "mdx-deck-code-surfer": "^0.5.5",
+    "raw-loader": "^1.0.0"
+  }
+}
