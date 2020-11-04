@@ -1,0 +1,5 @@
+FROM jupyterlabbenchmarks/jlab-base:latest
+
+RUN pip install jupyterlab==2.2.8
+
+RUN jupyter labextension install @jupyterlab-benchmarks/table-render
