@@ -31,7 +31,7 @@ jobs:
         NODEJS: [12.x]
         PLAYWRIGTH: ['1.3.0']
         # JupyterLab [older-commit, newer-commit]
-        JLAB_COMMITS: [2.2.x, virtual_notebook/window]
+        JLAB_COMMITS: [2.2.x, virtual_notebook_window]
         # Benchmarks
         BENCHMARK_MAX_N: [100]          # Default is 100
         BENCHMARK_NUMBER_SAMPLES: [21]  # Default is 20
@@ -108,7 +108,7 @@ jobs:
     needs: linux
     env:
       OLD_KEY: '2.2.x'
-      NEW_KEY: 'virtual_notebook/window'
+      NEW_KEY: 'virtual_notebook_window'
       KEY_TYPE: branch
     strategy:
       matrix:
