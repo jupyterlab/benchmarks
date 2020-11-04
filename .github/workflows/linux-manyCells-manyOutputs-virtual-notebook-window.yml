@@ -108,7 +108,7 @@ jobs:
     needs: linux
     env:
       OLD_KEY: '2.2.x'
-      NEW_KEY: '2.2.x-div-block'
+      NEW_KEY: 'virtual_notebook/window'
       KEY_TYPE: branch
     strategy:
       matrix:
