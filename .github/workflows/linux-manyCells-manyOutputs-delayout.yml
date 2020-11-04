@@ -1,4 +1,4 @@
-name: Linux-manyCells-manyOutputs-div-block-2.2.x
+name: Linux-manyCells-manyOutputs-delayout
 on:
   push:
   schedule:

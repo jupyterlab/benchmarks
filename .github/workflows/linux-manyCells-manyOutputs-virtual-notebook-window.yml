@@ -1,4 +1,4 @@
-name: Linux-manyCells-manyOutputs-div-block-2.2.x
+name: Linux-manyCells-manyOutputs-virtual-notebook-window
 on:
   push:
   schedule:
