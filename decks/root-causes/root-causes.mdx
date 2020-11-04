@@ -14,7 +14,7 @@ Navigate with ➡️
 
 Preview mode with `Option`+`P`
 
-<small>November 3, 2020</small>
+<small>November 4, 2020</small>
 
 ---
 
@@ -25,41 +25,6 @@ Preview mode with `Option`+`P`
     <p>Exponential time adding CodeMirrors</p>
   </div>
 </Split>
-
----
-
-export default Invert
-
-# Causes in the Frontend
-
-## Not in the Backend!
-
-<Appear>
-  <p>Forced Layout on each CodeMirror addition</p>
-  <p>Lumino Panel slows down</p>
-</Appear>
-
-```notes
-...
-```
-
----
-
-export default Invert
-
-# Fixes
-
-<Appear>
-  <p>1️⃣ Virtual Notebook</p>
-  <p>2️⃣ DeLayout Rendering</p>
-  <p>3️⃣ Fix Lumino or DeLumino</p>
-  <p>4️⃣ Tune or Fix Code Mirror</p>
-  <p>5️⃣ Service or Web Workers</p>
-</Appear>
-
-```notes
-...
-```
 
 ---
 
@@ -75,6 +40,47 @@ export default Invert
 
 ---
 
+export default Invert
+
+# Causes in the Frontend
+
+## Backend not covered here!
+
+<Appear>
+  <p style={{color: 'yellow'}}>Forced Layout on each CodeMirror addition</p>
+  <p style={{color: 'yellow'}}>Lumino Panel slows down</p>
+</Appear>
+
+```notes
+...
+```
+
+---
+
+export default Invert
+
+<SplitRight>
+
+<div>
+  <img src="./images/fixes-comparison.png"/>
+  <h1>Fixes</h1>
+  <Appear>
+    <p>1️⃣ Virtual Notebook</p>
+    <p>2️⃣ DeLayout Rendering</p>
+    <p>3️⃣ 🚧 Tune or Fix Code Mirror</p>
+    <p>4️⃣ 🚧 Fix Lumino or DeLumino</p>
+    <p>5️⃣ 🚧 Service or Web Workers</p>
+  </Appear>
+</div>
+
+</SplitRight>
+
+```notes
+...
+```
+
+---
+
 # 1️⃣ Virtual Notebook
 
 ### Render the first 10 cells and placeholders for the rest
@@ -82,16 +88,17 @@ export default Invert
 ### Lazy render the rest
 
 <ul style={{listStyle: 'none'}}>
-  <li>👍 Notebook loads faster (90% faster for very large notebooks)</li>
-  <li>❗ User is impacted by the Forced Layout while scrolling and notebook still renders</li>
-  <li>❓ Alternative: Only render cells in the visible area with a <em>Window</em></li>
+  <li style={{marginBottom: 50}}>👍 Notebook loads faster (90% faster for very large notebooks)</li>
+  <li style={{marginBottom: 50}}>❗ User is impacted by the Forced Layout while scrolling and notebook still renders</li>
+  <li>⚙️ Set `renderOnIdle=false`</li>
+  <li>⚙️ Alternative: Only render cells in the visible area with a <em>Window</em></li>
 </ul>
 
 ---
 
 <CodeSurfer
   code={require("raw-loader!./snippets/virtual-notebook.ts")} 
-  title="Notebook Constructor"
+  title="FYI Notebook Constructor"
   showNumbers={false}
   steps={[
     {}, // First step should be an overview of the snippet
@@ -116,7 +123,7 @@ export default Invert
     <p>👍 Avoid repetitive Force Layout</p>
     <p>Mutate all content with <em>contain: none</em></p>
     <p>👍 A single Forced Layout instead of many</p>
-    <h3>➡️ 40% faster for 1000 cells on a single page</h3>
+    <h3>➡️ Faster for 1000 cells on a single page</h3>
   </Appear>
 </div>
 
@@ -124,15 +131,7 @@ export default Invert
 
 ---
 
-# 3️⃣ Fix Lumino or DeLumino
-
-#### 1000 JupyterLab Cells: 50 seconds.
-
-#### 1000 JupyterLab Cells in a Lumino BoxPanel: 10 seconds for DOMContentLoaded, cells are only shown after 140 seconds.
-
----
-
-# 4️⃣ Tune or Fix Code Mirror
+# 3️⃣ 🚧 Tune or Fix Code Mirror
 
 #### Tune CodeMirror configuration
 
@@ -140,9 +139,41 @@ export default Invert
 
 ---
 
-# 5️⃣ Service or Web Workers
+# 4️⃣ 🚧 Fix Lumino or DeLumino
 
-#### Bring more Concurrency
+#### 1000 JupyterLab Cells: 50 seconds.
+
+#### 1000 JupyterLab Cells in a Lumino BoxPanel
+
+#### 10 seconds for DOMContentLoaded, cells are only shown after 140 seconds.
+
+---
+
+# 5️⃣ 🚧 Service or Web Workers
+
+#### Bring more Concurrency❗
+
+#### Rendering still the bootleneck...
+
+#### To be combined with 2️⃣ DeLayout Rendering❓
+
+---
+
+<CodeSurfer
+  code={require("raw-loader!./snippets/docker.sh")} 
+  title="🐳 Try with Docker"
+  showNumbers={false}
+  steps={[
+    {}, // First step should be an overview of the snippet
+    {range: [1,7], notes: "Vanilla JupyterLab 2.2.8"},
+    {range: [9,15], notes: "Virtual Notebook"},
+    {range: [17,23], notes: "Virtual Notebook with a Window"},
+    {range: [25,31], notes: "DeLayout"},
+    {}
+  ]}
+/>
+
+
 
 ---
 
