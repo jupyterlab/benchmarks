@@ -15,6 +15,10 @@ build: ## build the image.
 		-f Dockerfile.base \
 		.
 	@exec docker build \
+		-t jupyterlabbenchmarks/jlab-2-2-8:latest \
+		-f Dockerfile.2-2-8 \
+		.
+	@exec docker build \
 		-t jupyterlabbenchmarks/jlab-virtual-notebook:latest \
 		-f Dockerfile.virtual-notebook \
 		.
@@ -22,14 +26,34 @@ build: ## build the image.
 		-t jupyterlabbenchmarks/jlab-virtual-notebook-window:latest \
 		-f Dockerfile.virtual-notebook-window \
 		.
+	@exec docker build \
+		-t jupyterlabbenchmarks/jlab-delayout:latest \
+		-f Dockerfile.delayout \
+		.
 
 push: ## push the image.
 	@exec docker push \
 	    jupyterlabbenchmarks/jlab-base:latest
 	@exec docker push \
+	    jupyterlabbenchmarks/jlab-2-2-8:latest
+	@exec docker push \
 	    jupyterlabbenchmarks/jlab-virtual-notebook:latest
 	@exec docker push \
 	    jupyterlabbenchmarks/jlab-virtual-notebook-window:latest
+	@exec docker push \
+	    jupyterlabbenchmarks/jlab-delayout:latest
+
+start-2-2-8: rm ## start the container.
+	@exec docker run -it \
+		-e JUPYTER_ENABLE_LAB=true \
+		--rm \
+		-d \
+		--name jlab \
+		-p 8888:8888 \
+		jupyterlabbenchmarks/jlab-2-2-8:latest
+	@exec sleep 1s
+	make token
+	make logs
 
 start-virtual-notebook: rm ## start the container.
 	@exec docker run -it \
@@ -51,6 +75,18 @@ start-virtual-notebook-window: rm ## start the container.
 		--name jlab \
 		-p 8888:8888 \
 		jupyterlabbenchmarks/jlab-virtual-notebook-window:latest
+	@exec sleep 1s
+	make token
+	make logs
+
+start-delayout: rm ## start the container.
+	@exec docker run -it \
+		-e JUPYTER_ENABLE_LAB=true \
+		--rm \
+		-d \
+		--name jlab \
+		-p 8888:8888 \
+		jupyterlabbenchmarks/jlab-delayout:latest
 	@exec sleep 1s
 	make token
 	make logs
