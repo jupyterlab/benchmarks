@@ -6,4 +6,9 @@
 .ExperimentCodeMirrors {
   width: 100%;
   height: auto;
+  contain: strict;
+}
+
+.ExperimentContainNone {
+  contain: none !important;
 }

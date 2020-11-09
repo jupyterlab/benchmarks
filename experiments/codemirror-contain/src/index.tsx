@@ -24,4 +24,9 @@ for (let i = 0; i < NUMBER_OF_CODEMIRRORS; i++) {
   });
   console.log(performance.now());
 }
+
+const exp = document.querySelectorAll('.ExperimentCodeMirrors');
+exp.forEach(el => {
+  el.className = 'ExperimentCodeMirrors ExperimentContainNone'
+});
 console.log(performance.now());

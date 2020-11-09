@@ -1,9 +1,5 @@
-import CodeMirror from 'codemirror';
-
-import 'codemirror/mode/python/python';
-import 'codemirror/lib/codemirror.css';
-
-import './../style/index.css';
+import {EditorState, EditorView, basicSetup} from "@codemirror/next/basic-setup"
+import {html} from "@codemirror/next/lang-html"
 
 const editorContent = document.querySelector("#editor-content");
 
@@ -16,12 +12,15 @@ for (let i = 0; i < NUMBER_OF_CODEMIRRORS; i++) {
   let ce = document.createElement('div');
   ce.className = 'ExperimentCodeMirrors'
   editorContent.appendChild(ce);
-  const cm = CodeMirror(ce, {
-    value: `print("Code Mirror ${i}")\nline 2\nline 3`,
-    mode:  'python',
-    lineNumbers: false,  
-    viewportMargin: Infinity
-  });
+  let state = EditorState.create({
+    doc: `<script>
+const {readFile} = require("fs");
+readFile("package.json", "utf8", (err, data) => {
+  console.log(data);
+});
+</script>`,
+    extensions: [ basicSetup, html() ]});
+  new EditorView({state, parent: ce!})
   console.log(performance.now());
 }
 console.log(performance.now());
