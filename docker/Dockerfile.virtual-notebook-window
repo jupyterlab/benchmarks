@@ -5,6 +5,9 @@ RUN git clone \
   -b virtual_notebook/window \
   --depth 1
 
+COPY add_table_render.py /home/jovyan/scripts/add_table_render.py
+RUN cd jupyterlab && python /home/jovyan/scripts/add_table_render.py
+
 RUN cd jupyterlab && \
   pip install -e . && \
   yarn && \
