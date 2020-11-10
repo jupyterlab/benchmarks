@@ -70,7 +70,7 @@ export default Invert
   <h1>Fixes</h1>
   <Appear>
     <p>1️⃣ Virtual Notebook</p>
-    <p>2️⃣ DeLayout Rendering</p>
+    <p>2️⃣ 🏃 DeLayout Rendering</p>
     <p>3️⃣ 🏃 Stripped Output</p>
     <p>4️⃣ 🏃 Tune or Fix Code Mirror</p>
     <p>5️⃣ 🏃 Fix Lumino</p>
@@ -132,7 +132,7 @@ export default Invert
 
 <div>
   <img src="./images/codemirror-comparison.png"/>
-  <h1>2️⃣ DeLayout Rendering</h1>
+  <h1>2️⃣ 🏃 DeLayout Rendering</h1>
   <Appear>
     <p>Render all cells with <em>contain: strict</em></p>
     <p>👍 Avoid repetitive Force Layout</p>
@@ -195,6 +195,25 @@ export default Invert
 #### Rendering still the bootleneck...
 
 #### To be combined with 2️⃣ DeLayout Rendering❓
+
+---
+
+# Next Step?
+
+| Fix                     | Workload       | Gain   |
+| ----------------------- |:--------------:|:------:|
+| Virtual Notebook        | Done           | +++    |
+| Virtual Notebook Window | +              | ?      |
+| DeLayout                | +              | ++     |
+| CodeMirror.next         | +++++          | +++    |
+| Fix Lumino              | ++             | ++     |
+
+#### Proposal
+
+1. Larger number of cells to be rendered in Virtual Notebook (e.g. 100)
+2. Merge DeLayout
+3. Develop and Merge Lumino Fix
+4. Release 2.3.0a2
 
 ---
 
