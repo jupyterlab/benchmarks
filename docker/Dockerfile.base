@@ -156,6 +156,7 @@ RUN fix-permissions /etc/jupyter/
 USER $NB_UID
 
 COPY generated-1000cells-0.9ratio-2loc.ipynb /home/jovyan/generated-1000cells-0.9ratio-2loc.ipynb
+COPY generated-100cells-datatable-200rowx50col.ipynb /home/jovyan/generated-100cells-datatable-200rowx50col.ipynb
 COPY notebooks /home/jovyan/notebooks
 
 WORKDIR $HOME
