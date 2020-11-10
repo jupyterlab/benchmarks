@@ -14,7 +14,7 @@ Navigate with ➡️
 
 Preview mode with `Option`+`P`
 
-<small>November 4, 2020</small>
+<small>November 10, 2020</small>
 
 ---
 
@@ -72,8 +72,8 @@ export default Invert
     <p>1️⃣ Virtual Notebook</p>
     <p>2️⃣ DeLayout Rendering</p>
     <p>3️⃣ 🏃 Stripped Output</p>
-    <p>4️⃣ 🚧 Tune or Fix Code Mirror</p>
-    <p>5️⃣ 🚧 Fix Lumino or DeLumino</p>
+    <p>4️⃣ 🏃 Tune or Fix Code Mirror</p>
+    <p>5️⃣ 🏃 Fix Lumino</p>
     <p>6️⃣ 🚧 Service or Web Workers</p>
   </Appear>
 </div>
@@ -118,16 +118,20 @@ export default Invert
 
 ---
 
-# Benchmark on Virtual Notebook
-
-<img src='images/benchmark-virtual-notebook.png' />
+<Split>
+  <div>
+    <h1>Benchmark on Virtual Notebook</h1>
+    <p>Large gains</p>
+    <img src='images/benchmark-virtual-notebook.png' />
+  </div>
+</Split>
 
 ---
 
 <SplitRight>
 
 <div>
-  <img src="./images/codemirror-contain.png"/>
+  <img src="./images/codemirror-comparison.png"/>
   <h1>2️⃣ DeLayout Rendering</h1>
   <Appear>
     <p>Render all cells with <em>contain: strict</em></p>
@@ -150,21 +154,37 @@ export default Invert
 
 ---
 
-# 4️⃣ 🚧 Tune or Fix Code Mirror
+<SplitRight>
 
-#### Tune CodeMirror configuration
+<div>
+  <img src="./images/codemirror-comparison.png"/>
+  <h1>4️⃣ 🏃 Tune or Fix Code Mirror</h1>
+  <Appear>
+    <p>🤷 Tune CodeMirror configuration</p>
+    <p>🤷 Fix CodeMirror source code</p>
+    <p>❌ Move to CodeMirror.next - Backward Incompatible</p>
+    <p>➡️ Workaround with DeLayout Rendering</p>
+  </Appear>
+</div>
 
-#### Fix CodeMirror source code
+</SplitRight>
 
 ---
 
-# 5️⃣ 🚧 Fix Lumino or DeLumino
+<SplitRight>
 
-#### 1000 JupyterLab Cells: 50 seconds.
+<div>
+  <img src="./images/lumino-onresize.png" style={{maxWidth: 800}}/>
+  <h1>5️⃣ 🏃 Fix Lumino</h1>
+  <Appear>
+    <p>1000 JupyterLab Cells: 50 seconds.</p>
+    <p>1000 JupyterLab Cells in a Lumino BoxPanel</p>
+    <p>10 seconds for DOMContentLoaded, cells are only shown after 140 seconds</p>
+    <h3>➡️ Disable onResize events</h3>
+  </Appear>
+</div>
 
-#### 1000 JupyterLab Cells in a Lumino BoxPanel
-
-#### 10 seconds for DOMContentLoaded, cells are only shown after 140 seconds.
+</SplitRight>
 
 ---
 

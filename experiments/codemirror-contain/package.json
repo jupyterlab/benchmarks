@@ -1,0 +1,35 @@
+{
+  "name": "@jupyterlab/experiment-codemirror-contain",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "webpack",
+    "clean": "rimraf node_modules lib build",
+    "start": "webpack-dev-server"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "codemirror": "^5.57.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "7.9.6",
+    "@babel/preset-react": "7.9.4",
+    "@babel/preset-typescript": "7.9.0",
+    "@types/codemirror": "^0.0.56",
+    "babel-loader": "^8.0.6",
+    "css-loader": "4.2.2",
+    "rimraf": "3.0.2",
+    "style-loader": "1.2.1",
+    "webpack": "4.44.1",
+    "webpack-cli": "3.3.12",
+    "webpack-dev-server": "3.11.0",
+    "html-webpack-plugin": "4.4.1"
+  },
+  "babel": {
+    "presets": [  
+      "@babel/preset-env",
+      "@babel/preset-react",
+      "@babel/preset-typescript"
+    ]   
+  }
+}

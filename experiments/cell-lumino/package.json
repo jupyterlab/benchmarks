@@ -1,5 +1,5 @@
 {
-  "name": "@jupyterlab/experiment-cell-panel",
+  "name": "@jupyterlab/experiment-cell-lumino",
   "version": "0.0.1",
   "private": true,
   "scripts": {
