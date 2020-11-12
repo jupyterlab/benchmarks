@@ -1,4 +1,4 @@
-import { BoxPanel as Panel, Widget } from '@lumino/widgets';
+import { BoxPanel, Widget } from '@lumino/widgets';
 
 import { CodeCellModel, CodeCell } from '@jupyterlab/cells';
 import {
@@ -15,10 +15,10 @@ const NUMBER_OF_CELLS = 1000;
 
 const editorContent = document.querySelector("#editor-content");
 
-const panel = new Panel();
+const panel = new BoxPanel();
 panel.id = 'main';
-// panel.direction = 'top-to-bottom';
-// panel.spacing = 0;
+panel.direction = 'top-to-bottom';
+panel.spacing = 0;
 Widget.attach(panel, editorContent as HTMLElement);
 
 for (let i = 0; i < NUMBER_OF_CELLS; i++) {

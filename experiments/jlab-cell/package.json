@@ -1,5 +1,5 @@
 {
-  "name": "@jupyterlab/experiment-cell",
+  "name": "@jupyterlab/experiment-jlab-cell",
   "version": "0.0.1",
   "private": true,
   "scripts": {
