@@ -9,7 +9,7 @@ module.exports = {
   },
   bail: true,
   devtool: 'cheap-source-map',
-  mode: 'production',
+  mode: 'development',
   module: {
     rules: [
       { test: /\.css$/, use: ['style-loader', 'css-loader'] },

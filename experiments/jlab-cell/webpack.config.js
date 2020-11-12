@@ -8,7 +8,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'cell.js'
   },
-  mode: 'production',
+  mode: 'development',
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ],
   },

@@ -7,7 +7,7 @@ module.exports = {
     filename: 'remirror.js',
     path: path.resolve(__dirname, 'dist'),
   },
-  mode: 'production',
+  mode: 'development',
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx"]
   },

@@ -3,22 +3,20 @@ const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const path = require('path');
 
 module.exports = {
-  entry: ['./src/index.ts'],
+  entry: ['./src/index'],
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'cell-panel.js',
-    publicPath: '/',
+    filename: 'cell.js'
   },
-  mode: 'production',
+  mode: 'development',
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ],
   },
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
+        test: /\.ts(x?)?$/,
+        loader: "babel-loader",
       },
       { test: /\.css$/, use: ['style-loader', 'css-loader'] },
       { test: /\.md$/, use: 'raw-loader' },
