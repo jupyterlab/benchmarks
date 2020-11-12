@@ -5,18 +5,8 @@ import '../style/index.css';
 
 class ContentWidget extends Widget {
 
-  static createNode(): HTMLElement {
-    let node = document.createElement('div');
-    let content = document.createElement('div');
-    let input = document.createElement('input');
-    input.placeholder = 'Placeholder...';
-    content.appendChild(input);
-    node.appendChild(content);
-    return node;
-  }
-
-  constructor(name: string) {
-    super({ node: ContentWidget.createNode() });
+  constructor(name: string, id: number) {
+    super({ node: ContentWidget.createNode(id) });
     this.setFlag(Widget.Flag.DisallowLayout);
     this.addClass('content');
     this.addClass(name.toLowerCase());
@@ -34,6 +24,17 @@ class ContentWidget extends Widget {
       this.inputNode.focus();
     }
   }
+
+  private static createNode(id: number): HTMLElement {
+    let node = document.createElement('div');
+    let content = document.createElement('div');
+    let input = document.createElement('input');
+    input.placeholder = `Placeholer ${id}`;
+    content.appendChild(input);
+    node.appendChild(content);
+    return node;
+  }
+
 }
 
 let panel = new BoxPanel({ direction: 'top-to-bottom', spacing: 0 });
@@ -45,7 +46,7 @@ const colors = ['Red', 'Blue', 'Green', 'Yellow']
 
 for (let i = 0; i < NUMBER_OF_CODEMIRRORS; i++) {
   const color = colors[Math.floor(Math.random() * colors.length)];
-  let r1 = new ContentWidget(color);
+  let r1 = new ContentWidget(color, i);
   panel.addWidget(r1);
 }
 
