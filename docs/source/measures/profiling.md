@@ -4,6 +4,8 @@ You are invited to read the [anatomy of a frame](https://aerotwist.com/blog/the-
 
 ![](images/anatomy-of-a-frame.svg "")
 
+You can also know more on [what forces layout / reflow](https://gist.github.com/paulirish/5d52fb081b3570c81e3a).
+
 JupyterLab is hanging out / iterating at the Recalc style / Layout steps and does not produce the needed Tiles to be displayed. This happens when ["Any CSS property that changes an element's geometry, like its width, height, or position; the browser has to check all other elements and redo the layout.."](https://developers.google.com/web/tools/chrome-devtools/rendering-tools#layout).
 
 From the many cells profiling, a lot Force layouts are triggered in codemirror. The single cell profiling does not highlight the code mirror issue: jupyterlab is nearly as performant as classic notebook as we test with only one cell editor.
