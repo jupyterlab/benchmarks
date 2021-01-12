@@ -2,7 +2,7 @@
   "name": "@jupyterlab/experiment-jlab-cell-contain",
   "version": "0.0.1",
   "private": true,
-  "license": "BSD-3",
+  "license": "BSD-3-Clause",
   "scripts": {
     "build": "tsc && webpack",
     "clean": "rimraf node_modules lib build",
