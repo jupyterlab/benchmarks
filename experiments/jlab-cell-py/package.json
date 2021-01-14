@@ -2,6 +2,7 @@
   "name": "@jupyterlab/experiment-cell-py",
   "version": "0.0.1",
   "private": true,
+  "license": "BSD-3-Clause",
   "scripts": {
     "build": "tsc && webpack",
     "clean": "rimraf node_modules lib build",

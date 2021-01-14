@@ -2,6 +2,7 @@
   "name": "@jupyterlab/benchmarks",
   "version": "0.0.1",
   "private": true,
+  "license": "BSD-3-Clause",
   "workspaces": [
     "packages/*",
     "experiments/*",

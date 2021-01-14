@@ -13,4 +13,6 @@ git clone https://github.com/jupyterlab/benchmarks && \
   env 'BENCHMARK_NOTEBOOKS=["./longOutput", "./manyOutputs"]' jlpm all
 ```
 
+JupyterLab uses a shared copyright model that enables all contributors to maintain the copyright on their contributions. All code is licensed under the terms of the revised [BSD license](https://github.com/jupyterlab-benchmarks/jupyterlab/blob/master/LICENSE).
+
 ![benchmark-result](https://raw.githubusercontent.com/jupyterlab/benchmarks/master/docs/source/benchmarks/images/example.png "benchmark-result")

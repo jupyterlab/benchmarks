@@ -2,6 +2,7 @@
   "name": "@jupyterlab/experiment-luminoi-div-boxpanel",
   "version": "0.0.1",
   "private": true,
+  "license": "BSD-3-Clause",
   "scripts": {
     "build": "concurrently \"tsc\" \"gulp resources-to-lib\" && webpack",
     "clean": "rimraf node_modules lib build",

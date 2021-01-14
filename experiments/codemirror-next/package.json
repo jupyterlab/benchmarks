@@ -6,7 +6,7 @@
     "clean": "rimraf node_modules lib build",
     "start": "webpack-dev-server"
   },
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "dependencies": {
     "@codemirror/next": "0.12.0"
   },
