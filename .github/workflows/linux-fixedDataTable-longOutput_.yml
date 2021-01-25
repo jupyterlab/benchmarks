@@ -125,7 +125,7 @@ jobs:
     env:
       OLD_KEY: '2.2.x'
       NEW_KEY: '2.3.x'
-      KEY_TYPE: jlabversion
+      KEY_TYPE: branch
     strategy:
       matrix:
         PYTHON: [3.8]
