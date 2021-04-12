@@ -7,7 +7,6 @@
     "clean": "rimraf node_modules lib build",
     "start": "webpack-dev-server"
   },
-  "license": "MIT",
   "dependencies": {
     "monaco-editor": "0.21.2"
   },
