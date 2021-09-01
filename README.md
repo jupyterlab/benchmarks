@@ -1,5 +1,7 @@
 # Jupyterlab Benchmarks
 
+[![Join the chat at https://gitter.im/jupyterlab/Performance](https://badges.gitter.im/jupyterlab/Performance.svg)](https://gitter.im/jupyterlab/Performance?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This repository is a place to make JupyterLab fast.
 
 It tracks with benchmarks tooling the performance evolution of [JupyterLab](http://github.com/jupyterlab/jupyterlab). Read more on the [documentation website](https://jupyterlab-benchmarks.readthedocs.io).
