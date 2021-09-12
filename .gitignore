@@ -37,3 +37,4 @@ __pycache__
 !**/.*rc.js
 !docs/**/*.png
 !decks/**/*.png
+tests/benchmark-results
