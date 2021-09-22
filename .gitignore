@@ -38,3 +38,4 @@ __pycache__
 !docs/**/*.png
 !decks/**/*.png
 tests/benchmark-results
+tests/test-results

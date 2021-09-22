@@ -124,8 +124,6 @@ test.describe('Benchmark', () => {
           page.dblclick(`text=${file}`)
         ]);
 
-        await newPage.keyboard.press('Enter');
-
         // Wait for spinner to be hidden
         await newPage.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
           state: 'hidden'
@@ -134,6 +132,7 @@ test.describe('Benchmark', () => {
 
       // Get only the document node to avoid noise from kernel and debugger in the toolbar
       let document = await newPage.waitForSelector('.jp-Notebook');
+      newPage.waitForTimeout(50);  // Wait a bit
       expect(await document.screenshot()).toMatchSnapshot(
         `${file.replace('.', '-')}.png`
       );

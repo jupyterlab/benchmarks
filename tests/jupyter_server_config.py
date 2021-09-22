@@ -5,7 +5,7 @@ from tempfile import mkdtemp
 if getpass.getuser() == "jovyan":
     c.ServerApp.ip = "0.0.0.0"
 
-c.ServerApp.port = 8888
+c.ServerApp.port = 9999
 c.ServerApp.open_browser = False
 c.LabApp.dev_mode = False
 

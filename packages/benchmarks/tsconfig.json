@@ -3,7 +3,6 @@
     "target": "es2019",
     "noImplicitAny": true,
     "moduleResolution": "node",
-    "baseUrl": ".",
     "outDir": "./lib",
     "rootDir": "./src",
     "strict": true,
@@ -11,7 +10,8 @@
     "module": "CommonJS",
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "types": ["jest"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/*"]
 }
