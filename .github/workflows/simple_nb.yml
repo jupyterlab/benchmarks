@@ -1,0 +1,168 @@
+name: Simple notebooks
+
+on:
+  push:
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    env:
+      BROWSERS: '["chromium"]'
+      PLAYWRIGTH: ${{ matrix.PLAYWRIGTH }}
+      JLAB_HOME: '/home/runner/work/benchmarks/jupyterlab'
+      JLAB_REPO: "https://github.com/jupyterlab/jupyterlab.git"
+      # BENCHMARKS
+      BENCHMARK_NOTEBOOKS: '["./codeNotebook", "./mdNotebook"]'
+      BENCHMARK_MAX_N: ${{ matrix.BENCHMARK_MAX_N }}
+      BENCHMARK_NUMBER_SAMPLES: ${{ matrix.BENCHMARK_NUMBER_SAMPLES }}
+      BENCHMARK_SWITCHES: ${{ matrix.BENCHMARK_SWITCHES }}
+      BENCHMARK_MAX_TIME: ${{ matrix.BENCHMARK_MAX_TIME }}
+      BENCHMARK_OUTPUT: delay-${{ matrix.DELAY }}-simple.csv
+      # fixedDataTable.ts
+      TABLE_ROWS: ${{ matrix.TABLE_ROWS }}
+      TABLE_COLUMNS: ${{ matrix.TABLE_COLUMNS }}
+      # longOutputs.ts
+      DIV_NUMBER: ${{ matrix.DIV_NUMBER }}
+    strategy:
+      matrix:
+        PYTHON: [3.8]
+        NODEJS: [14.x]
+        PLAYWRIGTH: ['1.4.1']
+        # JupyterLab [older-commit]
+        JLAB_COMMITS: [c410501]  # Replace by branch
+        # Benchmarks
+        BENCHMARK_MAX_N: [100]          # Default is 100
+        BENCHMARK_NUMBER_SAMPLES: [21]  # Default is 20
+        BENCHMARK_SWITCHES: [10]
+        BENCHMARK_MAX_TIME: [10000]     # Default is 5000, using 20000
+        # fixedDataTable.ts
+        TABLE_ROWS: [5000]              # Default is 5000
+        TABLE_COLUMNS: [50]             # Default is 50
+        # longOutputs.ts
+        DIV_NUMBER: [100]               # Default is 100
+        DELAY: [0, 500]
+      fail-fast: false
+    timeout-minutes: 60
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.PYTHON }}
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.NODEJS }}
+      - name: Checkout benchmarks repository
+        uses: actions/checkout@v2
+      - name: Install JupyterLab
+        run: |
+          cd ..
+          git clone $JLAB_REPO
+          cd jupyterlab
+          git checkout ${{ matrix.JLAB_COMMITS }}
+          cd ..
+          python benchmarks/jupyterlab_benchmarks/patch_jlab.py
+          cd jupyterlab
+          # pip install plotly==4.5.4 ipywidgets==7.5.1
+          pip install -e .
+          jlpm install
+          jlpm run build
+
+      - name: Install benchmarks
+        run: |
+          python jupyterlab_benchmarks/patch_playwright.py
+          jlpm
+          jlpm run playwright install
+          jlpm run build
+      - name: List python dependencies
+        run: pip list
+      - name: List npm dependencies
+        continue-on-error: true
+        run: npm list --silent
+      - name: List JLab dev_mode dependencies
+        continue-on-error: true
+        run: |
+          cd ..
+          cd jupyterlab/dev_mode
+          npm list --silent
+      - name: Run benchmarks
+        env:
+          DELAY: ${{ matrix.DELAY }}
+        run: jlpm ci
+      - name: Remove notebook checkpoints and copy to artifacts folder
+        run: |
+          rm -rf packages/run/notebooks/.ipynb_checkpoints/
+      - name: Upload benchmark csv and notebook data artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: benchmarks
+          path: |
+            packages/run/*.csv
+            packages/run/*.json
+            packages/run/*.png
+            packages/run/notebooks/
+            !packages/run/analysis.vl.json
+            !packages/run/comparison.vl.json
+            !packages/run/package.json
+            !packages/run/tsconfig.json
+
+  linux-compare:
+    name: Linux
+    runs-on: ubuntu-latest
+    needs: linux
+    env:
+      OLD_KEY: 'delay-100'
+      NEW_KEY: 'delay-500'
+      KEY_TYPE: delay
+    strategy:
+      matrix:
+        PYTHON: [3.8]
+        NODEJS: [14.x]
+      fail-fast: false
+    timeout-minutes: 10
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.PYTHON }}
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.NODEJS }}
+      - name: Checkout benchmarks repository
+        uses: actions/checkout@v2
+      - name: Install compare tools
+        run: |
+          cd packages/compare
+          npm install
+      - name: List python dependencies
+        run: pip list
+      - name: List npm dependencies
+        continue-on-error: true
+        run: npm list --silent
+      - name: Download the benchmark data from previous jobs
+        uses: actions/download-artifact@v2
+        with:
+          name: benchmarks
+          path: packages/compare
+      - name: Check
+        run: |
+          cd packages/compare
+          ls
+      - name: Run compare python script
+        run: |
+          cd packages/compare
+          python compare.py
+      - uses: actions/upload-artifact@v2
+        with:
+          name: results
+          path: |
+            packages/compare/*.csv
+            packages/compare/*.json
+            packages/compare/*.vl.json
+            packages/compare/*.png
+            packages/compare/notebooks/*.ipynb
+            !packages/compare/package.json
+            !packages/compare/package-lock.json
+            !packages/compare/tsconfig.json

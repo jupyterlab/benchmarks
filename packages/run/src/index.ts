@@ -190,6 +190,11 @@ function writeOutput({
           `);
           await waitForNotebook(id);
           await waitFor({ widgetID: id, page });
+          // Add fake delay for testing
+          const fakeDelay = parseInt(process.env["DELAY"] ?? '0', 10);
+          if ( fakeDelay > 0) {
+            await page.waitForTimeout(fakeDelay);
+          }
           const time = await endTime();
           // Wait some time to reduce variance
           await page.waitForTimeout(WAIT_BETWEEN_TESTS);
