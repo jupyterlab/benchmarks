@@ -4,9 +4,7 @@
   "private": true,
   "license": "BSD-3-Clause",
   "workspaces": [
-    "packages/*",
-    "experiments/*",
-    "extensions/*"
+    "packages/*"
   ],
   "scripts": {
     "build": "lerna run build --stream",
