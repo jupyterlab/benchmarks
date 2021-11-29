@@ -178,6 +178,7 @@ jobs:
           name: benchmark-assets
           path: |
             benchmarks/tests/benchmark-results
+            benchmarks/tests/test-results
 
       - name: Print JupyterLab logs
         if: always()

@@ -93,7 +93,7 @@ test.describe("Benchmark", () => {
       const perf = galata.newPerformanceHelper(page);
 
       await page.goto(baseURL + "?reset");
-      await page.waitForFunction(() => !!document.body.getAttribute('data-jp-theme-name'));
+      // await page.waitForFunction(() => !!document.body.getAttribute('data-jp-theme-name'));
 
       await page.click("#filebrowser >> .jp-BreadCrumbs-home");
       await page.dblclick(`#filebrowser >> text=${tmpPath}`);
