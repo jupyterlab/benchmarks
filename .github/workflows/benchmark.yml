@@ -76,6 +76,7 @@ jobs:
       - name: Launch JupyterLab
         shell: bash
         run: |
+          jlpm install
           # Mount a volume to overwrite the server configuration
           jlpm start-jlab 2>&1 > /tmp/jupyterlab_server_old.log &
         working-directory: benchmarks/tests
@@ -83,7 +84,6 @@ jobs:
       - name: Install browser
         run: |
           # Install only Chromium browser
-          jlpm install
           jlpm playwright install chromium
         working-directory: benchmarks/tests
 
