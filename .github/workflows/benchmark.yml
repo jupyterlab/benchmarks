@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       challenger:
-        description: "JupyterLab Git repository with the challenger version"
+        description: "JupyterLab Git repository with the challenger version (format {owner}/{repo})"
         required: true
       challenger_branch:
         description: "Git repository reference to the challenger branch"
@@ -64,7 +64,7 @@ jobs:
       - name: Checkout reference branch
         uses: actions/checkout@v2
         with:
-          repository: https://github.com/jupyterlab/jupyterlab.git
+          repository: jupyterlab/jupyterlab
           ref: ${{ github.event.inputs.reference_branch }}
           path: reference
 
