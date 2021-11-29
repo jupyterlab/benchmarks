@@ -1,25 +1,27 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-import { expect } from "@playwright/test";
-import { benchmark, galata, test } from "@jupyterlab/galata";
+import { expect, test } from "@playwright/test";
+import { benchmark, galata } from "@jupyterlab/galata";
 import path from "path";
 import NotebookType from "../generators/notebookType";
 
-test.use({
-  tmpPath: "test-performance-open",
-});
+// How many times to switch between each notebook
+const SWITCHES = Number(process.env["BENCHMARK_SWITCHES"] || 10);
+
+const tmpPath = "test-performance-open";
 
 const files = [
   "codeNotebook",
   "mdNotebook",
-  "largePlotly",
-  "longOutput",
-  "manyPlotly",
-  "manyOutputs",
-  "errorOutputs",
+  // "largePlotly",
+  // "longOutput",
+  // "manyPlotly",
+  // "manyOutputs",
+  // "errorOutputs",
 ];
 const textFile = "lorem_ipsum.txt";
+const n = 100;
 
 // Build test parameters list [file, index]
 const parameters = [].concat(
@@ -30,24 +32,23 @@ const parameters = [].concat(
   )
 );
 
-let generators: {[k: string]: NotebookType} = {};
+let generators: { [k: string]: NotebookType } = {};
 
 test.describe("Benchmark", () => {
   // Generate the files for the benchmark
-  test.beforeAll(async ({ baseURL, tmpPath }) => {
+  test.beforeAll(async ({ baseURL }) => {
     const contents = galata.newContentsHelper(baseURL);
 
     const loadedGenerators = (
       await Promise.all(files.map((path) => import(`../generators/${path}`)))
     ).map((pkg) => pkg.default);
 
-    for(let i=0; i < loadedGenerators.length; i++) {
-      generators[files[i]] = loadedGenerators[i]
+    for (let i = 0; i < loadedGenerators.length; i++) {
+      generators[files[i]] = loadedGenerators[i];
     }
 
     await Promise.all(
       loadedGenerators.map((generator) => {
-        const n = 100;
         const fileContent = generator.notebook(n);
         const name = generator.label.replace("{N}", n.toString());
         return contents.uploadContent(
@@ -64,7 +65,7 @@ test.describe("Benchmark", () => {
   });
 
   // Remove benchmark files
-  test.afterAll(async ({ baseURL, tmpPath }) => {
+  test.afterAll(async ({ baseURL }) => {
     const contents = galata.newContentsHelper(baseURL);
     await contents.deleteDirectory(tmpPath);
   });
@@ -77,42 +78,44 @@ test.describe("Benchmark", () => {
   //  - Close the file
   for (const [file, sample] of parameters) {
     test(`measure ${file} - ${sample + 1}`, async ({
+      baseURL,
       browserName,
       page,
-      tmpPath,
     }, testInfo) => {
+      const filename = generators[file].label.replace("{N}", n.toString());
+
       const attachmentCommon = {
         nSamples: benchmark.nSamples,
         browser: browserName,
-        file: path.basename(file, ".ipynb"),
+        file: path.basename(filename, ".ipynb"),
         project: testInfo.project.name,
       };
+      const perf = galata.newPerformanceHelper(page);
 
-      const openTime = await page.performance.measure(async () => {
+      await page.goto(baseURL + "?reset");
+      await page.waitForFunction(() => !!document.body.getAttribute('data-jp-theme-name'));
+
+      await page.click("#filebrowser >> .jp-BreadCrumbs-home");
+      await page.dblclick(`#filebrowser >> text=${tmpPath}`);
+
+      const openTime = await perf.measure(async () => {
         // Open the notebook and wait for the spinner
         await Promise.all([
           page.waitForSelector('[role="main"] >> .jp-SpinnerContent'),
-          page.notebook.openByPath(`${tmpPath}/${file}`),
+          page.dblclick(`#filebrowser >> text=${filename}`),
         ]);
 
         // Wait for spinner to be hidden
         await page.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
           state: "hidden",
         });
-
-        // if (file === mdNotebook) {
-        //   // Wait for Latex rendering => consider as acceptable to require additional time
-        //   await page.waitForSelector('[role="main"] >> text=𝜌');
-        // }
-        // // Wait for kernel readiness => consider this is acceptable to take additional time
-        // await page.waitForSelector(`#jp-main-statusbar >> text=Idle`);
       });
 
       // Check the notebook is correctly opened
-      let panel = await page.activity.getPanel();
+      let panel = await page.$('[role="main"] >> .jp-NotebookPanel');
       // Get only the document node to avoid noise from kernel and debugger in the toolbar
-      let document = await panel.$(".jp-Notebook");
-      expect(await document.screenshot()).toMatchSnapshot(
+      let documentContent = await panel.$(".jp-Notebook");
+      expect(await documentContent.screenshot()).toMatchSnapshot(
         `${file.replace(".", "-")}.png`
       );
 
@@ -125,58 +128,74 @@ test.describe("Benchmark", () => {
       );
 
       // Shutdown the kernel to be sure it does not get in our way (especially for the close action)
-      await page.kernel.shutdownAll();
+      await page.click('li[role="menuitem"]:has-text("Kernel")');
+      await page.click('ul[role="menu"] >> text=Shut Down All Kernels…');
+      await page.click(':nth-match(button:has-text("Shut Down All"), 3)');
 
-      // Open text file
-      await page.filebrowser.revealFileInBrowser(`${tmpPath}/${textFile}`);
+      // Switch #SWITCHES times between the file editor and the notebook
+      for (let switchIdx = 0; switchIdx < SWITCHES; switchIdx++) {
+        // Open text file
+        const fromTime = await perf.measure(async () => {
+          await page.dblclick(`#filebrowser >> text=${textFile}`);
+          await page.waitForSelector(
+            `div[role="main"] >> .lm-DockPanel-tabBar >> text=${path.basename(
+              textFile
+            )}`
+          );
+        });
 
-      const fromTime = await page.performance.measure(async () => {
-        await page.filebrowser.open(textFile);
-        await page.waitForCondition(
-          async () => await page.activity.isTabActive(path.basename(textFile))
+        const editorPanel = page.locator(
+          'div[role="tabpanel"]:has-text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole")'
         );
-      });
+        await expect(editorPanel).toBeVisible();
 
-      let editorPanel = await page.activity.getPanel();
-      expect(await editorPanel.screenshot()).toMatchSnapshot("loremIpsum.png");
+        testInfo.attachments.push(
+          benchmark.addAttachment({
+            ...attachmentCommon,
+            test: "switch-from",
+            time: fromTime,
+          })
+        );
 
-      testInfo.attachments.push(
-        benchmark.addAttachment({
-          ...attachmentCommon,
-          test: "switch-from",
-          time: fromTime,
-        })
-      );
+        // Switch back
+        const toTime = await perf.measure(async () => {
+          await page.click(
+            `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}`
+          );
+        });
 
-      // Switch back
-      const toTime = await page.performance.measure(async () => {
-        await page.notebook.openByPath(`${tmpPath}/${file}`);
-      });
+        // Check the notebook is correctly opened
+        panel = await page.$('[role="main"] >> .jp-NotebookPanel');
+        // Get only the document node to avoid noise from kernel and debugger in the toolbar
+        documentContent = await panel.$(".jp-Notebook");
+        expect(await documentContent.screenshot()).toMatchSnapshot(
+          `${file.replace(".", "-")}.png`
+        );
 
-      // Check the notebook is correctly opened
-      panel = await page.activity.getPanel();
-      // Get only the document node to avoid noise from kernel and debugger in the toolbar
-      document = await panel.$(".jp-Notebook");
-      expect(await document.screenshot()).toMatchSnapshot(
-        `${file.replace(".", "-")}.png`
-      );
-
-      testInfo.attachments.push(
-        benchmark.addAttachment({
-          ...attachmentCommon,
-          test: "switch-to",
-          time: toTime,
-        })
-      );
+        testInfo.attachments.push(
+          benchmark.addAttachment({
+            ...attachmentCommon,
+            test: "switch-to",
+            time: toTime,
+          })
+        );
+      }
 
       // Close notebook
-      const closeTime = await page.performance.measure(async () => {
+      await page.click('li[role="menuitem"]:has-text("File")');
+      const closeTime = await perf.measure(async () => {
+        await page.click('ul[role="menu"] >> text=Close Tab');
         // Revert changes so we don't measure saving
-        await page.notebook.close(true);
+        const dimissButton = page.locator('button:has-text("Discard")');
+        if (await dimissButton.isVisible({ timeout: 50 })) {
+          await dimissButton.click();
+        }
       });
 
-      editorPanel = await page.activity.getPanel();
-      expect(await editorPanel.screenshot()).toMatchSnapshot("loremIpsum.png");
+      const editorPanel = page.locator(
+        'div[role="tabpanel"]:has-text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole")'
+      );
+      await expect(editorPanel).toBeVisible();
 
       testInfo.attachments.push(
         benchmark.addAttachment({

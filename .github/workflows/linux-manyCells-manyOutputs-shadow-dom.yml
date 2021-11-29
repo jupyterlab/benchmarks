@@ -1,10 +1,11 @@
 name: Linux-manyCells-manyOutputs-shadow-dom
 on:
-  push: 
-  schedule:
-    # * is a special character in YAML so you have to quote this string
-    # Run every 6 hours.
-    - cron:  '0 */6 * * *'
+  # push: 
+  # schedule:
+  #   # * is a special character in YAML so you have to quote this string
+  #   # Run every 6 hours.
+  #   - cron:  '0 */6 * * *'
+  workflow_dispatch:
 jobs:
   linux:
     name: Linux

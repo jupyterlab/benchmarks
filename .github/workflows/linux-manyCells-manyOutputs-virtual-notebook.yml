@@ -1,10 +1,11 @@
 name: Linux-manyCells-manyOutputs-virtual-notebook
 on:
-  push:
-  schedule:
-    # * is a special character in YAML so you have to quote this string
-    # Run every 6 hours.
-    - cron:  '0 */1 * * *'
+  # push:
+  # schedule:
+  #   # * is a special character in YAML so you have to quote this string
+  #   # Run every 6 hours.
+  #   - cron:  '0 */1 * * *'
+  workflow_dispatch:
 jobs:
   linux:
     name: Linux

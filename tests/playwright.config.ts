@@ -8,19 +8,6 @@ export default {
     {
       name: "jupyterlab",
       testMatch: "jupyterlab/**",
-      use: {
-        // Remove codemirror cursor
-        mockSettings: {
-          "@jupyterlab/fileeditor-extension:plugin": {
-            editorConfig: { cursorBlinkRate: -1 },
-          },
-          "@jupyterlab/notebook-extension:tracker": {
-            codeCellConfig: { cursorBlinkRate: -1 },
-            markdownCellConfig: { cursorBlinkRate: -1 },
-            rawCellConfig: { cursorBlinkRate: -1 },
-          },
-        },
-      },
     },
     {
       name: "retrolab",
@@ -58,7 +45,13 @@ export default {
       },
     },
   ],
-  reporter: [[process.env.CI ? "dot" : "list"], ["./benchmarkReporter"]],
+  reporter: [
+    [process.env.CI ? "dot" : "list"],
+    [
+      "@jupyterlab/galata/lib/benchmarkReporter",
+      { outputFile: "lab-benchmark.json" },
+    ],
+  ],
   use: {
     // Browser options
     // headless: false,
@@ -67,6 +60,7 @@ export default {
     viewport: { width: 1024, height: 768 },
     // Artifacts
     video: "retain-on-failure",
+    baseURL: process.env.TARGET_URL ?? 'http://127.0.0.1:9999'
   },
   preserveOutput: "failures-only",
   workers: 1,

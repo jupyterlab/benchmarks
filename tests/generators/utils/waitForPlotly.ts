@@ -2,7 +2,7 @@
  * Copyright (c) Jupyter Development Team.
  * Distributed under the terms of the Modified BSD License.
  */
-import * as playwright from 'playwright';
+import { Page } from "@playwright/test";
 
 /**
  * Wait for width to be changed to greater than the default of 700px which happens after rendering is done.
@@ -12,7 +12,7 @@ export default async function waitForPlotly({
   page
 }: {
   widgetID: string;
-  page: playwright.Page;
+  page: Page;
 }): Promise<void> {
   await page.waitForFunction(
     (widgetID: string) => {

@@ -11,7 +11,7 @@ import { mean, performanceChange, performanceChangeFromData } from "../index";
 describe("@jupyterlab/benchmarks", () => {
   const paperResult = {
     mean: 68.3 / 74.5,
-    confidenceInterval: 60.2 / 70.2,
+    confidenceInterval: 60.2 / 74.5,
   };
   describe("quantile", () => {
     it("should be about equal", () => {
@@ -66,7 +66,7 @@ function assertResultsEqual(
 ) {
   assertAboutEqual(l.mean, r.mean, `${message}: means`);
   assertAboutEqual(
-    r.confidenceInterval,
+    l.confidenceInterval,
     r.confidenceInterval,
     `${message}: confidence interval`
   );

@@ -1,0 +1,186 @@
+name: Benchmark Tests
+
+on:
+  # schedule:
+  #   - cron: '12 1 * * 0'
+  workflow_dispatch:
+    inputs:
+      challenger:
+        description: "JupyterLab Git repository with the challenger version"
+        required: true
+      challenger_branch:
+        description: "Git repository reference to the challenger branch"
+        required: true
+      reference_branch:
+        description: "Reference branch on the JupyterLab repository (default: master)"
+        required: false
+        default: 'master'
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+
+    env:
+      BENCHMARK_NUMBER_SAMPLES: 5
+
+    steps:
+      - name: Checkout benchmarks project
+        uses: actions/checkout@v2
+        with:
+          path: benchmarks
+
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - uses: iterative/setup-cml@v1
+
+      - name: Cache pip on Linux
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-3.8-${{ hashFiles('**/requirements.txt', 'setup.cfg') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-3.8
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Cache yarn
+        uses: actions/cache@v1
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      # First run the benchmark on the reference
+      - name: Checkout reference branch
+        uses: actions/checkout@v2
+        with:
+          repository: https://github.com/jupyterlab/jupyterlab.git
+          ref: ${{ github.event.inputs.reference_branch }}
+          path: reference
+
+      - name: Install dependencies
+        run: |
+          bash ./scripts/ci_install.sh
+        working-directory: reference
+
+      - name: Launch JupyterLab
+        shell: bash
+        run: |
+          # Mount a volume to overwrite the server configuration
+          jlpm start-jlab 2>&1 > /tmp/jupyterlab_server_old.log &
+        working-directory: benchmarks/tests
+
+      - name: Install browser
+        run: |
+          # Install only Chromium browser
+          jlpm install
+          jlpm playwright install chromium
+        working-directory: benchmarks/tests
+
+      - name: Wait for JupyterLab
+        uses: ifaxity/wait-on-action@v1
+        with:
+          resource: http-get://localhost:9999/lab
+          timeout: 360000
+
+      - name: Execute benchmark tests
+        continue-on-error: true
+        working-directory: benchmarks/tests
+        run: |
+          jlpm run test --project jupyterlab -u
+          cp tests-out/lab-benchmark-expected.json /tmp/
+
+      - name: Kill the server
+        shell: bash
+        run: |
+          kill -s SIGKILL $(pgrep jupyter-lab)
+          pip uninstall jupyterlab
+
+      # Second benchmark run on the challenger
+      - name: Checkout challenger
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.challenger }}
+          ref: ${{ github.event.inputs.challenger_branch }}
+          path: challenger
+
+      - name: Install dependencies
+        run: |
+          bash ./scripts/ci_install.sh
+        working-directory: challenger
+
+      - name: Launch JupyterLab
+        shell: bash
+        run: |
+          # Mount a volume to overwrite the server configuration
+          jlpm start-jlab 2>&1 > /tmp/jupyterlab_server_new.log &
+        working-directory: benchmarks/tests
+
+      - name: Wait for JupyterLab
+        uses: ifaxity/wait-on-action@v1
+        with:
+          resource: http-get://localhost:8888/lab
+          timeout: 360000
+
+      - name: Execute benchmark tests
+        continue-on-error: true
+        shell: bash
+        run: |
+          cp /tmp/lab-benchmark-expected.json ./tests-out
+          jlpm run test --project jupyterlab
+        working-directory: benchmarks/tests
+
+      - name: Generate the report
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPORT: ./benchmark-results/lab-benchmark.md
+        shell: bash
+        working-directory: benchmarks/tests
+        run: |
+          # Publish image to cml.dev
+          echo "" >> ${REPORT}
+          cml-publish ./benchmark-results/lab-benchmark.png --md >> ${REPORT}
+          echo "" >> ${REPORT}
+
+          # Test if metadata have changed
+          export METADATA_DIFF="/tmp/metadata.diff"
+          diff -u <(jq --sort-keys .metadata benchmark-results/lab-benchmark.json) <(jq --sort-keys .metadata lab-benchmark-expected.json) > ${METADATA_DIFF} || true
+          if [[ -s ${METADATA_DIFF} ]]; then
+            echo "<details><summary>:exclamation: Test metadata have changed</summary>" >> ${REPORT}
+            echo "" >> ${REPORT}
+            echo "\`\`\`diff" >> ${REPORT}
+            cat ${METADATA_DIFF} >> ${REPORT}
+            echo "\`\`\`" >> ${REPORT}
+            echo "" >> ${REPORT}
+            echo "</details>" >> ${REPORT}
+          fi
+
+          # Copy the reference data to upload it as artifact
+          cp lab-benchmark-expected.json ./benchmark-results/
+
+          # Save PR number for comment publication
+          echo "${PULL_REQUEST_ID}" > ./benchmark-results/NR
+
+      - name: Upload Benchmark Test assets
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: benchmark-assets
+          path: |
+            benchmarks/tests/benchmark-results
+
+      - name: Print JupyterLab logs
+        if: always()
+        run: |
+          cat /tmp/jupyterlab_server_old.log
+          cat /tmp/jupyterlab_server_new.log

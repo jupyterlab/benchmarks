@@ -2,7 +2,7 @@
  * Copyright (c) Jupyter Development Team.
  * Distributed under the terms of the Modified BSD License.
  */
-import * as playwright from 'playwright';
+import { Page } from "@playwright/test";
 
 type NotebookType = {
   label: string;
@@ -10,10 +10,7 @@ type NotebookType = {
    * Function that should return when the notebook, with this widgetID
    * is "ready". Waits for this before stopping the timing function.
    */
-  waitFor: (options: {
-    widgetID: string;
-    page: playwright.Page;
-  }) => Promise<void | null>;
+  waitFor: (options: { widgetID: string; page: Page }) => Promise<void | null>;
   /**
    * Function that takes the n and returns the notebook object that will
    * serialized to JSON and saved.

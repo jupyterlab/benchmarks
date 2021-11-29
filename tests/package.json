@@ -10,11 +10,13 @@
     "install:browser": "playwright install chromium",
     "start-jlab": "fkill -s :9999 && jupyter lab --config ./jupyter_server_config.py",
     "start-jlab:detached": "yarn run start-jlab&",
-    "test": "playwright test",
+    "pretest": "tsc --incremental -p tsconfig.json",
+    "test": "playwright test -c tests-out",
     "test:report": "http-server ./playwright-report -a localhost -o"
   },
   "devDependencies": {
-    "@jupyterlab/galata": "^4.3.0-alpha.9",
+    "@jupyterlab/galata": "^4.1.1",
+    "@playwright/test": "^1.16.0",
     "@types/node-fetch": "^2.5.4",
     "fkill-cli": "6.0.1",
     "node-fetch": "^2.6.0",
