@@ -71,6 +71,8 @@ jobs:
       - name: Install dependencies
         run: |
           bash ./scripts/ci_install.sh
+          # Build dev mode
+          jlpm run build
         working-directory: reference
 
       - name: Launch JupyterLab
@@ -117,6 +119,8 @@ jobs:
       - name: Install dependencies
         run: |
           bash ./scripts/ci_install.sh
+          # Build dev mode
+          jlpm run build
         working-directory: challenger
 
       - name: Launch JupyterLab
@@ -129,7 +133,7 @@ jobs:
       - name: Wait for JupyterLab
         uses: ifaxity/wait-on-action@v1
         with:
-          resource: http-get://localhost:8888/lab
+          resource: http-get://localhost:9999/lab
           timeout: 360000
 
       - name: Execute benchmark tests
