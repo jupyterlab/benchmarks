@@ -1,5 +1,7 @@
 {
   "name": "@jupyterlab/benchmarks",
+  "homepage": "https://github.com/jupyterlab/benchmarks",
+  "author": {"name": "Project Jupyter Contributors"},
   "version": "0.1.0",
   "private": true,
   "license": "BSD-3-Clause",

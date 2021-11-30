@@ -1,13 +1,14 @@
 {
   "name": "@jupyterlab-benchmarks/table-render",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A JupyterLab extension for rendering table files.",
+  "homepage": "https://github.com/jupyterlab/benchmarks",
   "author": {"name": "Project Jupyter Contributors", "email": ""},
   "contributors": [{
     "name": "D. E. Shaw & Co., L.P."
   }],
   "license": "BSD-3-Clause",
-  "private": false,
+  "private": true,
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "style": "style/index.css",
@@ -26,19 +27,26 @@
     "outputDir": "jupyterlab_benchmarks_table_render/labextension"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
-    "extension:disable": "jupyter labextension disable @jupyterlab-benchmarks/table-render",
-    "extension:enable": "jupyter labextension enable @jupyterlab-benchmarks/table-render",
-    "extension:install": "jupyter labextension install @jupyterlab-benchmarks/table-render",
-    "extension:uninstall": "jupyter labextension uninstall  @jupyterlab-benchmarks/table-render",
-    "prepare": "npm run clean && npm run build",
-    "watch": "tsc -w"
+    "build": "jlpm run build:lib && jlpm run build:labextension:dev",
+    "build:prod": "jlpm run clean && jlpm run build:lib && jlpm run build:labextension",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:lib": "tsc",
+    "clean": "jlpm run clean:lib",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "clean:labextension": "rimraf {{ cookiecutter.python_name }}/labextension",
+    "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
+    "eslint": "eslint . --ext .ts,.tsx --fix",
+    "eslint:check": "eslint . --ext .ts,.tsx",
+    "install:extension": "jlpm run build",
+    "watch": "run-p watch:src watch:labextension",
+    "watch:src": "tsc -w",
+    "watch:labextension": "jupyter labextension watch ."
   },
   "dependencies": {
-    "@jupyterlab/apputils": "^3.3.0-alpha.15",
-    "@jupyterlab/rendermime-interfaces": "^3.3.0-alpha.15",
-    "@lumino/widgets": "^1.30.0",
+    "@jupyterlab/apputils": "^3.1.0",
+    "@jupyterlab/rendermime-interfaces": "^3.1.0",
+    "@lumino/widgets": "^1.18.0",
     "fixed-data-table-2": "^1.1.1",
     "react": "^17.0.1"
   },
