@@ -1,4 +1,4 @@
-name: Benchmark Tests
+name: JupyterLab Benchmark Tests
 
 on:
   # schedule:
@@ -109,6 +109,9 @@ jobs:
         continue-on-error: true
         working-directory: benchmarks/tests
         run: |
+          # Update test screenshots
+          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
+
           jlpm run test --project jupyterlab -u
           cp tests-out/lab-benchmark-expected.json /tmp/
 
@@ -150,6 +153,9 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
+          # Update test screenshots
+          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
+
           cp /tmp/lab-benchmark-expected.json ./tests-out
           jlpm run test --project jupyterlab
         working-directory: benchmarks/tests
