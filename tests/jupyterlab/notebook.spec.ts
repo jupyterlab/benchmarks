@@ -6,26 +6,30 @@ import { benchmark, galata } from "@jupyterlab/galata";
 import path from "path";
 import NotebookType from "../generators/notebookType";
 
+// The maximum N
+const MAX_N = Number(process.env["BENCHMARK_MAX_N"] || 100);
 // How many times to switch between each notebook
 const SWITCHES = Number(process.env["BENCHMARK_SWITCHES"] || 10);
+// Notebooks to test
+const notebookEnv = process.env.BENCHMARK_NOTEBOOKS;
+const NOTEBOOK_PACKAGES: Array<string> = notebookEnv
+  ? JSON.parse(notebookEnv)
+  : [
+      "codeNotebook",
+      "mdNotebook",
+      // "largePlotly",
+      // "longOutput",
+      // "manyPlotly",
+      // "manyOutputs",
+      // "errorOutputs",
+    ];
 
 const tmpPath = "test-performance-open";
-
-const files = [
-  "codeNotebook",
-  "mdNotebook",
-  // "largePlotly",
-  // "longOutput",
-  // "manyPlotly",
-  // "manyOutputs",
-  // "errorOutputs",
-];
 const textFile = "lorem_ipsum.txt";
-const n = 100;
 
 // Build test parameters list [file, index]
 const parameters = [].concat(
-  ...files.map((file) =>
+  ...NOTEBOOK_PACKAGES.map((file) =>
     new Array<number>(benchmark.nSamples)
       .fill(0)
       .map((_, index) => [file, index])
@@ -40,22 +44,33 @@ test.describe("Benchmark", () => {
     const contents = galata.newContentsHelper(baseURL);
 
     const loadedGenerators = (
-      await Promise.all(files.map((path) => import(`../generators/${path}`)))
+      await Promise.all(
+        NOTEBOOK_PACKAGES.map((path) => import(`../generators/${path}`))
+      )
     ).map((pkg) => pkg.default);
 
     for (let i = 0; i < loadedGenerators.length; i++) {
-      generators[files[i]] = loadedGenerators[i];
+      generators[NOTEBOOK_PACKAGES[i]] = loadedGenerators[i];
     }
 
     await Promise.all(
       loadedGenerators.map((generator) => {
-        const fileContent = generator.notebook(n);
-        const name = generator.label.replace("{N}", n.toString());
-        return contents.uploadContent(
-          JSON.stringify(fileContent),
-          "text",
-          `${tmpPath}/${name}.ipynb`
-        );
+        const fileContent = generator.notebook(MAX_N);
+        const name = generator.label.replace("{N}", MAX_N.toString());
+        return contents
+          .uploadContent(
+            JSON.stringify(fileContent),
+            "text",
+            `${tmpPath}/${name}.ipynb`
+          )
+          .then(() => {
+            // Create a copy of the notebook to test switching to a similar notebook
+            return contents.uploadContent(
+              JSON.stringify(fileContent),
+              "text",
+              `${tmpPath}/${name}_copy.ipynb`
+            );
+          });
       })
     );
 
@@ -82,7 +97,7 @@ test.describe("Benchmark", () => {
       browserName,
       page,
     }, testInfo) => {
-      const filename = generators[file].label.replace("{N}", n.toString());
+      const filename = generators[file].label.replace("{N}", MAX_N.toString());
 
       const attachmentCommon = {
         nSamples: benchmark.nSamples,
