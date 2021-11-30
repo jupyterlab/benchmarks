@@ -170,7 +170,7 @@ jobs:
           fi
 
           # Copy the reference data to upload it as artifact
-          cp lab-benchmark-expected.json ./benchmark-results/
+          cp tests-out/lab-benchmark-expected.json ./benchmark-results/
 
           # Save PR number for comment publication
           echo "${PULL_REQUEST_ID}" > ./benchmark-results/NR
