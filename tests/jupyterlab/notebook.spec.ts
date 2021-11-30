@@ -88,8 +88,12 @@ test.describe("Benchmark", () => {
   // Loop on benchmark files nSamples times
   //  For each file, benchmark:
   //  - Open the file
-  //  - Switch to a text file
-  //  - Switch back to the file
+  //  (
+  //    - Switch to a copy of the file
+  //    - Switch back to the file
+  //    - Switch to a text file
+  //    - Switch back to the file
+  //  ) * SWITCHES times
   //  - Close the file
   for (const [file, sample] of parameters) {
     test(`measure ${file} - ${sample + 1}`, async ({
@@ -117,7 +121,7 @@ test.describe("Benchmark", () => {
         // Open the notebook and wait for the spinner
         await Promise.all([
           page.waitForSelector('[role="main"] >> .jp-SpinnerContent'),
-          page.dblclick(`#filebrowser >> text=${filename}`),
+          page.dblclick(`#filebrowser >> text=${filename}.ipynb`),
         ]);
 
         // Wait for spinner to be hidden
@@ -127,7 +131,9 @@ test.describe("Benchmark", () => {
       });
 
       // Check the notebook is correctly opened
-      let panel = await page.$('[role="main"] >> .jp-NotebookPanel');
+      let panel = await page.$(
+        '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+      );
       // Get only the document node to avoid noise from kernel and debugger in the toolbar
       let documentContent = await panel.$(".jp-Notebook");
       expect(await documentContent.screenshot()).toMatchSnapshot(
@@ -142,6 +148,27 @@ test.describe("Benchmark", () => {
         })
       );
 
+      // Open text file
+      await page.dblclick(`#filebrowser >> text=${textFile}`);
+      await page.waitForSelector(
+        `div[role="main"] >> .lm-DockPanel-tabBar >> text=${path.basename(
+          textFile
+        )}`
+      );
+
+      // Open copied notebook
+      await page.dblclick(`#filebrowser >> text=${filename}_copy.ipynb`);
+      await page.waitForSelector(
+        `div[role="main"] >> .lm-DockPanel-tabBar >> text=${path.basename(
+          filename
+        )}_copy.ipynb`
+      );
+
+      // Switch to test notebook
+      await page.click(
+        `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
+      );
+
       // Shutdown the kernel to be sure it does not get in our way (especially for the close action)
       await page.click('li[role="menuitem"]:has-text("Kernel")');
       await page.click('ul[role="menu"] >> text=Shut Down All Kernels…');
@@ -149,10 +176,59 @@ test.describe("Benchmark", () => {
 
       // Switch #SWITCHES times between the file editor and the notebook
       for (let switchIdx = 0; switchIdx < SWITCHES; switchIdx++) {
-        // Open text file
+        // Switch to copy
+        const fromTimeCopy = await perf.measure(async () => {
+          await page.click(
+            `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}_copy.ipynb`
+          );
+        });
+
+        // Check the notebook is correctly opened
+        panel = await page.$(
+          '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-3"]'
+        );
+        // Get only the document node to avoid noise from kernel and debugger in the toolbar
+        documentContent = await panel.$(".jp-Notebook");
+        expect(await documentContent.screenshot()).toMatchSnapshot(
+          `${file.replace(".", "-")}.png`
+        );
+
+        testInfo.attachments.push(
+          benchmark.addAttachment({
+            ...attachmentCommon,
+            test: "switch-from-copy",
+            time: fromTimeCopy,
+          })
+        );
+
+        // Switch back
+        const toTimeCopy = await perf.measure(async () => {
+          await page.click(
+            `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
+          );
+        });
+
+        // Check the notebook is correctly opened
+        panel = await page.$(
+          '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+        );
+        // Get only the document node to avoid noise from kernel and debugger in the toolbar
+        documentContent = await panel.$(".jp-Notebook");
+        expect(await documentContent.screenshot()).toMatchSnapshot(
+          `${file.replace(".", "-")}.png`
+        );
+
+        testInfo.attachments.push(
+          benchmark.addAttachment({
+            ...attachmentCommon,
+            test: "switch-to-copy",
+            time: toTimeCopy,
+          })
+        );
+
+        // Switch text file
         const fromTime = await perf.measure(async () => {
-          await page.dblclick(`#filebrowser >> text=${textFile}`);
-          await page.waitForSelector(
+          await page.click(
             `div[role="main"] >> .lm-DockPanel-tabBar >> text=${path.basename(
               textFile
             )}`
@@ -167,7 +243,7 @@ test.describe("Benchmark", () => {
         testInfo.attachments.push(
           benchmark.addAttachment({
             ...attachmentCommon,
-            test: "switch-from",
+            test: "switch-from-txt",
             time: fromTime,
           })
         );
@@ -175,12 +251,14 @@ test.describe("Benchmark", () => {
         // Switch back
         const toTime = await perf.measure(async () => {
           await page.click(
-            `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}`
+            `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
           );
         });
 
         // Check the notebook is correctly opened
-        panel = await page.$('[role="main"] >> .jp-NotebookPanel');
+        panel = await page.$(
+          '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+        );
         // Get only the document node to avoid noise from kernel and debugger in the toolbar
         documentContent = await panel.$(".jp-Notebook");
         expect(await documentContent.screenshot()).toMatchSnapshot(
@@ -190,7 +268,7 @@ test.describe("Benchmark", () => {
         testInfo.attachments.push(
           benchmark.addAttachment({
             ...attachmentCommon,
-            test: "switch-to",
+            test: "switch-to-txt",
             time: toTime,
           })
         );

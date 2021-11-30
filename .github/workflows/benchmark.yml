@@ -188,9 +188,6 @@ jobs:
           # Copy the reference data to upload it as artifact
           cp tests-out/lab-benchmark-expected.json ./benchmark-results/
 
-          # Save PR number for comment publication
-          echo "${PULL_REQUEST_ID}" > ./benchmark-results/NR
-
       - name: Upload Benchmark Test assets
         if: always()
         uses: actions/upload-artifact@v2
