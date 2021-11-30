@@ -80,6 +80,9 @@ jobs:
         run: |
             pip install plotly
             pip install -v extensions/fixed-data-table
+
+            jupyter server extension list
+            jupyter labextension list
         working-directory: benchmarks
 
       - name: Launch JupyterLab
