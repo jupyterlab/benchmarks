@@ -104,7 +104,7 @@ jobs:
         shell: bash
         run: |
           kill -s SIGKILL $(pgrep jupyter-lab)
-          pip uninstall jupyterlab
+          pip uninstall --yes jupyterlab
 
       # Second benchmark run on the challenger
       - name: Checkout challenger
