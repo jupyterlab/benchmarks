@@ -15,13 +15,23 @@ on:
         description: "Reference branch on the JupyterLab repository (default: master)"
         required: false
         default: 'master'
+      tests:
+        description: "List of test notebooks to include (comma separated list)"
+        required: false
+        default: "codeNotebook, mdNotebook"
 
 jobs:
   test:
     runs-on: ubuntu-20.04
 
     env:
-      BENCHMARK_NUMBER_SAMPLES: 5
+      BENCHMARK_NUMBER_SAMPLES: 100
+      # How many times to switch between each notebook
+      BENCHMARK_SWITCHES: 10
+      # The test notebook size
+      BENCHMARK_MAX_N: 100
+      # Notebooks to test
+      BENCHMARK_NOTEBOOKS: ${{ github.event.inputs.tests }}
 
     steps:
       - name: Checkout benchmarks project

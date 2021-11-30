@@ -17,11 +17,11 @@ const NOTEBOOK_PACKAGES: Array<string> = notebookEnv
   : [
       "codeNotebook",
       "mdNotebook",
-      // "largePlotly",
-      // "longOutput",
-      // "manyPlotly",
-      // "manyOutputs",
-      // "errorOutputs",
+      "largePlotly",
+      "longOutput",
+      "manyPlotly",
+      "manyOutputs",
+      "errorOutputs",
     ];
 
 const tmpPath = "test-performance-open";
