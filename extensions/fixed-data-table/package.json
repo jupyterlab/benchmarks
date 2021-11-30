@@ -2,7 +2,10 @@
   "name": "@jupyterlab-benchmarks/table-render",
   "version": "0.1.1",
   "description": "A JupyterLab extension for rendering table files.",
-  "author": "",
+  "author": {"name": "Project Jupyter Contributors", "email": ""},
+  "contributors": [{
+    "name": "D. E. Shaw & Co., L.P."
+  }],
   "license": "BSD-3-Clause",
   "private": false,
   "main": "lib/index.js",
@@ -15,30 +18,42 @@
   ],
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
-    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
+    "style/index.js"
   ],
   "jupyterlab": {
-    "mimeExtension": true
+    "mimeExtension": true,
+    "outputDir": "jupyterlab_benchmarks_table_render/labextension"
   },
   "scripts": {
-    "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
     "build": "tsc",
-    "prepare": "npm run clean && npm run build",
-    "watch": "tsc -w",
+    "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
+    "extension:disable": "jupyter labextension disable @jupyterlab-benchmarks/table-render",
+    "extension:enable": "jupyter labextension enable @jupyterlab-benchmarks/table-render",
     "extension:install": "jupyter labextension install @jupyterlab-benchmarks/table-render",
     "extension:uninstall": "jupyter labextension uninstall  @jupyterlab-benchmarks/table-render",
-    "extension:enable": "jupyter labextension enable @jupyterlab-benchmarks/table-render",
-    "extension:disable": "jupyter labextension disable @jupyterlab-benchmarks/table-render"
+    "prepare": "npm run clean && npm run build",
+    "watch": "tsc -w"
   },
   "dependencies": {
-    "@jupyterlab/apputils": "^2.1.1",
-    "@jupyterlab/rendermime-interfaces": "^2.0.0",
-    "@lumino/widgets": "^1.5.0",
+    "@jupyterlab/apputils": "^3.3.0-alpha.15",
+    "@jupyterlab/rendermime-interfaces": "^3.3.0-alpha.15",
+    "@lumino/widgets": "^1.30.0",
     "fixed-data-table-2": "^1.1.1",
-    "react": "~16.9.0"
+    "react": "^17.0.1"
   },
   "devDependencies": {
-    "rimraf": "^2.6.3",
-    "typescript": "~3.7.0"
-  }
+    "@jupyterlab/builder": "^3.1.0",
+    "@types/react": "^17.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.8.1",
+    "@typescript-eslint/parser": "^4.8.1",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.1.1",
+    "rimraf": "^3.0.2",
+    "typescript": "~4.1.3"
+  },
+  "styleModule": "style/index.js"
 }

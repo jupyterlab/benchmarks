@@ -75,6 +75,13 @@ jobs:
           jlpm run build
         working-directory: reference
 
+      - name: Install extensions
+        # This is done after installing the reference in order to have jlpm available.
+        run: |
+            pip install plotly
+            pip install -v extensions/fixed-data-table
+        working-directory: benchmarks
+
       - name: Launch JupyterLab
         shell: bash
         run: |
