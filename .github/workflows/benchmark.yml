@@ -15,22 +15,30 @@ on:
         description: "Reference branch on the JupyterLab repository (default: master)"
         required: false
         default: "master"
+      samples:
+        description: "Number of samples to compute"
+        required: false
+        default: "100"
       tests:
         description: "List of test notebooks to include (comma separated list)"
         required: false
-        default: '["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "errorOutputs"]'
+        default: '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]'
         # default: '["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"]'
+      size:
+        description: "Test files size (bigger means larger test files)"
+        required: false
+        default: "100"
 
 jobs:
   test:
     runs-on: ubuntu-20.04
 
     env:
-      BENCHMARK_NUMBER_SAMPLES: 100
+      BENCHMARK_NUMBER_SAMPLES: ${{ github.event.inputs.samples }}
       # How many times to switch between each notebook
-      BENCHMARK_SWITCHES: 10
+      BENCHMARK_SWITCHES: 3
       # The test notebook size
-      BENCHMARK_MAX_N: 100
+      BENCHMARK_MAX_N: ${{ github.event.inputs.size }}
       # Notebooks to test
       BENCHMARK_NOTEBOOKS: ${{ github.event.inputs.tests }}
 
