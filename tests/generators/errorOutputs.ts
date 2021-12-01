@@ -10,7 +10,7 @@ import NotebookType from './notebookType';
 const STD_ERROR = 10;
 
 export default {
-  label: `errorOutputs - ${STD_ERROR}×{N} errors output collected`,
+  label: `errorOutputs - ${STD_ERROR}x{N} errors output collected`,
   waitFor: async () => null,
   notebook: (n: number) => {
     const outputs = [];

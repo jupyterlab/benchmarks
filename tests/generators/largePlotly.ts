@@ -7,7 +7,7 @@ import waitForPlotly from './utils/waitForPlotly';
 import NotebookType from './notebookType';
 
 export default {
-  label: 'largePlotly - 4 plotly outputs each with 1000*{N} points',
+  label: 'largePlotly - 4 plotly outputs each with 1000x{N} points',
   waitFor: waitForPlotly,
   notebook: (n: number) =>
     galata.Notebook.makeNotebook([
