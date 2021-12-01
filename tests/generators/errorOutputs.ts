@@ -6,8 +6,8 @@ import { galata } from '@jupyterlab/galata';
 import NotebookType from './notebookType';
 
 // Adjust this value depending on the platform you run your benchmark.
-// const STD_ERROR = 1000; // For really heavy notebooks, use 10000.
-const STD_ERROR = 1000; // For reasonable notebooks, use 1000.
+// For really heavy notebooks, use STD_ERROR * n ~ 10000; for reasonable notebooks ~ 1000
+const STD_ERROR = 10;
 
 export default {
   label: `errorOutputs - ${STD_ERROR}×{N} errors output collected`,

@@ -13,7 +13,7 @@ export default {
       name: "retrolab",
       testMatch: "retrolab/**",
       use: {
-        baseURL: "http://localhost:8890",
+        baseURL: "http://localhost:9980",
         mockSettings: {
           "@jupyterlab/fileeditor-extension:plugin": {
             editorConfig: { cursorBlinkRate: -1 },
@@ -59,9 +59,9 @@ export default {
     // Context options
     viewport: { width: 1024, height: 768 },
     // Artifacts
-    video: "off", // "retain-on-failure",
-    baseURL: process.env.TARGET_URL ?? 'http://127.0.0.1:9999'
+    video: "on", // "retain-on-failure",
+    baseURL: process.env.TARGET_URL ?? 'http://localhost:9999'
   },
-  preserveOutput: "failures-only",
+  preserveOutput: "always",
   workers: 1,
 };

@@ -10,8 +10,10 @@
     "build": "yarn run pretest",
     "clean": "rimraf tests-out/**/*.js tests-out/**/*.js.map tests-out/*.js* tests-out/*.tsbuildinfo",
     "install:browser": "playwright install chromium",
-    "start-jlab": "fkill -s :9999 && jupyter lab --config ./jupyter_server_config.py",
+    "start-jlab": "fkill -s :9999 && jupyter lab --config ./jupyter_lab_config.py",
     "start-jlab:detached": "yarn run start-jlab&",
+    "start-retro": "fkill -s :9980 && jupyter retro --config ./jupyter_retro_config.py",
+    "start-retro:detached": "yarn run start-retro&",
     "pretest": "tsc --incremental -p tsconfig.json",
     "test": "playwright test -c tests-out",
     "test:report": "http-server ./playwright-report -a localhost -o"
@@ -19,10 +21,7 @@
   "devDependencies": {
     "@jupyterlab/galata": "^4.1.1",
     "@playwright/test": "^1.16.0",
-    "@types/node-fetch": "^2.5.4",
     "fkill-cli": "^6.0.1",
-    "node-fetch": "^2.6.0",
-    "npm-run-all": "4.1.5",
     "path": "~0.12.7",
     "rimraf": "^3.0.2",
     "typescript": "~4.1.3"

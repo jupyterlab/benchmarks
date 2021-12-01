@@ -24,7 +24,7 @@ const NOTEBOOK_PACKAGES: Array<string> = notebookEnv
       "errorOutputs",
     ];
 
-const tmpPath = "test-performance-open";
+const tmpPath = "test-performance";
 const textFile = "lorem_ipsum.txt";
 
 // Build test parameters list [file, index]
@@ -38,7 +38,7 @@ const parameters = [].concat(
 
 let generators: { [k: string]: NotebookType } = {};
 
-test.describe("Benchmark", () => {
+test.describe("JupyterLab Benchmark", () => {
   // Generate the files for the benchmark
   test.beforeAll(async ({ baseURL }) => {
     const contents = galata.newContentsHelper(baseURL);
@@ -112,7 +112,11 @@ test.describe("Benchmark", () => {
       const perf = galata.newPerformanceHelper(page);
 
       await page.goto(baseURL + "?reset");
-      // await page.waitForFunction(() => !!document.body.getAttribute('data-jp-theme-name'));
+
+      // Workaround to wait for the theme
+      // await page.waitForFunction(
+      //   () => !!document.body.getAttribute("data-jp-theme-name")
+      // );
 
       await page.click("#filebrowser >> .jp-BreadCrumbs-home");
       await page.dblclick(`#filebrowser >> text=${tmpPath}`);

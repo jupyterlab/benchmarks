@@ -14,11 +14,11 @@ on:
       reference_branch:
         description: "Reference branch on the JupyterLab repository (default: master)"
         required: false
-        default: 'master'
+        default: "master"
       tests:
         description: "List of test notebooks to include (comma separated list)"
         required: false
-        default: "codeNotebook, mdNotebook"
+        default: '["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"]'
 
 jobs:
   test:
@@ -42,7 +42,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v2
         with:
-          node-version: '14.x'
+          node-version: "14.x"
       - name: Install Python
         uses: actions/setup-python@v2
         with:
@@ -88,11 +88,11 @@ jobs:
       - name: Install extensions
         # This is done after installing the reference in order to have jlpm available.
         run: |
-            pip install plotly
-            pip install -v extensions/fixed-data-table
+          pip install ipywidgets plotly
+          pip install -v extensions/fixed-data-table
 
-            jupyter server extension list
-            jupyter labextension list
+          jupyter server extension list
+          jupyter labextension list
         working-directory: benchmarks
 
       - name: Launch JupyterLab

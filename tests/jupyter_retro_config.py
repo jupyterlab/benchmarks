@@ -5,16 +5,16 @@ from tempfile import mkdtemp
 if getpass.getuser() == "jovyan":
     c.ServerApp.ip = "0.0.0.0"
 
-c.ServerApp.port = 9999
+c.ServerApp.port = 9980
 c.ServerApp.open_browser = False
 
-c.ServerApp.root_dir = mkdtemp(prefix='benchmarks-test-')
+c.ServerApp.root_dir = mkdtemp(prefix='benchmarks-retro-')
 
 c.ServerApp.token = ""
 c.ServerApp.password = ""
 c.ServerApp.disable_check_xsrf = True
 
-c.LabApp.dev_mode = True
+c.LabApp.dev_mode = False
 c.LabApp.extensions_in_dev_mode = True
 c.LabApp.expose_app_in_browser = True
 
