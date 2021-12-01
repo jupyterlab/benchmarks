@@ -18,7 +18,8 @@ on:
       tests:
         description: "List of test notebooks to include (comma separated list)"
         required: false
-        default: '["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"]'
+        default: '["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "errorOutputs"]'
+        # default: '["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"]'
 
 jobs:
   test:
@@ -80,6 +81,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          set -ex
           bash ./scripts/ci_install.sh
           # Build dev mode
           jlpm run build
@@ -88,6 +90,7 @@ jobs:
       - name: Install extensions
         # This is done after installing the reference in order to have jlpm available.
         run: |
+          set -ex
           pip install ipywidgets plotly
           pip install -v extensions/fixed-data-table
 
@@ -105,6 +108,7 @@ jobs:
 
       - name: Install browser
         run: |
+          set -ex
           # Install only Chromium browser
           jlpm playwright install chromium
         working-directory: benchmarks/tests
@@ -119,6 +123,7 @@ jobs:
         continue-on-error: true
         working-directory: benchmarks/tests
         run: |
+          set -ex
           # Update test screenshots
           BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
 
@@ -141,6 +146,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          set -ex
           bash ./scripts/ci_install.sh
           # Build dev mode
           jlpm run build
@@ -163,6 +169,7 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
+          set -ex
           # Update test screenshots
           BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
 
@@ -206,6 +213,7 @@ jobs:
           path: |
             benchmarks/tests/benchmark-results
             benchmarks/tests/test-results
+            /tmp/benchmarks-*
 
       - name: Print JupyterLab logs
         if: always()
