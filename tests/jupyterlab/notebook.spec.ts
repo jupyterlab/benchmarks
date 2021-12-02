@@ -164,12 +164,15 @@ test.describe("JupyterLab Benchmark", () => {
       );
 
       // Open copied notebook
-      await page.dblclick(`#filebrowser >> text=${filename}_copy.ipynb`);
-      await page.waitForSelector(
-        `div[role="main"] >> .lm-DockPanel-tabBar >> text=${path.basename(
-          filename
-        )}_copy.ipynb`
-      );
+      await Promise.all([
+        page.waitForSelector('[role="main"] >> .jp-SpinnerContent'),
+        page.dblclick(`#filebrowser >> text=${filename}_copy.ipynb`),
+      ]);
+
+      // Wait for spinner to be hidden
+      await page.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
+        state: "hidden",
+      });
 
       // Switch to test notebook
       await page.click(
