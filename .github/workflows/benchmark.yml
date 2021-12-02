@@ -1,8 +1,9 @@
 name: JupyterLab Benchmark Tests
 
 on:
-  # schedule:
-  #   - cron: '12 1 * * 0'
+  schedule:
+    # Every Sunday at 01:12am
+    - cron: '12 1 * * 0'
   workflow_dispatch:
     inputs:
       challenger:
@@ -20,10 +21,9 @@ on:
         required: false
         default: "100"
       tests:
-        description: "List of test notebooks to include (comma separated list)"
+        description: 'List of test notebooks to include (available ["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"])'
         required: false
         default: '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]'
-        # default: '["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"]'
       size:
         description: "Test files size (bigger means larger test files)"
         required: false
@@ -34,6 +34,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     env:
+      # How many samples to compute the statistical distribution
       BENCHMARK_NUMBER_SAMPLES: ${{ github.event.inputs.samples }}
       # How many times to switch between each notebook
       BENCHMARK_SWITCHES: 3
@@ -41,6 +42,11 @@ jobs:
       BENCHMARK_MAX_N: ${{ github.event.inputs.size }}
       # Notebooks to test
       BENCHMARK_NOTEBOOKS: ${{ github.event.inputs.tests }}
+      
+      # Repository to clone for scheduled benchmark
+      SCHEDULE_REPOSITORY: jupyterlab/jupyterlab
+      # Branch to checkout for scheduled benchmark
+      SCHEDULE_REF: master
 
     steps:
       - name: Checkout benchmarks project
@@ -56,6 +62,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+          
+      # Freeze NodeJS to make CML happy
+      - name: Install NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
       - uses: iterative/setup-cml@v1
 
@@ -81,11 +93,28 @@ jobs:
 
       # First run the benchmark on the reference
       - name: Checkout reference branch
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/checkout@v2
         with:
           repository: jupyterlab/jupyterlab
           ref: ${{ github.event.inputs.reference_branch }}
           path: reference
+
+      - name: Checkout reference branch - schedule
+        if: ${{ github.event_name == 'schedule' }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.SCHEDULE_REPOSITORY }}
+          ref: ${{ env.SCHEDULE_REF }}
+          path: reference
+          # Need to fetch enough nodes to get the commit of a week ago
+          fetch-depth: 100
+
+      - name: Checkout reference commit - schedule
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          export OLD_REF_SHA=$(git rev-parse '${SCHEDULE_REF}@{7 days ago}')
+          git checkout ${OLD_REF_SHA}
 
       - name: Install dependencies
         run: |
@@ -146,10 +175,19 @@ jobs:
 
       # Second benchmark run on the challenger
       - name: Checkout challenger
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/checkout@v2
         with:
           repository: ${{ github.event.inputs.challenger }}
           ref: ${{ github.event.inputs.challenger_branch }}
+          path: challenger
+
+      - name: Checkout challenger - schedule
+        if: ${{ github.event_name == 'schedule' }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.SCHEDULE_REPOSITORY }}
+          ref: ${{ env.SCHEDULE_REF }}
           path: challenger
 
       - name: Install dependencies
@@ -194,7 +232,7 @@ jobs:
         run: |
           # Publish image to cml.dev
           echo "" >> ${REPORT}
-          cml-publish ./benchmark-results/lab-benchmark.png --md >> ${REPORT}
+          cml-publish ./benchmark-results/lab-benchmark.png --md >> ${REPORT} || true
           echo "" >> ${REPORT}
 
           # Test if metadata have changed
