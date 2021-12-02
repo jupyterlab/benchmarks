@@ -70,8 +70,11 @@ test.describe("RetroLab Benchmark", () => {
 
   // Remove benchmark files
   test.afterAll(async ({ baseURL }) => {
-    const contents = galata.newContentsHelper(baseURL);
-    await contents.deleteDirectory(tmpPath);
+    // Clean temporary file except on CI
+    if (!process.env.CI) {
+      const contents = galata.newContentsHelper(baseURL);
+      await contents.deleteDirectory(tmpPath);
+    }
   });
 
   // Loop on benchmark files nSamples times
@@ -117,15 +120,15 @@ test.describe("RetroLab Benchmark", () => {
       });
 
       // Workaround to wait for the theme
-      // await newPage.waitForFunction(
-      //   () => !!document.body.getAttribute("data-jp-theme-name")
-      // );
+      await newPage.waitForFunction(
+        () => !!document.body.getAttribute("data-jp-theme-name")
+      );
 
       // Get only the document node to avoid noise from kernel and debugger in the toolbar
       let documentPanel = await newPage.waitForSelector(".jp-Notebook");
       newPage.waitForTimeout(50); // Wait a bit
       expect(await documentPanel.screenshot()).toMatchSnapshot(
-        `${filename.replace(".", "-")}.png`
+        `${file.replace(".", "-")}.png`
       );
 
       testInfo.attachments.push(

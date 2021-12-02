@@ -220,7 +220,7 @@ jobs:
           name: benchmark-assets
           path: |
             benchmarks/tests/benchmark-results
-            benchmarks/tests/test-results
+            benchmarks/tests/test-results/*-1-*
             /tmp/benchmarks-*
 
       - name: Print JupyterLab logs

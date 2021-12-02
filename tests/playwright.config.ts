@@ -62,7 +62,7 @@ export default {
     video: "off", // "retain-on-failure",
     baseURL: process.env.TARGET_URL ?? 'http://localhost:9999'
   },
-  preserveOutput: "never",
+  preserveOutput: "failures-only",
   workers: 1,
   retries: 1
 };

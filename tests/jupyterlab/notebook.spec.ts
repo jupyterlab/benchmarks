@@ -81,8 +81,11 @@ test.describe("JupyterLab Benchmark", () => {
 
   // Remove benchmark files
   test.afterAll(async ({ baseURL }) => {
-    const contents = galata.newContentsHelper(baseURL);
-    await contents.deleteDirectory(tmpPath);
+    // Clean temporary file except on CI
+    if (!process.env.CI) {
+      const contents = galata.newContentsHelper(baseURL);
+      await contents.deleteDirectory(tmpPath);
+    }
   });
 
   // Loop on benchmark files nSamples times
