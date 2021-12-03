@@ -18,7 +18,7 @@ export default {
         outputs: [],
         source: [
           'import plotly.graph_objects as go\n',
-          `data = list(range(${n}))\n`,
+          `data = list(range(4))\n`,
           `fig = go.Figure(data=go.Scatter(y=data, x=data))`
         ]
       },

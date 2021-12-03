@@ -18,7 +18,7 @@ export default {
         outputs: [],
         source: [
           'import plotly.graph_objects as go\n',
-          `data = list(range(${n}))\n`,
+          `data = list(range(1000 * ${n}))\n`,
           'fig = go.Figure(data=go.Scatter(y=data, x=data))'
         ]
       },
@@ -38,7 +38,7 @@ export default {
                     type: 'scatter',
                     x: points,
                     y: points
-                  }))(Array.from({ length: n * 10 }, (_, i) => i))
+                  }))(Array.from({ length: n * 1000 }, (_, i) => i))
                 ],
                 layout: {
                   autosize: true

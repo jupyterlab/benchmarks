@@ -3,7 +3,7 @@ name: JupyterLab Benchmark Tests
 on:
   schedule:
     # Every Sunday at 01:12am
-    - cron: '12 1 * * 0'
+    - cron: "12 1 * * 0"
   workflow_dispatch:
     inputs:
       challenger:
@@ -36,13 +36,13 @@ jobs:
     env:
       # How many samples to compute the statistical distribution
       BENCHMARK_NUMBER_SAMPLES: ${{ github.event.inputs.samples }}
-      # How many times to switch between each notebook
+      # How many times to switch between each tabs
       BENCHMARK_SWITCHES: 3
       # The test notebook size
       BENCHMARK_MAX_N: ${{ github.event.inputs.size }}
       # Notebooks to test
       BENCHMARK_NOTEBOOKS: ${{ github.event.inputs.tests }}
-      
+
       # Repository to clone for scheduled benchmark
       SCHEDULE_REPOSITORY: jupyterlab/jupyterlab
       # Branch to checkout for scheduled benchmark
@@ -58,16 +58,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "14.x"
+
       - name: Install Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-          
-      # Freeze NodeJS to make CML happy
-      - name: Install NodeJS
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
 
       - uses: iterative/setup-cml@v1
 
@@ -259,7 +254,7 @@ jobs:
           path: |
             benchmarks/tests/benchmark-results
             benchmarks/tests/test-results/*-1-*
-            /tmp/benchmarks-*
+            /tmp/benchmarks-*/*
 
       - name: Print JupyterLab logs
         if: always()
