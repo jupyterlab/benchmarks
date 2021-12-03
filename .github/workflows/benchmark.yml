@@ -254,7 +254,8 @@ jobs:
           path: |
             benchmarks/tests/benchmark-results
             benchmarks/tests/test-results/*-1-*
-            /tmp/benchmarks-*/*
+            benchmarks/tests/tests-out/**/*.png
+            /tmp/benchmarks-*/*.ipynb
 
       - name: Print JupyterLab logs
         if: always()
