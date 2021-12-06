@@ -16,6 +16,10 @@ on:
         description: "Reference branch on the JupyterLab repository (default: master)"
         required: false
         default: "master"
+      browser:
+        description: "Which browser to use (one of 'chromium' [default], 'firefox', 'webkit')"
+        required: false
+        default: "chromium"
       samples:
         description: "Number of samples to compute"
         required: false
@@ -34,6 +38,8 @@ jobs:
     runs-on: ubuntu-20.04
 
     env:
+      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
+      BROWSER_NAME: ${{ github.event.inputs.browser }}
       # How many samples to compute the statistical distribution
       BENCHMARK_NUMBER_SAMPLES: ${{ github.event.inputs.samples }}
       # How many times to switch between each tabs
@@ -110,6 +116,7 @@ jobs:
         run: |
           export OLD_REF_SHA=$(git rev-parse '${SCHEDULE_REF}@{7 days ago}')
           git checkout ${OLD_REF_SHA}
+        working-directory: reference
 
       - name: Install dependencies
         run: |
@@ -167,6 +174,9 @@ jobs:
         run: |
           kill -s SIGKILL $(pgrep jupyter-lab)
           pip uninstall --yes jupyterlab
+
+          # Remove generated test files to keep only one copy from challenger test
+          rm -rf /tmp/benchmarks-*
 
       # Second benchmark run on the challenger
       - name: Checkout challenger
@@ -246,6 +256,9 @@ jobs:
           # Copy the reference data to upload it as artifact
           cp ./tests-out/lab-benchmark-expected.json ./benchmark-results/
 
+          # Remove checkpoints (to make the artifacts lighter)
+          rm -rf /tmp/benchmarks-*/.ipynb_checkpoints
+
       - name: Upload Benchmark Test assets
         if: always()
         uses: actions/upload-artifact@v2
@@ -256,7 +269,6 @@ jobs:
             benchmarks/tests/test-results/*-1-*
             benchmarks/tests/tests-out/**/*.png
             /tmp/benchmarks-*
-            !/tmp/benchmarks-*/.ipynb_checkpoints
 
       - name: Print JupyterLab logs
         if: always()

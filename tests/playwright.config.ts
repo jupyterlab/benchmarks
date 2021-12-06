@@ -54,6 +54,7 @@ export default {
   ],
   use: {
     // Browser options
+    browserName: process.env.BROWSER_NAME ?? 'chromium',
     // headless: false,
     // slowMo: 500,
     // Context options
