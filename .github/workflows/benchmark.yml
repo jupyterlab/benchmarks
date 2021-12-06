@@ -256,9 +256,6 @@ jobs:
           # Copy the reference data to upload it as artifact
           cp ./tests-out/lab-benchmark-expected.json ./benchmark-results/
 
-          # Remove checkpoints (to make the artifacts lighter)
-          rm -rf /tmp/benchmarks-*/.ipynb_checkpoints
-
       - name: Upload Benchmark Test assets
         if: always()
         uses: actions/upload-artifact@v2
@@ -269,6 +266,7 @@ jobs:
             benchmarks/tests/test-results/*-1-*
             benchmarks/tests/tests-out/**/*.png
             /tmp/benchmarks-*
+            !/tmp/benchmarks-*/**/.ipynb_checkpoints
 
       - name: Print JupyterLab logs
         if: always()
