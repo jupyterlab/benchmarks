@@ -1,139 +1,93 @@
 # Benchmarks Tooling
 
-This package contains some scripts to run benchmarks against JupyterLab.
+This package is using [Playwright](https://playwright.dev/) to execute a given scenario with test notebooks.
 
-Currently it runs one type benchmark, switching between open notebooks, with a variety
-of different notebook sizes and types.
+## Running test
 
-To run the benchmarks against notebooks with long outputs and notebooks with many outputs, and to see how the times change as the notebooks grow:
+To run the test, you will need to
 
-```bash
-# Install dependencies.
-jlpm
-# Define the folder with your JupyterLab source against which the benchmark will be run.
-export JLAB_HOME=<the_folder_with_your_jupyterlab_source>
-# Run a benchmark passing 2 notebooks that will be opened and switched between.
-env 'BENCHMARK_NOTEBOOKS=["./longOutput", "./manyOutputs"]' jlpm all
+1. Start JupyterLab after compiling it at a reference state with the following command
+
 ```
+jupyter lab --config tests/jupyter_lab_config.py
+```
+
+2. Run the tests against the reference
+
+```
+yarn install
+yarn build
+cd tests
+yarn playwright install chromium
+yarn test --project jupyterlab -u
+```
+
+3. Stop JupyterLab
+4. Start JupyterLab after compiling it a challenger state
+
+```
+jupyter lab --config tests/jupyter_lab_config.py
+```
+
+5. Run the tests against the challenger
+
+```
+cd tests
+yarn test --project jupyterlab
+```
+
+The benchmark report is generated in the folder `benchmark-results`.
 
 ![](./images/example.png)
 
-The benchmark will be run on both `Firefox` and `Chrome`.
+It represents the execution time distribution for the reference JupyterLab version vs the challenger one. Each column represents a test notebook. And each row represents a measurement in the benchmark scenario:
 
-If you have issues with browsers not starting, just run `node ./node_modules/playwright/install.js` to ensure browsers are downloaded and installed (it could be that the download had issues when you installed initially).
+- _open_: Time to open the notebook
+- _switch-from-copy_: Time to switch from the notebook to its copy
+- _switch-to-copy_: Time to switch back from the copy to the notebook
+- _switch-from-txt_: Time to switch from the notebook to a text editor
+- _switch-to-txt_: Time to switch back from the text editor to the notebook
+- _close_: Time to close the notebook (and display the text editor)
 
-Optionally, you can launch in separated shell and run the analysis when the benchmark is completed.
+## Test notebooks
 
-```bash
-# Shell 1
-jlpm start:jlab
+The available notebook definitions are located in the [/src/notebooks](https://github.com/jupyterlab/benchmarks/tree/master/tests/generators/) folder (some have special requirements - see below):
 
-# Shell 2
-env 'BENCHMARK_NOTEBOOKS=["./longOutput", "./manyOutputs"]' jlpm start:benchmark
-# Analyse when benchmark is completed.
-jlpm start:analysis
+- [`codeNotebook`](https://github.com/jupyterlab/benchmarks/tree/master/tests/generators/codeNotebook.ts): Only lots of code cells (without outputs).
+- [`errorOutputs`](https://github.com/jupyterlab/benchmarks/tree/master/tests/generators/errorOutputs.ts): One cell with lots of error outputs.
+- [`fixedDataTable`](https://github.com/jupyterlab/benchmarks/tree/master/tests/generators/fixedDataTable.ts): Use test extension [fixed-data-table](https://github.com/jupyterlab/benchmarks/tree/master/extensions/fixed-data-table).
+- [`largePlotly`](https://github.com/jupyterlab/benchmarks/tree/master/tests/generators/largePlotly.ts): Four large Plotly.
+- [`longOutput`](https://github.com/jupyterlab/benchmarks/tree/master/tests/generators/longOutput.ts): One cell with one long HTML output.
+- [`manyCells`](https://github.com/jupyterlab/benchmarks/tree/master/tests/generators/manyCells.ts): Lots of cells.
+- [`manyOutputs`](https://github.com/jupyterlab/benchmarks/tree/master/tests/generators/manyOutputs.ts): Lots of outputs.
+- [`manyPlotly`](https://github.com/jupyterlab/benchmarks/tree/master/tests/generators/manyPlotly.ts): Lots of small Plotly.
+- [`mdNotebook`](https://github.com/jupyterlab/benchmarks/tree/master/tests/generators/mdNotebook.ts): Only lots of markdown cells.
+
+## Requirements
+
+The test notebooks with Plotly requires to install `plotly` and `ipywigets`:
+
+```sh
+pip install plotly ipywidgets
 ```
 
-`BENCHMARK_NOTEBOOKS` should be a list strings that node can import that return a description of how to create a notebook.
+If you need one of the test extension (like _fixed-data-table_), you can install it with:
 
-They should have a default export of the type `NotebookType` in [`notebookType.ts`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebookType.ts).
-
-If you don't provide it, it will be run against all built in benchmark, which require installing some extensions below. It will keep increasing the `n` until either it reaches a maximum or the time exceeds a certain budget.
-
-The available notebook definitions are located in the [/src/notebooks](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/) folder (some of those like the `plotly` and the `fixed-data-tables` need specific configuration as details in the next section to activate the extension):
-
-- [`errorOutputs`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/errorOutputs.ts).
-- [`fixedDataTable`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/fixedDataTable.ts).
-- [`largePlotly`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/largePlotly.ts).
-- [`longOutput`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/longOutput.ts).
-- [`manyCells`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/manyCells.ts).    
-- [`manyOutputs`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/manyOutputs.ts).
-- [`manyPlotly`](https://github.com/jupyterlab/benchmarks/tree/master/src/notebooks/manyPlotly.ts).
-
-To run benchmark with heavier notebooks, your could try the following.
-
-```bash
-env 'BENCHMARK_NOTEBOOKS=["./manyCells", "./errorOutputs"]' jlpm all
+```sh
+pip install -v extensions/fixed-data-table
 ```
 
-## Run with Plotly
+## Customization
 
-We also build in support to run this against some plotly ipywidgets, to get a sense of
-how rendering time is impacted by heavier mime render types:
+The benchmark test can be customized through environment variables:
+- BENCHMARK_NUMBER_SAMPLES [default : 100]: How many samples to compute the statistical distribution
+- BENCHMARK_SWITCHES [default: 3]: How many times to switch between each tabs
+- BENCHMARK_MAX_N [default: 100]: The test notebook size
+- BENCHMARK_NOTEBOOKS [default: `["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"]`]: Notebooks to test
 
-First add `plotly` and `ipywidgets` to the jupyterlab source tree in `dev_mode/package.json`:
+## Benchmarks comparison
 
-```
-    "externalExtensions": {
-      "@jupyter-widgets/jupyterlab-manager": "2.0.0",
-      "plotlywidget": "1.5.4",
-      "jupyterlab-plotly": "1.5.4"
-    },
-```
-
-Then install the python packages:
-
-```bash
-pip install plotly==4.5.4 ipywidgets==7.5.1
-```
-
-You can now run the benchmarks and view the results:
-
-```bash
-env 'BENCHMARK_NOTEBOOKS=["./largePlotly", "./manyPlotly"]' jlpm all
-```
-
-## Run with React Fixed Data Table
-
-We add support for testing against a mime render of [`fixed-data-table-2`](https://github.com/schrodinger/fixed-data-table-2) which
-is an example of a cell output that takes a while to render.
-
-First add `fdtmime` to the jupyterlab source tree in `dev_mode/package.json`:
-
-```
-    "externalExtensions": {
-      "fdtmime": "*"
-    },
-```
-
-Then symlink `${JLAB_HOME}/node_modules/fdtmime` to the `<your-benchmarks-repo-folder>/extensions/fixed-data-table` folder.
-
-You can now run the benchmarks and view the results:
-
-```bash
-env 'BENCHMARK_NOTEBOOKS=["./fixedDataTable", "./manyOutputs"]' jlpm all
-```
-
-## Compare Benchmarks
-
-We also support comparing two runs of benchmarks to give a sense of the relative changes. This is meant to answer the question "How much did these code changes affect the time it takes to open a notebook?"
-
-To do this, it uses the technique from Tomas Kalibera and Richard Jones in their paper
+The benchmarks comparison uses the technique from Tomas Kalibera and Richard Jones in their paper
 ["Quantifying Performance Changes with Effect Size Confidence Intervals."](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjEq7u9ovXqAhXYs54KHf3QCM0QFjACegQIBRAB&url=https%3A%2F%2Farxiv.org%2Fabs%2F2007.10899&usg=AOvVaw0ihkJJIaT6v95zlAtGtI2o) From their abstract:
 
 > Inspired by statistical methods used in other fields of science, and building on results in statistics that did not make it to introductory textbooks, we present a statistical model that allows us both to quantify uncertainty in the ratio of (execution time) means and to design experiments with a rigorous treatment of those multiple sources of non-determinism that might impact measured performance. Better still, under our framework summaries can be as simple as “system A is faster than system B by 5.5% ± 2.5%, with 95% confidence”, a more natural statement than those derived from typical current practice, which are often misinterpreted.
-
-```bash
-# Create `old.csv` and `new.csv` files
-env 'BENCHMARK_NOTEBOOKS=["./manyOutputs", "./longOutput"]' BENCHMARK_OUTPUT=old.csv jlpm start:benchmark
-env 'BENCHMARK_NOTEBOOKS=["./manyOutputs", "./longOutput"]' BENCHMARK_OUTPUT=new.csv jlpm start:benchmark
-# Create comparison csv file
-jlpm run start:compare
-# Create and open graph to view results
-jlpm run start:compare-graph
-```
-
-When creating the comparison file, it will also print out a textual form of the analysis, like this:
-
-```bash
-$ node lib/compare.js
-Writing output to diff.csv
-Parsing data { path: 'old.csv', version: 'old' }
-Parsing data { path: 'old.csv', version: 'new_' }
-In firefox opening a notebook with 100 n outputs each of a div where n=0 is between 36.4% slower and 26.7% faster with 95% confidence.
-In firefox opening a notebook with one output with 100 n divs where n=0 is between 1615.4% slower and 94.2% faster with 95% confidence.
-...
-✨  Done in 1.08s.
-```
-
-That's the same information as in the graph, but expressed as English.

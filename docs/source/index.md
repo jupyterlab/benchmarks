@@ -3,10 +3,11 @@ JupyterLab Benchmarks Documentation
 
 **Benchmarking tools for JupyterLab**
 
-This project is a place to make JupyerLab faster. For now, we want to optimize for various notebook content:
+This project is a place to make JupyterLab faster. For now, we want to optimize for various notebook content:
 
 1. Opening a new notebook.
 1. Switching tabs. An acceptable time is 300-500 ms switch time.
+1. Closing a notebook
 
 The following is out-of-scope, but could become later in-scope:
 

@@ -1,33 +1,23 @@
 {
   "name": "@jupyterlab/benchmarks",
-  "version": "0.0.1",
+  "homepage": "https://github.com/jupyterlab/benchmarks",
+  "author": {"name": "Project Jupyter Contributors"},
+  "version": "0.1.0",
   "private": true,
   "license": "BSD-3-Clause",
   "workspaces": [
-    "packages/*",
-    "experiments/*",
-    "extensions/*"
+    "extensions/*",
+    "tests"
   ],
   "scripts": {
     "build": "lerna run build --stream",
     "clean": "lerna run clean && rimraf node_modules yarn.lock",
-    "start:benchmark": "lerna run --scope @jupyterlab/benchmarks-run start:benchmark",
-    "start:all": "lerna run --scope @jupyterlab/benchmarks-run --stream start:all",
-    "start:analysis": "lerna run --scope @jupyterlab/benchmarks-run --stream start:analysis",
-    "start:compare": "lerna run --scope @jupyterlab/benchmarks-compare --stream start:compare",
-    "start:compare-graph": "lerna run --scope @jupyterlab/benchmarks-compare --stream start:compare-graph",
-    "all": "lerna run --scope @jupyterlab/benchmarks-run --stream all",
-    "ci": "lerna run --scope @jupyterlab/benchmarks-run --stream ci"
+    "start": "lerna run --scope @jupyterlab/benchmark-tests start-jlab:detached",
+    "test": "lerna run --scope @jupyterlab/benchmark-tests test"
   },
-  "dependencies": {
-    "@stdlib/stdlib": "0.0.92",
-    "csv-parser": "2.3.3",
-    "neat-csv": "5.2.0",
-    "playwright": "1.0.2",
-    "systeminformation": "^4.27.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "lerna": "3.22.1",
-    "rimraf": "3.0.2"
+    "lerna": "^3.22.1",
+    "rimraf": "^3.0.2"
   }
 }

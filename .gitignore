@@ -4,7 +4,6 @@
 out.*
 *.csv
 *.diff
-*.png
 
 *.lock
 *.log
@@ -37,3 +36,9 @@ __pycache__
 !**/.*rc.js
 !docs/**/*.png
 !decks/**/*.png
+tests/benchmark-results
+tests/test-results
+!tests/tests-out/**/*.png
+tests/tests-out/**/*.json
+tests/tests-out/**/*.js
+tests/tests-out/**/*.js.map
