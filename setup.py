@@ -1,11 +1,9 @@
-"""myst-parser package setup."""
-from importlib import import_module
-
-from setuptools import find_packages, setup
+"""package setup."""
+from setuptools import setup
 
 setup(
     name="jupyterlab-benchmarks",
-    version=import_module("jupyterlab_benchmarks").__version__,
+    version="0.2.0",
     description=(
         "Benchmarking tools for JupyterLab."
     ),
@@ -14,16 +12,16 @@ setup(
     url="https://github.com/jupyterlab/benchmarks",
     project_urls={"Documentation": "https://jupyterlab-benchmarks.readthedocs.io"},
     license="MIT",
-    packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
