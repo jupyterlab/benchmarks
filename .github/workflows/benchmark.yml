@@ -3,7 +3,7 @@ name: JupyterLab Benchmark Tests
 on:
   schedule:
     # Every Sunday at 01:12am
-    - cron: "12 1 * * 2"
+    - cron: "12 12 * * 3"
   workflow_dispatch:
     inputs:
       challenger:
@@ -39,15 +39,15 @@ jobs:
 
     env:
       # Which browser to use (one of 'chromium', 'firefox', 'webkit')
-      BROWSER_NAME: ${{ github.event.inputs.browser }}
+      BROWSER_NAME: ${{ github.event.inputs.browser || 'chromium' }}
       # How many samples to compute the statistical distribution
-      BENCHMARK_NUMBER_SAMPLES: ${{ github.event.inputs.samples }}
+      BENCHMARK_NUMBER_SAMPLES: ${{ github.event.inputs.samples || '100' }}
       # How many times to switch between each tabs
       BENCHMARK_SWITCHES: 3
       # The test notebook size
-      BENCHMARK_MAX_N: ${{ github.event.inputs.size }}
+      BENCHMARK_MAX_N: ${{ github.event.inputs.size || '100' }}
       # Notebooks to test
-      BENCHMARK_NOTEBOOKS: ${{ github.event.inputs.tests }}
+      BENCHMARK_NOTEBOOKS: ${{ github.event.inputs.tests || '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]' }}
 
       # Repository to clone for scheduled benchmark
       SCHEDULE_REPOSITORY: jupyterlab/jupyterlab
