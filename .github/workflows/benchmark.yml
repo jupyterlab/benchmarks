@@ -3,7 +3,7 @@ name: JupyterLab Benchmark Tests
 on:
   schedule:
     # Every Sunday at 01:12am
-    - cron: "12 12 * * 3"
+    - cron: "12 14 * * 3"
   workflow_dispatch:
     inputs:
       challenger:
@@ -114,7 +114,7 @@ jobs:
       - name: Checkout reference commit - schedule
         if: ${{ github.event_name == 'schedule' }}
         run: |
-          export OLD_REF_SHA=$(git rev-parse '${{ env.SCHEDULE_REF }}@{7 days ago}')
+          export OLD_REF_SHA=$(git log --since="1 week ago" --format='%H' | tail -n1)
           git checkout ${OLD_REF_SHA}
         working-directory: reference
 
