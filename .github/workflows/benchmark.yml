@@ -3,7 +3,7 @@ name: JupyterLab Benchmark Tests
 on:
   schedule:
     # Every Sunday at 01:12am
-    - cron: "12 14 * * 3"
+    - cron: "12 1 * * 4"
   workflow_dispatch:
     inputs:
       challenger:
