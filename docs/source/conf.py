@@ -34,9 +34,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
-    "sphinxcontrib.bibtex",
     "sphinx_tabs.tabs",
-    "sphinxcontrib.mermaid",
 ]
 
 source_suffix = {
