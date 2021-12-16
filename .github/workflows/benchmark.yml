@@ -3,7 +3,7 @@ name: JupyterLab Benchmark Tests
 on:
   schedule:
     # Every Sunday at 01:12am
-    - cron: "12 1 * * 4"
+    - cron: "12 12 * * 4"
   workflow_dispatch:
     inputs:
       challenger:
@@ -50,9 +50,9 @@ jobs:
       BENCHMARK_NOTEBOOKS: ${{ github.event.inputs.tests || '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]' }}
 
       # Repository to clone for scheduled benchmark
-      SCHEDULE_REPOSITORY: jupyterlab/jupyterlab
+      CHALLENGER_REPOSITORY: ${{ github.event.inputs.challenger || 'jupyterlab/jupyterlab' }}
       # Branch to checkout for scheduled benchmark
-      SCHEDULE_REF: master
+      CHALLENGER_REF: ${{ github.event.inputs.challenger_branch || 'master' }}
 
     steps:
       - name: Checkout benchmarks project
@@ -105,8 +105,8 @@ jobs:
         if: ${{ github.event_name == 'schedule' }}
         uses: actions/checkout@v2
         with:
-          repository: ${{ env.SCHEDULE_REPOSITORY }}
-          ref: ${{ env.SCHEDULE_REF }}
+          repository: ${{ env.CHALLENGER_REPOSITORY }}
+          ref: ${{ env.CHALLENGER_REF }}
           path: reference
           # Need to fetch enough nodes to get the commit of a week ago
           fetch-depth: 100
@@ -121,6 +121,7 @@ jobs:
       - name: Install dependencies
         run: |
           set -ex
+          echo "OLD_REF_SHA=$(git log -n1 --format='%H')" >> $GITHUB_ENV
           bash ./scripts/ci_install.sh
           # Build dev mode
           jlpm run build
@@ -180,24 +181,16 @@ jobs:
 
       # Second benchmark run on the challenger
       - name: Checkout challenger
-        if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/checkout@v2
         with:
-          repository: ${{ github.event.inputs.challenger }}
-          ref: ${{ github.event.inputs.challenger_branch }}
-          path: challenger
-
-      - name: Checkout challenger - schedule
-        if: ${{ github.event_name == 'schedule' }}
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ env.SCHEDULE_REPOSITORY }}
-          ref: ${{ env.SCHEDULE_REF }}
+          repository: ${{ env.CHALLENGER_REPOSITORY }}
+          ref: ${{ env.CHALLENGER_REF }}
           path: challenger
 
       - name: Install dependencies
         run: |
           set -ex
+          echo "NEW_REF_SHA=$(git log -n1 --format='%H')" >> $GITHUB_ENV
           bash ./scripts/ci_install.sh
           # Build dev mode
           jlpm run build
@@ -238,6 +231,11 @@ jobs:
           # Publish image to cml.dev
           echo "" >> ${REPORT}
           cml-publish ./benchmark-results/lab-benchmark.png --md >> ${REPORT} || true
+          echo "Expected = [${{ env.OLD_REF_SHA }}](https://github.com/jupyterlab/jupyterlab/commit/${{ env.OLD_REF_SHA }}) | Actual = [${{ env.NEW_REF_SHA }}](https://github.com/${{ env.CHALLENGER_REPOSITORY }}/commit/${{ env.NEW_REF_SHA }})" >> ${REPORT}
+          echo "[Go to action log](https://github.com/jupyterlab/benchmarks/actions/runs/${{ github.run_id }})" >> ${REPORT}
+          if [[ "${{ env.CHALLENGER_REPOSITORY }}" == "jupyterlab/jupyterlab" ]]; then
+            echo "[Changelog covered](https://github.com/jupyterlab/jupyterlab/compare/${{ env.OLD_REF_SHA }}...${{ env.NEW_REF_SHA }})" >> ${REPORT}
+          fi
           echo "" >> ${REPORT}
 
           # Test if metadata have changed
@@ -255,6 +253,23 @@ jobs:
 
           # Copy the reference data to upload it as artifact
           cp ./tests-out/lab-benchmark-expected.json ./benchmark-results/
+
+      - name: Publish the report
+        if: ${{ github.event_name == 'schedule' }}
+        uses: actions/github-script@v3.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            var fs = require('fs');
+            var issue_number = 80;
+            var report = String(fs.readFileSync('./benchmarks/tests/benchmark-results/lab-benchmark.md'))
+
+            await github.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number,
+              body: report
+            });
 
       - name: Upload Benchmark Test assets
         if: always()
