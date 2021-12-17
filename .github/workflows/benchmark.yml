@@ -3,7 +3,7 @@ name: JupyterLab Benchmark Tests
 on:
   schedule:
     # Every Sunday at 01:12am
-    - cron: "12 12 * * 4"
+    - cron: "12 10 * * 5"
   workflow_dispatch:
     inputs:
       challenger:
@@ -32,6 +32,9 @@ on:
         description: "Test files size (bigger means larger test files)"
         required: false
         default: "100"
+
+permissions:
+  issues: write
 
 jobs:
   test:
@@ -256,15 +259,14 @@ jobs:
 
       - name: Publish the report
         if: ${{ github.event_name == 'schedule' }}
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            var fs = require('fs');
-            var issue_number = 80;
-            var report = String(fs.readFileSync('./benchmarks/tests/benchmark-results/lab-benchmark.md'))
+            const fs = require('fs');
+            const issue_number = 80;
+            const report = String(fs.readFileSync('./benchmarks/tests/benchmark-results/lab-benchmark.md'))
 
-            await github.issues.createComment({
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue_number,
