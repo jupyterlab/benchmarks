@@ -32,5 +32,6 @@ export default {
             '\n',
             '### This heading should be highlighted too'
           ]);      
-    }
+    },
+    search: "echo",
 }

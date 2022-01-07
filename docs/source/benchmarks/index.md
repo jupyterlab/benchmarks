@@ -47,6 +47,7 @@ It represents the execution time distribution for the reference JupyterLab versi
 - _switch-to-copy_: Time to switch back from the copy to the notebook
 - _switch-from-txt_: Time to switch from the notebook to a text editor
 - _switch-to-txt_: Time to switch back from the text editor to the notebook
+- _search_: Time to find a word in the notebook (not available on all notebooks)
 - _close_: Time to close the notebook (and display the text editor)
 
 ## Test notebooks

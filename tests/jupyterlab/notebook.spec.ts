@@ -97,6 +97,7 @@ test.describe("JupyterLab Benchmark", () => {
   //    - Switch to a text file
   //    - Switch back to the file
   //  ) * SWITCHES times
+  //  - Search for word (if a search term is defined)
   //  - Close the file
   for (const [file, sample] of parameters) {
     test(`measure ${file} - ${sample + 1}`, async ({
@@ -115,11 +116,6 @@ test.describe("JupyterLab Benchmark", () => {
       const perf = galata.newPerformanceHelper(page);
 
       await page.goto(baseURL + "?reset");
-
-      // Workaround to wait for the theme
-      // await page.waitForFunction(
-      //   () => !!document.body.getAttribute("data-jp-theme-name")
-      // );
 
       await page.click("#filebrowser >> .jp-BreadCrumbs-home");
       await page.dblclick(`#filebrowser >> text=${tmpPath}`);
@@ -280,6 +276,26 @@ test.describe("JupyterLab Benchmark", () => {
             ...attachmentCommon,
             test: "switch-to-txt",
             time: toTime,
+          })
+        );
+      }
+
+      // Measure search
+      const searchWord = generators[file].search;
+      if (searchWord) {
+        await page.keyboard.press("Control+f");
+        const searchTime = await perf.measure(async () => {
+          await Promise.all([
+            page.waitForSelector("text=-/-", { state: "detached" }),
+            page.fill('[placeholder="Find"]', searchWord),
+          ]);
+        });
+
+        testInfo.attachments.push(
+          benchmark.addAttachment({
+            ...attachmentCommon,
+            test: "search",
+            time: searchTime,
           })
         );
       }

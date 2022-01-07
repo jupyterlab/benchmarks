@@ -33,5 +33,6 @@ export default {
           "    display('I am a long string which is repeatedly added to the dom in separated divs: %d' % i)"
         ]
       }
-    ])
+    ]),
+  search: "div",
 } as NotebookType;
