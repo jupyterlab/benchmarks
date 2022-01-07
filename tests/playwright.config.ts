@@ -3,7 +3,7 @@
 
 export default {
   reportSlowTests: null,
-  timeout: 60000,
+  timeout: 90000,
   projects: [
     {
       name: "jupyterlab",
@@ -60,7 +60,7 @@ export default {
     // Context options
     viewport: { width: 1024, height: 768 },
     // Artifacts
-    video: "off", // "retain-on-failure",
+    video: "on", // "retain-on-failure",
     baseURL: process.env.TARGET_URL ?? 'http://localhost:9999'
   },
   preserveOutput: "failures-only",
