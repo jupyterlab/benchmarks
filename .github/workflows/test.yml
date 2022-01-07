@@ -97,6 +97,9 @@ jobs:
         working-directory: benchmarks/tests
         run: |
           set -ex
+          # Update the snapshots
+          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
+          # Check that all tests pass with updated snapshots
           BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab
 
       - name: Kill the server
