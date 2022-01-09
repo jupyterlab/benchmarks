@@ -9,7 +9,7 @@ import NotebookType from './notebookType';
 export default {
   // TODO suppress cutting number of plots by half once it is fast enough
   // to switch between this test notebook and its copy
-  label: 'manyPlotly - 0.5*{N} plotly ouputs each with four points',
+  label: 'manyPlotly - 0.1*{N} plotly ouputs each with four points',
   waitFor: waitForPlotly,
   notebook: (n: number) =>
     galata.Notebook.makeNotebook([
@@ -24,7 +24,7 @@ export default {
           `fig = go.Figure(data=go.Scatter(y=data, x=data))`
         ]
       },
-      ...Array.from({ length: 0.5 * n }, () => ({
+      ...Array.from({ length: 0.1 * n }, () => ({
         cell_type: 'code',
         execution_count: 1,
         metadata: {},
