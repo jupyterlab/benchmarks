@@ -170,7 +170,7 @@ jobs:
           # Update test screenshots
           BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
 
-          jlpm run test --project jupyterlab -u
+          jlpm run test --project jupyterlab
           cp tests-out/lab-benchmark-expected.json /tmp/
 
       - name: Kill the server

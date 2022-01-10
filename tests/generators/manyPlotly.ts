@@ -7,7 +7,9 @@ import { galata } from '@jupyterlab/galata';
 import NotebookType from './notebookType';
 
 export default {
-  label: 'manyPlotly - {N}+1 plotly ouputs each with four points',
+  // TODO suppress cutting number of plots by half once it is fast enough
+  // to switch between this test notebook and its copy
+  label: 'manyPlotly - 0.1*{N} plotly ouputs each with four points',
   waitFor: waitForPlotly,
   notebook: (n: number) =>
     galata.Notebook.makeNotebook([
@@ -22,7 +24,7 @@ export default {
           `fig = go.Figure(data=go.Scatter(y=data, x=data))`
         ]
       },
-      ...Array.from({ length: n + 1 }, () => ({
+      ...Array.from({ length: 0.1 * n }, () => ({
         cell_type: 'code',
         execution_count: 1,
         metadata: {},

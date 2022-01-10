@@ -15,6 +15,7 @@ The best way to use this project for benchmark test execution is to start a manu
 - Switching back
 - Switching from the test notebook to a text editor
 - Switching back
+- Search for a word
 - Closing the test notebook
 
 There are multiple test notebooks available and their size can be tune with a size parameter.

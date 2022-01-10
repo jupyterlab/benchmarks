@@ -1,0 +1,124 @@
+name: Check on JupyterLab
+
+on:
+  pull_request:
+    branches: ['master']
+  push:
+    branches: ['master']
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout benchmarks project
+        uses: actions/checkout@v2
+        with:
+          path: benchmarks
+
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14.x"
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Cache pip on Linux
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-3.8-${{ hashFiles('**/requirements.txt', 'setup.cfg') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-3.8
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Cache yarn
+        uses: actions/cache@v1
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Checkout JupyterLab
+        uses: actions/checkout@v2
+        with:
+          repository: jupyterlab/jupyterlab
+          ref: master
+          path: reference
+
+      - name: Install dependencies
+        run: |
+          set -ex
+          echo "OLD_REF_SHA=$(git log -n1 --format='%H')" >> $GITHUB_ENV
+          bash ./scripts/ci_install.sh
+          # Build dev mode
+          jlpm run build
+        working-directory: reference
+
+      - name: Install extensions
+        # This is done after installing the reference in order to have jlpm available.
+        run: |
+          set -ex
+          pip install ipywidgets plotly
+          pip install -v extensions/fixed-data-table
+
+          jupyter server extension list
+          jupyter labextension list
+        working-directory: benchmarks
+
+      - name: Launch JupyterLab
+        shell: bash
+        run: |
+          jlpm install
+          # Mount a volume to overwrite the server configuration
+          jlpm start-jlab 2>&1 > /tmp/jupyterlab_server.log &
+        working-directory: benchmarks/tests
+
+      - name: Install browser
+        run: |
+          set -ex
+          # Install only Chromium browser
+          jlpm playwright install chromium
+        working-directory: benchmarks/tests
+
+      - name: Wait for JupyterLab
+        uses: ifaxity/wait-on-action@v1
+        with:
+          resource: http-get://localhost:9999/lab
+          timeout: 360000
+
+      - name: Execute benchmark tests for validation
+        working-directory: benchmarks/tests
+        run: |
+          set -ex
+          # Update the snapshots
+          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
+          # Check that all tests pass with updated snapshots
+          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab
+
+      - name: Kill the server
+        if: always()
+        shell: bash
+        run: |
+          kill -s SIGKILL $(pgrep jupyter-lab)
+
+      - name: Upload Test assets
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-assets
+          path: |
+            benchmarks/tests/test-results/
+            benchmarks/tests/tests-out/**/*.png
+
+      - name: Print JupyterLab logs
+        if: always()
+        run: |
+          cat /tmp/jupyterlab_server.log
+

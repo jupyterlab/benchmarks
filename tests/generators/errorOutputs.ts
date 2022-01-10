@@ -39,5 +39,6 @@ export default {
         ]
       }
     ]);
-  }
+  },
+  search: "iAmNotDefined"
 } as NotebookType;

@@ -41,5 +41,6 @@ export default {
             DIV_NUMBER}))}</div>\')`
         ]
       }
-    ])
+    ]),
+  search: "long"
 } as NotebookType;

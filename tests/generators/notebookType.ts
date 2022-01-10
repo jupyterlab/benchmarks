@@ -16,6 +16,12 @@ type NotebookType = {
    * serialized to JSON and saved.
    */
   notebook: (n: number) => object;
+  /**
+   * Search term
+   * 
+   * Optional search word for the search step
+   */
+  search?: string;
 };
 
 // eslint-disable-next-line no-undef

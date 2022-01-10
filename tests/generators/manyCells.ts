@@ -53,5 +53,6 @@ export default {
     }
 
     return galata.Notebook.makeNotebook(cells);
-  }
+  },
+  search: "stderr"
 } as NotebookType;

@@ -15,4 +15,5 @@ export default {
       '    print(f"{PREFIX} {x}")',
     ]);
   },
+  search: "of",
 };
