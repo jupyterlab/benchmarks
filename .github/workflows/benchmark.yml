@@ -62,7 +62,7 @@ jobs:
       size: ${{ github.event.inputs.size || '100' }}
 
   search-test:
-    if: ${{ github.event.inputs.test_steps && !contains(github.event.inputs.test_steps, "search") }}
+    if: ${{ github.event.inputs.test_steps && !contains(github.event.inputs.test_steps, 'search') }}
     uses: fcollonval/benchmarks/.github/workflows/run-jupyterlab.yml@ft/split-job
     with:
       event: ${{ github.event_name }}
