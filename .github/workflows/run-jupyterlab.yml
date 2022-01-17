@@ -35,6 +35,11 @@ on:
         required: false
         default: '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]'
         type: string
+      test_steps:
+        description: 'List of test steps for each notebook (available ["open", "switch-with-copy", "switch-with-txt", "search", "close"])'
+        required: false
+        default: '["open", "switch-with-copy", "switch-with-txt", "search", "close"]'
+        type: string
       size:
         description: "Test files size (bigger means larger test files)"
         required: false
@@ -45,25 +50,27 @@ permissions:
   issues: write
 
 jobs:
-  test:
+  run-benchmark:
     runs-on: ubuntu-20.04
 
     env:
       # Which browser to use (one of 'chromium', 'firefox', 'webkit')
-      BROWSER_NAME: ${{ inputs.browser || 'chromium' }}
+      BROWSER_NAME: ${{ inputs.browser }}
       # How many samples to compute the statistical distribution
-      BENCHMARK_NUMBER_SAMPLES: ${{ inputs.samples || '100' }}
+      BENCHMARK_NUMBER_SAMPLES: ${{ inputs.samples }}
       # How many times to switch between each tabs
       BENCHMARK_SWITCHES: 3
       # The test notebook size
-      BENCHMARK_MAX_N: ${{ inputs.size || '100' }}
+      BENCHMARK_MAX_N: ${{ inputs.size }}
       # Notebooks to test
-      BENCHMARK_NOTEBOOKS: ${{ inputs.tests || '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]' }}
+      BENCHMARK_NOTEBOOKS: ${{ inputs.tests }}
+      # Test steps to measure on each test notebook
+      BENCHMARK_STEPS: ${{ inputs.test_steps }}
 
       # Repository to clone for scheduled benchmark
-      CHALLENGER_REPOSITORY: ${{ inputs.challenger || 'jupyterlab/jupyterlab' }}
+      CHALLENGER_REPOSITORY: ${{ inputs.challenger }}
       # Branch to checkout for scheduled benchmark
-      CHALLENGER_REF: ${{ inputs.challenger_branch || 'master' }}
+      CHALLENGER_REF: ${{ inputs.challenger_branch }}
 
     steps:
       - name: Checkout benchmarks project

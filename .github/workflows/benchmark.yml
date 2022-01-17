@@ -28,6 +28,10 @@ on:
         description: 'List of test notebooks to include (available ["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"])'
         required: false
         default: '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]'
+      test_steps:
+        description: 'List of test steps for each notebook (available ["open", "switch-with-copy", "switch-with-txt", "search", "close"])'
+        required: false
+        default: '["open", "switch-with-copy", "switch-with-txt", "close"]'
       size:
         description: "Test files size (bigger means larger test files)"
         required: false
@@ -37,7 +41,7 @@ permissions:
   issues: write
 
 jobs:
-  test:
+  basic-test:
     uses: fcollonval/benchmarks/.github/workflows/run-jupyterlab.yml@ft/split-job
     with:
       event: ${{ github.event_name }}
@@ -52,5 +56,28 @@ jobs:
       samples: ${{ github.event.inputs.samples || '100' }}
       # Notebooks to test
       tests: ${{ github.event.inputs.tests || '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]' }}
+      # Test steps to measure on each test notebook
+      test_steps: ${{ github.event.inputs.test_steps || '["open", "switch-with-copy", "switch-with-txt", "close"]' }}
+      # The test notebook size
+      size: ${{ github.event.inputs.size || '100' }}
+
+  search-test:
+    if: ${{ github.event.inputs.test_steps && !contains(github.event.inputs.test_steps, "search") }}
+    uses: fcollonval/benchmarks/.github/workflows/run-jupyterlab.yml@ft/split-job
+    with:
+      event: ${{ github.event_name }}
+      # Repository to clone for scheduled benchmark
+      challenger: ${{ github.event.inputs.challenger || 'jupyterlab/jupyterlab' }}
+      # Branch to checkout for scheduled benchmark
+      challenger_branch: ${{ github.event.inputs.challenger_branch || 'master' }}
+      reference_branch: ${{ github.event.inputs.reference_branch || 'master' }}
+      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
+      browser: ${{ github.event.inputs.browser || 'chromium' }}
+      # How many samples to compute the statistical distribution
+      samples: ${{ github.event.inputs.samples || '100' }}
+      # Notebooks to test
+      tests: ${{ github.event.inputs.tests || '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]' }}
+      # Test steps to measure on each test notebook
+      test_steps: '["search"]'
       # The test notebook size
       size: ${{ github.event.inputs.size || '100' }}
