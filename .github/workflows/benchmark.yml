@@ -38,36 +38,19 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
-
-    env:
-      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
-      BROWSER_NAME: ${{ github.event.inputs.browser || 'chromium' }}
-      # How many samples to compute the statistical distribution
-      BENCHMARK_NUMBER_SAMPLES: ${{ github.event.inputs.samples || '100' }}
-      # How many times to switch between each tabs
-      BENCHMARK_SWITCHES: 3
-      # The test notebook size
-      BENCHMARK_MAX_N: ${{ github.event.inputs.size || '100' }}
-      # Notebooks to test
-      BENCHMARK_NOTEBOOKS: ${{ github.event.inputs.tests || '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]' }}
-
+    uses: fcollonval/benchmarks/.github/workflows/run-jupyterlab.yml@ft/split-job
+    with:
+      event: ${{ github.event_name }}
       # Repository to clone for scheduled benchmark
-      CHALLENGER_REPOSITORY: ${{ github.event.inputs.challenger || 'jupyterlab/jupyterlab' }}
+      challenger: ${{ github.event.inputs.challenger || 'jupyterlab/jupyterlab' }}
       # Branch to checkout for scheduled benchmark
-      CHALLENGER_REF: ${{ github.event.inputs.challenger_branch || 'master' }}
-
-      REFERENCE_BRANCH: ${{ github.event.inputs.reference_branch || 'master' }}
-
-    steps:
-      - name: Run benchmark
-        uses: ./.github/workflows/run-jupyterlab
-        with:
-          event: ${{ github.event_name }}
-          challenger: ${{ env.CHALLENGER_REPOSITORY }}
-          challenger_branch: ${{ env.CHALLENGER_REPOSITORY }}
-          reference_branch: ${{ env.REFERENCE_BRANCH }}
-          browser: ${{ env.BROWSER_NAME }}
-          samples: ${{ env.BENCHMARK_NUMBER_SAMPLES }}
-          tests: ${{ env.BENCHMARK_NOTEBOOKS }}
-          size: ${{ env.BENCHMARK_MAX_N }}
+      challenger_branch: ${{ github.event.inputs.challenger_branch || 'master' }}
+      reference_branch: ${{ github.event.inputs.reference_branch || 'master' }}
+      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
+      browser: ${{ github.event.inputs.browser || 'chromium' }}
+      # How many samples to compute the statistical distribution
+      samples: ${{ github.event.inputs.samples || '100' }}
+      # Notebooks to test
+      tests: ${{ github.event.inputs.tests || '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]' }}
+      # The test notebook size
+      size: ${{ github.event.inputs.size || '100' }}
