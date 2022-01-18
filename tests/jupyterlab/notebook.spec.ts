@@ -150,6 +150,7 @@ test.describe("JupyterLab Benchmark", () => {
       expect(await documentContent.screenshot()).toMatchSnapshot(
         `${file.replace(".", "-")}.png`
       );
+
       if (STEPS.includes("open")) {
         testInfo.attachments.push(
           benchmark.addAttachment({
@@ -179,12 +180,12 @@ test.describe("JupyterLab Benchmark", () => {
         await page.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
           state: "hidden",
         });
-
-        // Switch to test notebook
-        await page.click(
-          `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
-        );
       }
+
+      // Switch to test notebook
+      await page.click(
+        `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
+      );
 
       // Shutdown the kernel to be sure it does not get in our way (especially for the close action)
       await page.click('li[role="menuitem"]:has-text("Kernel")');
@@ -298,7 +299,9 @@ test.describe("JupyterLab Benchmark", () => {
       // Measure search
       const searchWord = generators[file].search;
       if (searchWord && STEPS.includes("search")) {
-        await page.keyboard.press("Control+f");
+        await page.click('li[role="menuitem"]:has-text("Edit")');
+        await page.click('ul[role="menu"] >> text=Find…');
+
         const searchTime = await perf.measure(async () => {
           await Promise.all([
             page.waitForSelector("text=-/-", { state: "detached" }),

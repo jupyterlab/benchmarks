@@ -45,6 +45,11 @@ on:
         required: false
         default: "100"
         type: string
+      artifacts_name:
+        description: "Uploaded benchmark assets name"
+        required: false
+        default: "benchmark-assets"
+        type: string
 
 permissions:
   issues: write
@@ -292,7 +297,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: benchmark-assets
+          name: ${{ inputs.artifacts_name }}
           path: |
             benchmarks/tests/benchmark-results
             benchmarks/tests/test-results/*-1-*
