@@ -42,7 +42,7 @@ permissions:
 
 jobs:
   basic-test:
-    uses: fcollonval/benchmarks/.github/workflows/run-jupyterlab.yml@ft/split-job
+    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
     with:
       event: ${{ github.event_name }}
       # Repository to clone for scheduled benchmark
@@ -65,7 +65,7 @@ jobs:
   search-test:
     # When running scheduled job - run search test in a separate job to avoid hitting the 6h limit.
     if: ${{ github.event_name == 'schedule' }}
-    uses: fcollonval/benchmarks/.github/workflows/run-jupyterlab.yml@ft/split-job
+    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
     with:
       event: ${{ github.event_name }}
       # Repository to clone for scheduled benchmark
