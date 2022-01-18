@@ -63,7 +63,8 @@ jobs:
       artifacts_name: 'benchmarks-basic-report'
 
   search-test:
-    if: ${{ github.event.inputs.test_steps && !contains(github.event.inputs.test_steps, 'search') }}
+    # When running scheduled job - run search test in a separate job to avoid hitting the 6h limit.
+    if: ${{ github.event_name == 'schedule' }}
     uses: fcollonval/benchmarks/.github/workflows/run-jupyterlab.yml@ft/split-job
     with:
       event: ${{ github.event_name }}
