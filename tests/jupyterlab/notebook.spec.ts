@@ -24,6 +24,12 @@ const NOTEBOOK_PACKAGES: Array<string> = notebookEnv
       "errorOutputs",
     ];
 
+// Steps to test
+const stepsEnv = process.env.BENCHMARK_STEPS;
+const STEPS: Array<string> = stepsEnv
+  ? JSON.parse(stepsEnv)
+  : ["open", "switch-with-copy", "switch-with-txt", "search", "close"];
+
 const tmpPath = "test-performance";
 const textFile = "lorem_ipsum.txt";
 
@@ -65,11 +71,13 @@ test.describe("JupyterLab Benchmark", () => {
           )
           .then(() => {
             // Create a copy of the notebook to test switching to a similar notebook
-            return contents.uploadContent(
-              JSON.stringify(fileContent),
-              "text",
-              `${tmpPath}/${name}_copy.ipynb`
-            );
+            if (STEPS.includes("switch-with-copy")) {
+              return contents.uploadContent(
+                JSON.stringify(fileContent),
+                "text",
+                `${tmpPath}/${name}_copy.ipynb`
+              );
+            }
           });
       })
     );
@@ -143,13 +151,15 @@ test.describe("JupyterLab Benchmark", () => {
         `${file.replace(".", "-")}.png`
       );
 
-      testInfo.attachments.push(
-        benchmark.addAttachment({
-          ...attachmentCommon,
-          test: "open",
-          time: openTime,
-        })
-      );
+      if (STEPS.includes("open")) {
+        testInfo.attachments.push(
+          benchmark.addAttachment({
+            ...attachmentCommon,
+            test: "open",
+            time: openTime,
+          })
+        );
+      }
 
       // Open text file
       await page.dblclick(`#filebrowser >> text=${textFile}`);
@@ -159,16 +169,18 @@ test.describe("JupyterLab Benchmark", () => {
         )}`
       );
 
-      // Open copied notebook
-      await Promise.all([
-        page.waitForSelector('[role="main"] >> .jp-SpinnerContent'),
-        page.dblclick(`#filebrowser >> text=${filename}_copy.ipynb`),
-      ]);
+      if (STEPS.includes("switch-with-copy")) {
+        // Open copied notebook
+        await Promise.all([
+          page.waitForSelector('[role="main"] >> .jp-SpinnerContent'),
+          page.dblclick(`#filebrowser >> text=${filename}_copy.ipynb`),
+        ]);
 
-      // Wait for spinner to be hidden
-      await page.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
-        state: "hidden",
-      });
+        // Wait for spinner to be hidden
+        await page.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
+          state: "hidden",
+        });
+      }
 
       // Switch to test notebook
       await page.click(
@@ -182,108 +194,114 @@ test.describe("JupyterLab Benchmark", () => {
 
       // Switch #SWITCHES times between the file editor and the notebook
       for (let switchIdx = 0; switchIdx < SWITCHES; switchIdx++) {
-        // Switch to copy
-        const fromTimeCopy = await perf.measure(async () => {
-          await page.click(
-            `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}_copy.ipynb`
+        if (STEPS.includes("switch-with-copy")) {
+          // Switch to copy
+          const fromTimeCopy = await perf.measure(async () => {
+            await page.click(
+              `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}_copy.ipynb`
+            );
+          });
+
+          // Check the notebook is correctly opened
+          panel = await page.$(
+            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-3"]'
           );
-        });
-
-        // Check the notebook is correctly opened
-        panel = await page.$(
-          '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-3"]'
-        );
-        // Get only the document node to avoid noise from kernel and debugger in the toolbar
-        documentContent = await panel.$(".jp-Notebook");
-        expect(await documentContent.screenshot()).toMatchSnapshot(
-          `${file.replace(".", "-")}.png`
-        );
-
-        testInfo.attachments.push(
-          benchmark.addAttachment({
-            ...attachmentCommon,
-            test: "switch-from-copy",
-            time: fromTimeCopy,
-          })
-        );
-
-        // Switch back
-        const toTimeCopy = await perf.measure(async () => {
-          await page.click(
-            `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
+          // Get only the document node to avoid noise from kernel and debugger in the toolbar
+          documentContent = await panel.$(".jp-Notebook");
+          expect(await documentContent.screenshot()).toMatchSnapshot(
+            `${file.replace(".", "-")}.png`
           );
-        });
 
-        // Check the notebook is correctly opened
-        panel = await page.$(
-          '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
-        );
-        // Get only the document node to avoid noise from kernel and debugger in the toolbar
-        documentContent = await panel.$(".jp-Notebook");
-        expect(await documentContent.screenshot()).toMatchSnapshot(
-          `${file.replace(".", "-")}.png`
-        );
-
-        testInfo.attachments.push(
-          benchmark.addAttachment({
-            ...attachmentCommon,
-            test: "switch-to-copy",
-            time: toTimeCopy,
-          })
-        );
-
-        // Switch text file
-        const fromTime = await perf.measure(async () => {
-          await page.click(
-            `div[role="main"] >> .lm-DockPanel-tabBar >> text=${path.basename(
-              textFile
-            )}`
+          testInfo.attachments.push(
+            benchmark.addAttachment({
+              ...attachmentCommon,
+              test: "switch-from-copy",
+              time: fromTimeCopy,
+            })
           );
-        });
 
-        const editorPanel = page.locator(
-          'div[role="tabpanel"]:has-text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole")'
-        );
-        await expect(editorPanel).toBeVisible();
+          // Switch back
+          const toTimeCopy = await perf.measure(async () => {
+            await page.click(
+              `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
+            );
+          });
 
-        testInfo.attachments.push(
-          benchmark.addAttachment({
-            ...attachmentCommon,
-            test: "switch-from-txt",
-            time: fromTime,
-          })
-        );
-
-        // Switch back
-        const toTime = await perf.measure(async () => {
-          await page.click(
-            `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
+          // Check the notebook is correctly opened
+          panel = await page.$(
+            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
           );
-        });
+          // Get only the document node to avoid noise from kernel and debugger in the toolbar
+          documentContent = await panel.$(".jp-Notebook");
+          expect(await documentContent.screenshot()).toMatchSnapshot(
+            `${file.replace(".", "-")}.png`
+          );
 
-        // Check the notebook is correctly opened
-        panel = await page.$(
-          '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
-        );
-        // Get only the document node to avoid noise from kernel and debugger in the toolbar
-        documentContent = await panel.$(".jp-Notebook");
-        expect(await documentContent.screenshot()).toMatchSnapshot(
-          `${file.replace(".", "-")}.png`
-        );
+          testInfo.attachments.push(
+            benchmark.addAttachment({
+              ...attachmentCommon,
+              test: "switch-to-copy",
+              time: toTimeCopy,
+            })
+          );
+        }
 
-        testInfo.attachments.push(
-          benchmark.addAttachment({
-            ...attachmentCommon,
-            test: "switch-to-txt",
-            time: toTime,
-          })
-        );
+        if (STEPS.includes("switch-with-txt")) {
+          // Switch text file
+          const fromTime = await perf.measure(async () => {
+            await page.click(
+              `div[role="main"] >> .lm-DockPanel-tabBar >> text=${path.basename(
+                textFile
+              )}`
+            );
+          });
+
+          const editorPanel = page.locator(
+            'div[role="tabpanel"]:has-text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole")'
+          );
+          await expect(editorPanel).toBeVisible();
+
+          testInfo.attachments.push(
+            benchmark.addAttachment({
+              ...attachmentCommon,
+              test: "switch-from-txt",
+              time: fromTime,
+            })
+          );
+
+          // Switch back
+          const toTime = await perf.measure(async () => {
+            await page.click(
+              `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
+            );
+          });
+
+          // Check the notebook is correctly opened
+          panel = await page.$(
+            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+          );
+          // Get only the document node to avoid noise from kernel and debugger in the toolbar
+          documentContent = await panel.$(".jp-Notebook");
+          expect(await documentContent.screenshot()).toMatchSnapshot(
+            `${file.replace(".", "-")}.png`
+          );
+
+          testInfo.attachments.push(
+            benchmark.addAttachment({
+              ...attachmentCommon,
+              test: "switch-to-txt",
+              time: toTime,
+            })
+          );
+        }
       }
 
       // Measure search
       const searchWord = generators[file].search;
-      if (searchWord) {
-        await page.keyboard.press("Control+f");
+      if (searchWord && STEPS.includes("search")) {
+        await page.click('li[role="menuitem"]:has-text("Edit")');
+        await page.click('ul[role="menu"] >> text=Find…');
+
         const searchTime = await perf.measure(async () => {
           await Promise.all([
             page.waitForSelector("text=-/-", { state: "detached" }),
@@ -300,29 +318,31 @@ test.describe("JupyterLab Benchmark", () => {
         );
       }
 
-      // Close notebook
-      await page.click('li[role="menuitem"]:has-text("File")');
-      const closeTime = await perf.measure(async () => {
-        await page.click('ul[role="menu"] >> text=Close Tab');
-        // Revert changes so we don't measure saving
-        const dimissButton = page.locator('button:has-text("Discard")');
-        if (await dimissButton.isVisible({ timeout: 50 })) {
-          await dimissButton.click();
-        }
-      });
+      if (STEPS.includes("close")) {
+        // Close notebook
+        await page.click('li[role="menuitem"]:has-text("File")');
+        const closeTime = await perf.measure(async () => {
+          await page.click('ul[role="menu"] >> text=Close Tab');
+          // Revert changes so we don't measure saving
+          const dimissButton = page.locator('button:has-text("Discard")');
+          if (await dimissButton.isVisible({ timeout: 50 })) {
+            await dimissButton.click();
+          }
+        });
 
-      const editorPanel = page.locator(
-        'div[role="tabpanel"]:has-text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole")'
-      );
-      await expect(editorPanel).toBeVisible();
+        const editorPanel = page.locator(
+          'div[role="tabpanel"]:has-text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole")'
+        );
+        await expect(editorPanel).toBeVisible();
 
-      testInfo.attachments.push(
-        benchmark.addAttachment({
-          ...attachmentCommon,
-          test: "close",
-          time: closeTime,
-        })
-      );
+        testInfo.attachments.push(
+          benchmark.addAttachment({
+            ...attachmentCommon,
+            test: "close",
+            time: closeTime,
+          })
+        );
+      }
     });
   }
 });
