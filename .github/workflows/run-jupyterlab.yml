@@ -190,7 +190,8 @@ jobs:
           # Update test screenshots
           BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
 
-          jlpm run test --project jupyterlab
+          # -u is needed to generate the benchmark expected file
+          jlpm run test --project jupyterlab -u
           cp tests-out/lab-benchmark-expected.json /tmp/
 
       - name: Kill the server
