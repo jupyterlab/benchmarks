@@ -8,6 +8,7 @@ You need to start a manual benchmark workflow in the [repository actions](https:
 - Switching from the test notebook to a text editor
 - Switching back
 - Search for a word
+- Start the debugger
 - Closing the test notebook
 
 There are multiple test notebooks available and their size can be tune with a size parameter.

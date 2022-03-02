@@ -29,7 +29,7 @@ on:
         required: false
         default: '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]'
       test_steps:
-        description: 'List of test steps for each notebook (available ["open", "switch-with-copy", "switch-with-txt", "search", "close"])'
+        description: 'List of test steps for each notebook (available ["open", "switch-with-copy", "switch-with-txt", "search", "start-debug", "close"])'
         required: false
         default: '["open", "switch-with-copy", "switch-with-txt", "close"]'
       size:
@@ -41,7 +41,7 @@ permissions:
   issues: write
 
 jobs:
-  basic-test:
+  test:
     uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
     with:
       event: ${{ github.event_name }}
@@ -55,14 +55,14 @@ jobs:
       # How many samples to compute the statistical distribution
       samples: ${{ github.event.inputs.samples || '100' }}
       # Notebooks to test
-      tests: ${{ github.event.inputs.tests || '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]' }}
+      tests: ${{ github.event.inputs.tests || '["codeNotebook", "mdNotebook", "longOutput"]' }}
       # Test steps to measure on each test notebook
-      test_steps: ${{ github.event.inputs.test_steps || '["open", "switch-with-copy", "switch-with-txt", "close"]' }}
+      test_steps: ${{ github.event.inputs.test_steps || '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]' }}
       # The test notebook size
       size: ${{ github.event.inputs.size || '100' }}
-      artifacts_name: 'benchmarks-basic-report'
+      artifacts_name: 'benchmarks-report'
 
-  search-test:
+  second-files-set:
     # When running scheduled job - run search test in a separate job to avoid hitting the 6h limit.
     if: ${{ github.event_name == 'schedule' }}
     uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
@@ -78,9 +78,9 @@ jobs:
       # How many samples to compute the statistical distribution
       samples: ${{ github.event.inputs.samples || '100' }}
       # Notebooks to test
-      tests: ${{ github.event.inputs.tests || '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]' }}
+      tests: ${{ github.event.inputs.tests || '["largeMetadata", "errorOutputs"]' }}
       # Test steps to measure on each test notebook
-      test_steps: '["search"]'
+      test_steps: ${{ github.event.inputs.test_steps || '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]' }}
       # The test notebook size
       size: ${{ github.event.inputs.size || '100' }}
-      artifacts_name: 'benchmarks-search-report'
+      artifacts_name: 'benchmarks-2-report'

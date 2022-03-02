@@ -31,12 +31,12 @@ on:
         default: "100"
         type: string
       tests:
-        description: 'List of test notebooks to include (available ["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"])'
+        description: 'List of test notebooks to include (available ["codeNotebook", "mdNotebook", "largeMetadata", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"])'
         required: false
         default: '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]'
         type: string
       test_steps:
-        description: 'List of test steps for each notebook (available ["open", "switch-with-copy", "switch-with-txt", "search", "close"])'
+        description: 'List of test steps for each notebook (available ["open", "switch-with-copy", "switch-with-txt", "search", "start-debug", "close"])'
         required: false
         default: '["open", "switch-with-copy", "switch-with-txt", "search", "close"]'
         type: string

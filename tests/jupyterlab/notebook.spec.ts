@@ -29,7 +29,14 @@ const NOTEBOOK_PACKAGES: Array<string> = notebookEnv
 const stepsEnv = process.env.BENCHMARK_STEPS;
 const STEPS: Array<string> = stepsEnv
   ? JSON.parse(stepsEnv)
-  : ["open", "switch-with-copy", "switch-with-txt", "search", "close"];
+  : [
+      "open",
+      "switch-with-copy",
+      "switch-with-txt",
+      "search",
+      "start-debug",
+      "close",
+    ];
 
 const tmpPath = "test-performance";
 const textFile = "lorem_ipsum.txt";
@@ -107,6 +114,7 @@ test.describe("JupyterLab Benchmark", () => {
   //    - Switch back to the file
   //  ) * SWITCHES times
   //  - Search for word (if a search term is defined)
+  //  - Start the debugger
   //  - Close the file
   for (const [file, sample] of parameters) {
     test(`measure ${file} - ${sample + 1}`, async ({
@@ -187,11 +195,6 @@ test.describe("JupyterLab Benchmark", () => {
       await page.click(
         `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
       );
-
-      // Shutdown the kernel to be sure it does not get in our way (especially for the close action)
-      await page.click('li[role="menuitem"]:has-text("Kernel")');
-      await page.click('ul[role="menu"] >> text=Shut Down All Kernels…');
-      await page.click(':nth-match(button:has-text("Shut Down All"), 3)');
 
       // Switch #SWITCHES times between the file editor and the notebook
       for (let switchIdx = 0; switchIdx < SWITCHES; switchIdx++) {
@@ -317,7 +320,41 @@ test.describe("JupyterLab Benchmark", () => {
             time: searchTime,
           })
         );
+
+        // Close search
+        await page.click(
+          '.jp-DocumentSearch-button-wrapper >> svg[data-icon="ui-components:close"]'
+        );
       }
+
+      // Measure debug activateion
+      if (STEPS.includes("start-debug")) {
+        const startDebugTime = await perf.measure(async () => {
+          await Promise.all([
+            page.waitForSelector("text=function variables"),
+            page.click('button[title="Enable Debugger"]'),
+          ]);
+        });
+
+        testInfo.attachments.push(
+          benchmark.addAttachment({
+            ...attachmentCommon,
+            test: "start-debug",
+            time: startDebugTime,
+          })
+        );
+
+        // Hide file browser so the debug button is not hidden
+        await page.click('[title^="File Browser"]');
+
+        // Disable the debugger
+        await page.click('button[title="Disable Debugger"]')
+      }
+
+      // Shutdown the kernel to be sure it does not get in our way (especially for the close action)
+      await page.click('li[role="menuitem"]:has-text("Kernel")');
+      await page.click('ul[role="menu"] >> text=Shut Down All Kernels…');
+      await page.click(':nth-match(button:has-text("Shut Down All"), 3)');
 
       if (STEPS.includes("close")) {
         // Close notebook
