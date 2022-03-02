@@ -98,9 +98,9 @@ jobs:
         run: |
           set -ex
           # Update the snapshots
-          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
+          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project testing -u
           # Check that all tests pass with updated snapshots
-          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab
+          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project testing
 
       - name: Kill the server
         if: always()

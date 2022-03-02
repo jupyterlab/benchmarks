@@ -10,6 +10,13 @@ export default {
       testMatch: "jupyterlab/**",
     },
     {
+      name: "testing",
+      testMatch: "jupyterlab/**",
+      use: {
+        video: "retain-on-failure"
+      }
+    },
+    {
       name: "retrolab",
       testMatch: "retrolab/**",
       use: {
