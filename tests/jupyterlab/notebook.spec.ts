@@ -17,6 +17,7 @@ const NOTEBOOK_PACKAGES: Array<string> = notebookEnv
   : [
       "codeNotebook",
       "mdNotebook",
+      "largeMetadata",
       "largePlotly",
       "longOutput",
       "manyPlotly",

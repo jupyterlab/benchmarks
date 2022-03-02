@@ -25,7 +25,7 @@ on:
         required: false
         default: "100"
       tests:
-        description: 'List of test notebooks to include (available ["codeNotebook", "mdNotebook", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"])'
+        description: 'List of test notebooks to include (available ["codeNotebook", "mdNotebook", "largeMetadata", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"])'
         required: false
         default: '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]'
       test_steps:
