@@ -9,6 +9,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-20.04
+
+    env:
+      # How many times to switch between each tabs
+      BENCHMARK_SWITCHES: 3
+
     steps:
       - name: Checkout benchmarks project
         uses: actions/checkout@v2
