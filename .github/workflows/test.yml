@@ -9,6 +9,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-20.04
+
+    env:
+      # How many times to switch between each tabs
+      BENCHMARK_SWITCHES: 3
+
     steps:
       - name: Checkout benchmarks project
         uses: actions/checkout@v2
@@ -98,9 +103,9 @@ jobs:
         run: |
           set -ex
           # Update the snapshots
-          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
+          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project testing -u
           # Check that all tests pass with updated snapshots
-          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab
+          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project testing
 
       - name: Kill the server
         if: always()

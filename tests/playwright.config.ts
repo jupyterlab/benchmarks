@@ -3,11 +3,18 @@
 
 export default {
   reportSlowTests: null,
-  timeout: 60000,
+  timeout: 150000,
   projects: [
     {
       name: "jupyterlab",
       testMatch: "jupyterlab/**",
+    },
+    {
+      name: "testing",
+      testMatch: "jupyterlab/**",
+      use: {
+        video: "retain-on-failure"
+      }
     },
     {
       name: "retrolab",
