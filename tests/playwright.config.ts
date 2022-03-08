@@ -3,7 +3,7 @@
 
 export default {
   reportSlowTests: null,
-  timeout: 36000,
+  timeout: 54000,
   projects: [
     {
       name: "jupyterlab",
