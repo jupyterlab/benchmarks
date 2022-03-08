@@ -224,23 +224,15 @@ test.describe("JupyterLab Benchmark", () => {
             })
           );
 
-          // Hide conflict dialog if it shows up
-          try {
-            const dialog = page.locator(".jp-Dialog .jp-Dialog-content");
-            await dialog.waitFor({ timeout: 100 });
-            const dlgBtnSelector = "button.jp-mod-accept";
-            const dlgBtn = dialog.locator(dlgBtnSelector);
-            await dlgBtn.click();
-            await dialog.waitFor({ state: "hidden" });
-          } catch (error) {
-            // no-op
-          }
-
           // Switch back
           const toTimeCopy = await perf.measure(async () => {
-            await page.click(
-              `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
-            );
+            await Promise.allSettled([
+              // In case a dialog due to file out of synchronization is appearing.
+              page.click(".jp-Dialog .jp-Dialog-content button.jp-mod-accept", {timeout: 500}),
+              page.click(
+                `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
+              ),
+            ]);
           });
 
           // Check the notebook is correctly opened
