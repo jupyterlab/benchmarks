@@ -3,7 +3,7 @@
 
 export default {
   reportSlowTests: null,
-  timeout: 54000,
+  timeout: 90000,
   projects: [
     {
       name: "jupyterlab",
@@ -72,5 +72,5 @@ export default {
   },
   preserveOutput: "failures-only",
   workers: 1,
-  retries: 1
+  retries: 0
 };
