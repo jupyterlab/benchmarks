@@ -224,6 +224,18 @@ test.describe("JupyterLab Benchmark", () => {
             })
           );
 
+          // Hide conflict dialog if it shows up
+          try {
+            const dialog = page.locator(".jp-Dialog .jp-Dialog-content");
+            await dialog.waitFor({ timeout: 100 });
+            const dlgBtnSelector = "button.jp-mod-accept";
+            const dlgBtn = dialog.locator(dlgBtnSelector);
+            await dlgBtn.click();
+            await dialog.waitFor({ state: "hidden" });
+          } catch (error) {
+            // no-op
+          }
+
           // Switch back
           const toTimeCopy = await perf.measure(async () => {
             await page.click(
@@ -348,7 +360,7 @@ test.describe("JupyterLab Benchmark", () => {
         await page.click('[title^="File Browser"]');
 
         // Disable the debugger
-        await page.click('button[title="Disable Debugger"]')
+        await page.click('button[title="Disable Debugger"]');
       }
 
       // Shutdown the kernel to be sure it does not get in our way (especially for the close action)
