@@ -3,7 +3,7 @@ name: JupyterLab Weekly Benchmark Tests
 on:
   schedule:
     # Every Sunday at 01:12am
-    - cron: "10 11 * * 4"
+    - cron: "10 14 * * 4"
 
 permissions:
   issues: write
@@ -15,7 +15,7 @@ jobs:
     uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
     with:
       # Notebooks to test
-      tests: '["codeNotebook", ]'
+      tests: '["codeNotebook"]'
       artifacts_name: 'benchmark-codeNotebook-report'
       event: ${{ github.event_name }}
       # Repository to clone for scheduled benchmark
@@ -36,7 +36,7 @@ jobs:
     uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
     with:
       # Notebooks to test
-      tests: '["mdNotebook", ]'
+      tests: '["mdNotebook"]'
       artifacts_name: 'benchmark-mdNotebook-report'
       event: ${{ github.event_name }}
       # Repository to clone for scheduled benchmark
@@ -57,7 +57,7 @@ jobs:
     uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
     with:
       # Notebooks to test
-      tests: '["longOutput", ]'
+      tests: '["longOutput"]'
       artifacts_name: 'benchmark-longOutput-report'
       event: ${{ github.event_name }}
       # Repository to clone for scheduled benchmark
@@ -78,7 +78,7 @@ jobs:
     uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
     with:
       # Notebooks to test
-      tests: '["largeMetadata", ]'
+      tests: '["largeMetadata"]'
       artifacts_name: 'benchmark-largeMetadata-report'
       event: ${{ github.event_name }}
       # Repository to clone for scheduled benchmark
@@ -99,7 +99,7 @@ jobs:
     uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
     with:
       # Notebooks to test
-      tests: '["errorOutputs", ]'
+      tests: '["errorOutputs"]'
       artifacts_name: 'benchmark-errorOutputs-report'
       event: ${{ github.event_name }}
       # Repository to clone for scheduled benchmark
