@@ -1,0 +1,117 @@
+name: JupyterLab Weekly Benchmark Tests
+
+on:
+  schedule:
+    # Every Sunday at 01:12am
+    - cron: "30 9 * * 4"
+
+permissions:
+  issues: write
+
+jobs:
+  # One job per file to deal with the 6hours limit
+  # jobs.<job-id>.strategy is not allowed for reusable workflow; hence the job duplication
+  test-codeNotebook:
+    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
+    with:
+      # Notebooks to test
+      tests: '["codeNotebook", ]'
+      artifacts_name: 'benchmark-codeNotebook-report'
+      event: ${{ github.event_name }}
+      # Repository to clone for scheduled benchmark
+      challenger: 'jupyterlab/jupyterlab'
+      # Branch to checkout for scheduled benchmark
+      challenger_branch: 'master'
+      reference_branch: 'master'
+      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
+      browser: 'chromium'
+      # How many samples to compute the statistical distribution
+      samples: '100'
+      # Test steps to measure on each test notebook
+      test_steps: '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]'
+      # The test notebook size
+      size: '100'
+
+  test-mdNotebook:
+    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
+    with:
+      # Notebooks to test
+      tests: '["mdNotebook", ]'
+      artifacts_name: 'benchmark-mdNotebook-report'
+      event: ${{ github.event_name }}
+      # Repository to clone for scheduled benchmark
+      challenger: 'jupyterlab/jupyterlab'
+      # Branch to checkout for scheduled benchmark
+      challenger_branch: 'master'
+      reference_branch: 'master'
+      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
+      browser: 'chromium'
+      # How many samples to compute the statistical distribution
+      samples: '100'
+      # Test steps to measure on each test notebook
+      test_steps: '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]'
+      # The test notebook size
+      size: '100'
+
+  test-longOutput:
+    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
+    with:
+      # Notebooks to test
+      tests: '["longOutput", ]'
+      artifacts_name: 'benchmark-longOutput-report'
+      event: ${{ github.event_name }}
+      # Repository to clone for scheduled benchmark
+      challenger: 'jupyterlab/jupyterlab'
+      # Branch to checkout for scheduled benchmark
+      challenger_branch: 'master'
+      reference_branch: 'master'
+      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
+      browser: 'chromium'
+      # How many samples to compute the statistical distribution
+      samples: '100'
+      # Test steps to measure on each test notebook
+      test_steps: '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]'
+      # The test notebook size
+      size: '100'
+
+  test-largeMetadata:
+    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
+    with:
+      # Notebooks to test
+      tests: '["largeMetadata", ]'
+      artifacts_name: 'benchmark-largeMetadata-report'
+      event: ${{ github.event_name }}
+      # Repository to clone for scheduled benchmark
+      challenger: 'jupyterlab/jupyterlab'
+      # Branch to checkout for scheduled benchmark
+      challenger_branch: 'master'
+      reference_branch: 'master'
+      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
+      browser: 'chromium'
+      # How many samples to compute the statistical distribution
+      samples: '100'
+      # Test steps to measure on each test notebook
+      test_steps: '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]'
+      # The test notebook size
+      size: '100'
+
+  test-errorOutputs:
+    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
+    with:
+      # Notebooks to test
+      tests: '["errorOutputs", ]'
+      artifacts_name: 'benchmark-errorOutputs-report'
+      event: ${{ github.event_name }}
+      # Repository to clone for scheduled benchmark
+      challenger: 'jupyterlab/jupyterlab'
+      # Branch to checkout for scheduled benchmark
+      challenger_branch: 'master'
+      reference_branch: 'master'
+      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
+      browser: 'chromium'
+      # How many samples to compute the statistical distribution
+      samples: '100'
+      # Test steps to measure on each test notebook
+      test_steps: '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]'
+      # The test notebook size
+      size: '100'
