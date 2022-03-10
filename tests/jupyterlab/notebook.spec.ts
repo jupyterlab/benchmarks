@@ -226,9 +226,13 @@ test.describe("JupyterLab Benchmark", () => {
 
           // Switch back
           const toTimeCopy = await perf.measure(async () => {
-            await page.click(
-              `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
-            );
+            await Promise.allSettled([
+              // In case a dialog due to file out of synchronization is appearing.
+              page.click(".jp-Dialog .jp-Dialog-content button.jp-mod-accept", {timeout: 500}),
+              page.click(
+                `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
+              ),
+            ]);
           });
 
           // Check the notebook is correctly opened
@@ -348,7 +352,7 @@ test.describe("JupyterLab Benchmark", () => {
         await page.click('[title^="File Browser"]');
 
         // Disable the debugger
-        await page.click('button[title="Disable Debugger"]')
+        await page.click('button[title="Disable Debugger"]');
       }
 
       // Shutdown the kernel to be sure it does not get in our way (especially for the close action)

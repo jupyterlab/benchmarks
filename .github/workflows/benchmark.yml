@@ -1,9 +1,6 @@
 name: JupyterLab Benchmark Tests
 
 on:
-  schedule:
-    # Every Sunday at 01:12am
-    - cron: "12 1 * * 0"
   workflow_dispatch:
     inputs:
       challenger:
@@ -27,7 +24,7 @@ on:
       tests:
         description: 'List of test notebooks to include (available ["codeNotebook", "mdNotebook", "largeMetadata", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"])'
         required: false
-        default: '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]'
+        default: '["codeNotebook", "mdNotebook", "longOutput"]'
       test_steps:
         description: 'List of test steps for each notebook (available ["open", "switch-with-copy", "switch-with-txt", "search", "start-debug", "close"])'
         required: false
@@ -57,30 +54,7 @@ jobs:
       # Notebooks to test
       tests: ${{ github.event.inputs.tests || '["codeNotebook", "mdNotebook", "longOutput"]' }}
       # Test steps to measure on each test notebook
-      test_steps: ${{ github.event.inputs.test_steps || '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]' }}
+      test_steps: ${{ github.event.inputs.test_steps || '["open", "switch-with-copy", "switch-with-txt", "close"]' }}
       # The test notebook size
       size: ${{ github.event.inputs.size || '100' }}
       artifacts_name: 'benchmarks-report'
-
-  second-files-set:
-    # When running scheduled job - run search test in a separate job to avoid hitting the 6h limit.
-    if: ${{ github.event_name == 'schedule' }}
-    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
-    with:
-      event: ${{ github.event_name }}
-      # Repository to clone for scheduled benchmark
-      challenger: ${{ github.event.inputs.challenger || 'jupyterlab/jupyterlab' }}
-      # Branch to checkout for scheduled benchmark
-      challenger_branch: ${{ github.event.inputs.challenger_branch || 'master' }}
-      reference_branch: ${{ github.event.inputs.reference_branch || 'master' }}
-      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
-      browser: ${{ github.event.inputs.browser || 'chromium' }}
-      # How many samples to compute the statistical distribution
-      samples: ${{ github.event.inputs.samples || '100' }}
-      # Notebooks to test
-      tests: ${{ github.event.inputs.tests || '["largeMetadata", "errorOutputs"]' }}
-      # Test steps to measure on each test notebook
-      test_steps: ${{ github.event.inputs.test_steps || '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]' }}
-      # The test notebook size
-      size: ${{ github.event.inputs.size || '100' }}
-      artifacts_name: 'benchmarks-2-report'
