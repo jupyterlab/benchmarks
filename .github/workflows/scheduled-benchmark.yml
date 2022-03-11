@@ -3,7 +3,7 @@ name: JupyterLab Weekly Benchmark Tests
 on:
   schedule:
     # Every Sunday at 01:12am
-    - cron: "10 14 * * 4"
+    - cron: "45 14 * * 5"
 
 permissions:
   issues: write
@@ -28,7 +28,7 @@ jobs:
       # How many samples to compute the statistical distribution
       samples: '100'
       # Test steps to measure on each test notebook
-      test_steps: '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]'
+      test_steps: '["open", "search", "switch-with-copy", "switch-with-txt", "close"]'
       # The test notebook size
       size: '100'
 
@@ -49,7 +49,7 @@ jobs:
       # How many samples to compute the statistical distribution
       samples: '100'
       # Test steps to measure on each test notebook
-      test_steps: '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]'
+      test_steps: '["open", "search", "switch-with-copy", "switch-with-txt", "close"]'
       # The test notebook size
       size: '100'
 
@@ -70,7 +70,7 @@ jobs:
       # How many samples to compute the statistical distribution
       samples: '100'
       # Test steps to measure on each test notebook
-      test_steps: '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]'
+      test_steps: '["open", "search", "switch-with-copy", "switch-with-txt", "close"]'
       # The test notebook size
       size: '100'
 
@@ -91,7 +91,7 @@ jobs:
       # How many samples to compute the statistical distribution
       samples: '100'
       # Test steps to measure on each test notebook
-      test_steps: '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]'
+      test_steps: '["open", "search", "switch-with-copy", "switch-with-txt", "close"]'
       # The test notebook size
       size: '100'
 
@@ -112,6 +112,6 @@ jobs:
       # How many samples to compute the statistical distribution
       samples: '100'
       # Test steps to measure on each test notebook
-      test_steps: '["open", "search", "start-debug", "switch-with-copy", "switch-with-txt", "close"]'
+      test_steps: '["open", "search", "switch-with-copy", "switch-with-txt", "close"]'
       # The test notebook size
       size: '100'
