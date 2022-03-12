@@ -3,7 +3,7 @@ name: JupyterLab Weekly Benchmark Tests
 on:
   schedule:
     # Every Sunday at 01:12am
-    - cron: "45 14 * * 5"
+    - cron: "12 1 * * 0"
 
 permissions:
   issues: write

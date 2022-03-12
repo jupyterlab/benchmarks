@@ -218,6 +218,8 @@ jobs:
           bash ./scripts/ci_install.sh
           # Build dev mode
           jlpm run build
+          # Copy reference here so if it fails, the workflow will be in error
+          cp /tmp/lab-benchmark-expected.json ./tests-out
         working-directory: challenger
 
       - name: Launch JupyterLab
@@ -240,8 +242,6 @@ jobs:
           set -ex
           # Update test screenshots
           BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
-
-          cp /tmp/lab-benchmark-expected.json ./tests-out
           jlpm run test --project jupyterlab
         working-directory: benchmarks/tests
 
