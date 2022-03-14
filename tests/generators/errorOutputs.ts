@@ -7,7 +7,7 @@ import NotebookType from './notebookType';
 
 // Adjust this value depending on the platform you run your benchmark.
 // For really heavy notebooks, use STD_ERROR * n ~ 10000; for reasonable notebooks ~ 1000
-const STD_ERROR = 10;
+const STD_ERROR = Number(process.env['ERROR_OUTPUTS'] || 10);
 
 export default {
   label: `errorOutputs - ${STD_ERROR}x{N} errors output collected`,
