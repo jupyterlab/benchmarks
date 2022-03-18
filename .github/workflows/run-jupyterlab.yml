@@ -242,6 +242,11 @@ jobs:
           set -ex
           # Update test screenshots
           BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
+
+          # Copy reference here otherwise it will use the value from the update screenshots
+          # command called just before
+          cp /tmp/lab-benchmark-expected.json ./tests-out
+
           jlpm run test --project jupyterlab
         working-directory: benchmarks/tests
 
