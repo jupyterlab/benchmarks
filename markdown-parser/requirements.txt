@@ -2,4 +2,5 @@ jupyterlab[test]
 nbconvert
 playwright
 pytest
+pytest-playwright
 requests
