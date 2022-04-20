@@ -86,7 +86,7 @@ jobs:
         working-directory: benchmarks/markdown-parser
         run: |
           set -ex
-          pytest -rap -vv
+          pytest -rap -vv --base-url http://localhost:9999
 
       - name: Kill the server
         if: always()
