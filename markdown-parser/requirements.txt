@@ -1,0 +1,5 @@
+jupyterlab[test]
+nbconvert
+playwright
+pytest
+requests
