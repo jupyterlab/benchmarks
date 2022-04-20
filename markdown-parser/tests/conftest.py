@@ -12,7 +12,7 @@ def _build_artifact_test_folder(pytestconfig, request, folder_or_file_name):
 
 @pytest.fixture(scope="session")
 def jupyterlab_page(browser, browser_context_args, pytestconfig, request):
-    # Merge pytest-playwright fixture context and page at scope module
+    # Merge pytest-playwright fixtures context and page at scope session and load the JupyterLab page
     pages = []
     context = browser.new_context(**browser_context_args)
     context.on("page", lambda page: pages.append(page))
