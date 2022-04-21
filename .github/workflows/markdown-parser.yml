@@ -86,7 +86,17 @@ jobs:
         working-directory: benchmarks/markdown-parser
         run: |
           set -ex
-          pytest -rap -vv --base-url http://localhost:9999
+          mkdir -p reports
+          # For now limit ot JupyterLab vs GFM
+          pytest -rap -vv --base-url http://localhost:9999 --report-dir "$PWD/reports" tests/test_jupyterlab
+
+      - name: Upload pytest reports
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: markdown-parser-report-${{ github.run_number }}
+          path: |
+            benchmarks/markdown-parser/reports
 
       - name: Kill the server
         if: always()

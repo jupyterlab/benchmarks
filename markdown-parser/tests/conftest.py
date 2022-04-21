@@ -1,4 +1,5 @@
 import os
+import pathlib
 import pytest
 from playwright.sync_api import Error
 from slugify import slugify
@@ -80,3 +81,41 @@ def jupyterlab_page(browser, browser_context_args, pytestconfig, request):
             except Error:
                 # Silent catch empty videos.
                 pass
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--report-dir",
+        help="Directory in which the reports must be saved.",
+    )
+
+
+@pytest.fixture(scope="module")
+def md_report(request):
+    test_reports = []
+
+    yield test_reports
+
+    print(test_reports)
+
+    if len(test_reports[0]) > 0:
+        filename = pathlib.Path(request.config.getoption("report_dir")) / (
+            request.module.__name__.replace(".", "_") + "_report.md"
+        )
+
+        with filename.open("w") as f:
+            headers = test_reports[0]
+            f.writelines(
+                [
+                    f"# {request.module.__name__}\n",
+                    "\n",
+                    "| " + " | ".join(headers) + " |\n",
+                    "| " + " | ".join(["---"] * len(headers)) + " |\n",
+                ]
+            )
+            f.writelines(
+                map(
+                    lambda e: "| " + " | ".join(map(str, e.values())) + " |\n",
+                    test_reports,
+                )
+            )
