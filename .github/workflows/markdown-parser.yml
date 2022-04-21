@@ -88,7 +88,7 @@ jobs:
           set -ex
           mkdir -p reports
           # For now limit ot JupyterLab vs GFM
-          pytest -rap -vv --rootdir "$PWD" --base-url "http://localhost:9999" --report-dir "$PWD/reports" tests/test_jupyterlab
+          pytest -rap -vv --rootdir "$PWD" --base-url "http://localhost:9999" --report-dir "$PWD/reports" tests/test_jupyterlab.py
 
       - name: Upload pytest reports
         if: always()
