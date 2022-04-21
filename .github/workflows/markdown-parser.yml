@@ -34,17 +34,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-3.8
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - name: Cache yarn
-        uses: actions/cache@v1
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      # - name: Get yarn cache directory path
+      #   id: yarn-cache-dir-path
+      #   run: echo "::set-output name=dir::$(yarn cache dir)"
+      # - name: Cache yarn
+      #   uses: actions/cache@v1
+      #   id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      #   with:
+      #     path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+      #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-yarn-
 
       - name: Install dependencies
         working-directory: benchmarks/markdown-parser
@@ -86,10 +86,9 @@ jobs:
         working-directory: benchmarks/markdown-parser
         run: |
           set -ex
-          echo $PWD
           mkdir -p reports
           # For now limit ot JupyterLab vs GFM
-          pytest -rap -vv --base-url "http://localhost:9999" --report-dir "$PWD/reports" tests/test_jupyterlab
+          pytest -rap -vv --rootdir "$PWD" --base-url "http://localhost:9999" --report-dir "$PWD/reports" tests/test_jupyterlab
 
       - name: Upload pytest reports
         if: always()
