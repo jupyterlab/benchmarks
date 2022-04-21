@@ -83,14 +83,6 @@ def jupyterlab_page(browser, browser_context_args, pytestconfig, request):
                 pass
 
 
-def pytest_addoption(parser):
-    """Add option to set the comparison reports"""
-    parser.addoption(
-        "--report-dir",
-        help="Directory in which the reports must be saved.",
-    )
-
-
 @pytest.fixture(scope="module")
 def md_report(request):
     """Generate a comparison report for each test module.
