@@ -29,6 +29,7 @@ def commonmark_gfm_tests():
         sys.path.insert(0, str(test_folder))
 
         from spec_tests import get_tests
+        from normalize import normalize_html
 
         for testfile in SPEC_FILES:
             tests.extend(get_tests(str(test_folder / testfile)))

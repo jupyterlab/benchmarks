@@ -6,9 +6,13 @@ from .utils import commonmark_gfm_tests, get_jupyterlab_rendered_markdown
 
 @pytest.mark.parametrize("gfm", commonmark_gfm_tests())
 def test_nbconvert_jupyterlab(jupyterlab_page, md_report, gfm):
+
+    # Import normalize helper from github/cmark-gfm through its addition to sys.path in commonmark_gfm_tests
+    from normalize import normalize_html
+
     given = gfm["markdown"]
-    test = markdown2html_mistune(given)
-    ref = jupyterlab_page.evaluate(get_jupyterlab_rendered_markdown, gfm["markdown"])
+    test = normalize_html(markdown2html_mistune(given))
+    ref = normalize_html(jupyterlab_page.evaluate(get_jupyterlab_rendered_markdown, gfm["markdown"]))
 
     success = True
     try:
