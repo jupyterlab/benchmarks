@@ -228,7 +228,9 @@ test.describe("JupyterLab Benchmark", () => {
           const toTimeCopy = await perf.measure(async () => {
             await Promise.allSettled([
               // In case a dialog due to file out of synchronization is appearing.
-              page.click(".jp-Dialog .jp-Dialog-content button.jp-mod-accept", {timeout: 500}),
+              page.click(".jp-Dialog .jp-Dialog-content button.jp-mod-accept", {
+                timeout: 500,
+              }),
               page.click(
                 `div[role="main"] >> .lm-DockPanel-tabBar >> text=${filename}.ipynb`
               ),
@@ -309,6 +311,14 @@ test.describe("JupyterLab Benchmark", () => {
       if (searchWord && STEPS.includes("search")) {
         await page.click('li[role="menuitem"]:has-text("Edit")');
         await page.click('ul[role="menu"] >> text=Find…');
+
+        // Force searching in cell outputs
+        await page.click('button[title="Show Search Filters"]');
+        if (
+          !(await page.locator('text=Search Cell Outputs >> input[type="checkbox"]').isChecked())
+        ) {
+          await page.click("text=Search Cell Outputs");
+        }
 
         const searchTime = await perf.measure(async () => {
           await Promise.all([
