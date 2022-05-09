@@ -188,7 +188,7 @@ jobs:
         run: |
           set -ex
           # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 jlpm run test --project jupyterlab -u
 
           # -u is needed to generate the benchmark expected file
           jlpm run test --project jupyterlab -u
@@ -241,7 +241,7 @@ jobs:
         run: |
           set -ex
           # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 jlpm run test --project jupyterlab -u
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 jlpm run test --project jupyterlab -u
 
           # Copy reference here otherwise it will use the value from the update screenshots
           # command called just before
@@ -306,6 +306,7 @@ jobs:
           name: ${{ inputs.artifacts_name }}
           path: |
             benchmarks/tests/benchmark-results
+            benchmarks/tests/test-results/**/*.webm
             benchmarks/tests/test-results/*-1-*
             benchmarks/tests/tests-out/**/*.png
             /tmp/benchmarks-*
