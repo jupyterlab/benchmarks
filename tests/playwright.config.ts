@@ -67,7 +67,7 @@ export default {
     // Context options
     viewport: { width: 1024, height: 768 },
     // Artifacts
-    video: "off", // "retain-on-failure",
+    video: process.env.PW_VIDEO ? "on" : "off", // "retain-on-failure",
     baseURL: process.env.TARGET_URL ?? 'http://localhost:9999'
   },
   preserveOutput: "failures-only",
