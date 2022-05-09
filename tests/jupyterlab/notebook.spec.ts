@@ -315,7 +315,7 @@ test.describe("JupyterLab Benchmark", () => {
         // Force searching in cell outputs
         await page.click('button[title="Show Search Filters"]');
         if (
-          !(await page.locator("text=Search Cell Outputs > input").isChecked())
+          !(await page.locator('text=Search Cell Outputs >> input[type="checkbox"]').isChecked())
         ) {
           await page.click("text=Search Cell Outputs");
         }
