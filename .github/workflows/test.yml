@@ -60,7 +60,6 @@ jobs:
       - name: Install dependencies
         run: |
           set -ex
-          echo "OLD_REF_SHA=$(git log -n1 --format='%H')" >> $GITHUB_ENV
           bash ./scripts/ci_install.sh
           # Build dev mode
           jlpm run build
@@ -127,3 +126,101 @@ jobs:
         run: |
           cat /tmp/jupyterlab_server.log
 
+  memory-leak-test:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout benchmarks project
+        uses: actions/checkout@v2
+        with:
+          path: benchmarks
+
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14.x"
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Cache pip on Linux
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-3.8-${{ hashFiles('**/requirements.txt', 'setup.cfg') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-3.8
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Cache yarn
+        uses: actions/cache@v1
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Checkout JupyterLab
+        uses: actions/checkout@v2
+        with:
+          repository: jupyterlab/jupyterlab
+          ref: master
+          path: reference
+
+      - name: Install dependencies
+        run: |
+          set -ex
+          bash ./scripts/ci_install.sh
+          # Build dev mode
+          jlpm run build
+        working-directory: reference
+
+      - name: Launch JupyterLab
+        shell: bash
+        run: |
+          jlpm install
+          # Mount a volume to overwrite the server configuration
+          jlpm start-jlab 2>&1 > /tmp/jupyterlab_server.log &
+        working-directory: benchmarks/memory-leaks
+
+      - name: Install fuite
+        shell: bash
+        run: |
+          set -ex
+          jlpm install
+        working-directory: benchmarks/memory-leaks
+
+      - name: Wait for JupyterLab
+        uses: ifaxity/wait-on-action@v1
+        with:
+          resource: http-get://localhost:9999/lab
+          timeout: 360000
+
+      - name: Execute memory leaks test
+        working-directory: benchmarks/memory-leaks
+        run: |
+          set -ex
+          jlpm test:mocha
+
+      - name: Kill the server
+        if: always()
+        shell: bash
+        run: |
+          kill -s SIGKILL $(pgrep jupyter-lab)
+
+      # - name: Upload Test assets
+      #   if: always()
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: 
+      #     path: 
+
+      - name: Print JupyterLab logs
+        if: always()
+        run: |
+          cat /tmp/jupyterlab_server.log

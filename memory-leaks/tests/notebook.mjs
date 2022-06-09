@@ -1,4 +1,8 @@
-export async function setup(page) {}
+export async function setup(page) {
+  await page.waitForXPath(
+    '//div[contains(@class, "lm-TabBar-tabLabel")][text()="Launcher"]'
+  );
+}
 
 export async function createTests(page) {
   return Promise.resolve([

@@ -9,8 +9,8 @@
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
-    "test": "run-p --race test:start test:mocha",
-    "test:start": "jupyter lab --config ./jupyter_lab_config.py 1>jupyterlab-server.log 2>&1",
+    "start-jlab": "jupyter lab --config ./jupyter_lab_config.py 1>jupyterlab-server.log 2>&1",
+    "test": "run-p --race start-jlab test:mocha",
     "test:mocha": "mocha ./tests/"
   },
   "devDependencies": {
