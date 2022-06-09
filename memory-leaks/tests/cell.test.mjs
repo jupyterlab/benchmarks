@@ -1,16 +1,16 @@
 import { findLeaks } from "fuite";
 import { expect } from "chai";
 import { asyncIterableToArray, formatResult } from "./utils.mjs";
-import * as notebookScenario from "./notebook.mjs";
+import * as scenario from "./cell.mjs";
 
 const URL = process.env.TARGET_URL ?? "http://localhost:9999/lab?reset";
 
-describe("Notebook memory leaks", () => {
-  it("Opening a notebook", async () => {
+describe("Cell memory leaks", () => {
+  it("Adding a cell", async () => {
     const results = await asyncIterableToArray(
       findLeaks(URL, {
         iterations: parseInt(process.env.MEMORY_LEAK_NSAMPLES ?? '7', 10),
-        scenario: notebookScenario,
+        scenario,
       })
     );
 
