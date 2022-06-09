@@ -127,7 +127,8 @@ jobs:
           cat /tmp/jupyterlab_server.log
 
   memory-leak-test:
-    uses: jupyterlab/benchmarks/.github/workflows/run-memory-leak.yml
+    # uses: jupyterlab/benchmarks/.github/workflows/run-memory-leak.yml@master
+    uses: ./.github/workflows/run-memory-leak.yml
     with:
       repository: jupyterlab/jupyterlab
       branch: master
