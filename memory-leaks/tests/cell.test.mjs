@@ -9,13 +9,19 @@ describe("Cell memory leaks", () => {
   it("Adding a cell", async () => {
     const results = await asyncIterableToArray(
       findLeaks(URL, {
-        iterations: parseInt(process.env.MEMORY_LEAK_NSAMPLES ?? '7', 10),
+        iterations: parseInt(process.env.MEMORY_LEAK_NSAMPLES ?? "7", 10),
         scenario,
       })
     );
 
-    console.log(formatResult(results[0]));
+    results.forEach((r) => {
+      console.log(formatResult(r));
+    });
 
-    expect(results[0].result.leaks.detected).to.equal(false);
+    expect(results.map((r) => r.result.leaks.detected)).to.deep.equal([
+      false,
+      false,
+      false,
+    ]);
   });
 });
