@@ -1,0 +1,27 @@
+name: JupyterLab Memory Leak Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: "JupyterLab Git repository (format {owner}/{repo})"
+        required: true
+        type: string
+      branch:
+        description: "Git branch to test"
+        required: true
+        type: string
+      samples:
+        description: "Number of samples to compute"
+        required: false
+        default: "7"
+        type: string
+
+jobs:
+  memory-leak-test:
+    # uses: jupyterlab/benchmarks/.github/workflows/run-memory-leak.yml@master
+    uses: ./.github/workflows/run-memory-leak.yml
+    with:
+      repository: ${{ github.event.inputs.repository || 'jupyterlab/jupyterlab' }}
+      branch: ${{ github.event.inputs.branch || 'master' }}
+      samples: ${{ github.event.inputs.samples || '7' }}
