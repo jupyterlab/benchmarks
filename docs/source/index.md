@@ -58,6 +58,15 @@ benchmarks/ci
 ```{toctree}
 ---
 maxdepth: 2
+caption: Memory Leaks
+---
+memory-leak/index
+memory-leak/ci
+```
+
+```{toctree}
+---
+maxdepth: 2
 caption: Fixes
 ---
 fixes/strategies
