@@ -14,13 +14,15 @@ export async function createTests(page) {
 
 export async function iteration(page, data) {
   await page.click('.jp-LauncherCard[data-category="Notebook"]');
-  await page.waitForXPath(
+  const el = await page.waitForXPath(
     '//div[contains(@class, "lm-TabBar-tabLabel")][contains(text(), "Untitled")]'
   );
+  const title = await el.evaluate((node) => node.innerText);
   // Wait for UI stabilization once the notebook is opened
   await page.waitForTimeout(2000);
+
   const browserItem = await page.waitForXPath(
-    '//li[contains(@class, "jp-DirListing-item")][contains(@title, "Untitled.ipynb")]'
+    `//li[contains(@class, "jp-DirListing-item")][contains(@title, "${title}")]`
   );
   await browserItem.click({ button: "right" });
   const deleteItem = await page.waitForXPath(

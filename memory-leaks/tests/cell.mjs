@@ -54,7 +54,9 @@ export async function iteration(page, data) {
       break;
     case "code":
       await page.keyboard.press("C");
-      await page.waitForSelector(".jp-CodeCell");
+      await page.waitForXPath(
+        '//div[contains(@class, "jp-CodeCell")][position() = last()]'
+      );
       break;
   }
 
