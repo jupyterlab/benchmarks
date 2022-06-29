@@ -44,3 +44,37 @@ You can run in headless mode with the `-d` flag. And you can change the number
 of iteration with `-i <number>` option.
 
 > Don't forget the `?reset` query arguments to ensure the workspace is reset between each iteration.
+
+## Finding leaks
+
+From the direct report of `fuite`, you may have stack trace to look at for growing collections. But
+may not be sufficient to find all leaks. For that, you can use the 
+[three heap snapshot technique](https://docs.google.com/presentation/d/1wUVmf78gG-ra5aOxvTfYdiLkdGaR9OhXRnOlIcEmu2s)
+introduced by the GMail team. The steps to carry out are:
+
+1. Take a heap snapshot
+2. Do some actions that are creating memory leaks; e.g. opening and closing a new notebook.
+3. Take a second heap snapshot
+4. Do the same actions as in step _2_; e.g. opening and closing a new notebook.
+5. Take a third heap snapshot
+6. Assuming you are using Chrome-based browser, filter the objects to those allocated between
+   snapshots 1 and 2 in snapshot 3's _Summary_ view.
+
+This will grant you access to objects leaking in memory. From there:
+
+- Examine the retaining path of leaked objects in the lower half of the Profiles panel
+
+- If the allocation site cannot be easily inferred (i.e. event listeners):
+  - Instrument the constructor of the retaining object via the JS console to save the stack trace for allocations
+    Gmail team proposed the following snippet:
+    ```js
+    window.__save_el = goog.events.Listener
+    goog.events.Listener = function () { this._stack = new Error().stack;}
+    goog.events.Listener.prototype = window.__save_el.prototype
+    ```
+  - Rerun the scenario
+  - Expand objects in the retaining tree to see the stack trace: `$0._stack`
+
+- Fix it!
+  - Properly dispose of the retaining object
+  - unlisten() to event listeners
