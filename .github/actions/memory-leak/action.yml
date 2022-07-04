@@ -49,10 +49,10 @@ runs:
         MEMORY_LEAK_NSAMPLES: ${{ inputs.samples }}
       run: |
         set -ex
-        npm run test:mocha | tee memory-leaks.log
+        npm run test:mocha | tee /tmp/memory-leaks.log
       working-directory: ${{ github.action_path }}/../../../memory-leaks
 
     - name: Set job summary
       if: always()
       shell: bash
-      run: sed "s/Test[[:space:]]*:/#/" memory-leaks.log >> $GITHUB_STEP_SUMMARY
+      run: sed "s/Test[[:space:]]*:/#/" /tmp/memory-leaks.log >> $GITHUB_STEP_SUMMARY
