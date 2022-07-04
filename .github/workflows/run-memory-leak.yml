@@ -16,11 +16,6 @@ on:
         required: false
         default: "7"
         type: string
-      # artifacts_name:
-      #   description: "Uploaded memory leak assets name"
-      #   required: false
-      #   default: "memory-leak-assets"
-      #   type: string
 
 jobs:
   memory-leak-test:
@@ -88,37 +83,35 @@ jobs:
           jlpm start-jlab 2>&1 > /tmp/jupyterlab_server.log &
         working-directory: benchmarks/memory-leaks
 
-      - name: Install fuite
-        shell: bash
-        run: |
-          set -ex
-          jlpm install
-        working-directory: benchmarks/memory-leaks
+      # - name: Install fuite
+      #   shell: bash
+      #   run: |
+      #     set -ex
+      #     jlpm install
+      #   working-directory: benchmarks/memory-leaks
 
-      - name: Wait for JupyterLab
-        uses: ifaxity/wait-on-action@v1
-        with:
-          resource: http-get://localhost:9999/lab
-          timeout: 360000
+      # - name: Wait for JupyterLab
+      #   uses: ifaxity/wait-on-action@v1
+      #   with:
+      #     resource: http-get://localhost:9999/lab
+      #     timeout: 360000
+
+      # - name: Execute memory leaks test
+      #   working-directory: benchmarks/memory-leaks
+      #   run: |
+      #     set -ex
+      #     jlpm test:mocha
 
       - name: Execute memory leaks test
-        working-directory: benchmarks/memory-leaks
-        run: |
-          set -ex
-          jlpm test:mocha
+        uses: ./.github/actions/memory-leak
+        with:
+          github_token: "FAKE"
 
       - name: Kill the server
         if: always()
         shell: bash
         run: |
           kill -s SIGKILL $(pgrep jupyter-lab)
-
-      # - name: Upload Test assets
-      #   if: always()
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: 
-      #     path: 
 
       - name: Print JupyterLab logs
         if: always()
