@@ -1,47 +1,31 @@
-import { findLeaks } from "fuite";
-import { expect } from "chai";
-import { asyncIterableToArray, formatResult } from "./utils.mjs";
+import { testScenario } from "./utils.mjs";
 import * as addScenario from "./cell.mjs";
 import * as moveScenario from "./cell-motion.mjs";
 
-const URL = process.env.TARGET_URL ?? "http://localhost:9999/lab?reset";
-
 describe("Cell memory leaks", () => {
   it("Adding a cell", async () => {
-    const results = await asyncIterableToArray(
-      findLeaks(URL, {
-        iterations: parseInt(process.env.MEMORY_LEAK_NSAMPLES ?? "7", 10),
-        scenario: addScenario,
-      })
-    );
-
-    results.forEach((r) => {
-      console.log(formatResult(r));
+    await testScenario(addScenario, {
+      expectations: [
+        // Code cell
+        { objects: 1391, collections: 21 },
+        // Markdown cell
+        { objects: 1365, collections: 36 },
+        // Raw cell
+        { objects: 928, collections: 36 },
+      ],
     });
-
-    expect(results.map((r) => r.result.leaks.detected)).to.deep.equal([
-      false,
-      false,
-      false,
-    ]);
   });
 
   it("Drag and drop a cell", async () => {
-    const results = await asyncIterableToArray(
-      findLeaks(URL, {
-        iterations: parseInt(process.env.MEMORY_LEAK_NSAMPLES ?? "7", 10),
-        scenario: moveScenario,
-      })
-    );
-
-    results.forEach((r) => {
-      console.log(formatResult(r));
+    await testScenario(moveScenario, {
+      expectations: [
+        // Code cell
+        { objects: 114, collections: 24 },
+        // Markdown cell
+        { objects: 98, collections: 20 },
+        // Raw cell
+        { objects: 102, collections: 20 },
+      ],
     });
-
-    expect(results.map((r) => r.result.leaks.detected)).to.deep.equal([
-      false,
-      false,
-      false,
-    ]);
   });
 });

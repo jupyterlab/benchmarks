@@ -55,4 +55,4 @@ runs:
     - name: Set job summary
       if: always()
       shell: bash
-      run: sed "s/Test[[:space:]]*:/#/" /tmp/memory-leaks.log >> $GITHUB_STEP_SUMMARY
+      run: cat /tmp/memory-leaks.log >> $GITHUB_STEP_SUMMARY

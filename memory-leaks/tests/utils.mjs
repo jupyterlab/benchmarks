@@ -1,7 +1,10 @@
+import { expect } from "chai";
+import { findLeaks } from "fuite";
 import prettyBytes from "pretty-bytes";
-import { getBorderCharacters, table as formatTable } from "table";
 
-const TABLE_CONFIG = { border: getBorderCharacters("norc") };
+const ITERATIONS = parseInt(process.env.MEMORY_LEAK_NSAMPLES ?? "7", 10);
+
+const URL = process.env.TARGET_URL ?? "http://localhost:9999/lab?reset";
 
 export async function asyncIterableToArray(iterable) {
   const res = [];
@@ -11,6 +14,46 @@ export async function asyncIterableToArray(iterable) {
   return res;
 }
 
+/**
+ * Check a scenario is not leaking outside the default values.
+ *
+ * @param {*} results Fuite test results
+ * @param {*} defaultValues Default maximal leaking number for 'objects', 'collections', 'domNodes' and 'eventListeners' per tests
+ */
+function expectNoLeaks(results, defaultValues = []) {
+  results.forEach((test) => {
+    console.log(formatResultAsMarkdown(test));
+  });
+
+  expect(
+    results.map((test) => test.result.leaks.detected).includes(true)
+  ).to.equal(false);
+
+  results.forEach((test, idx) => {
+    const expectations = defaultValues[idx] ?? {};
+    expect(
+      test.result.leaks.objects
+        .map((obj) => obj.countDeltaPerIteration)
+        .reduce((agg, count) => agg + count, 0),
+      `${test.test.description} - Objects leaking`
+    ).to.be.at.most(expectations.objects ?? 0);
+    expect(
+      test.result.leaks.collections
+        .map((collection) => collection.deltaPerIteration)
+        .reduce((agg, count) => agg + count, 0),
+      `${test.test.description} - Collections leaking`
+    ).to.be.at.most(expectations.collections ?? 0);
+    expect(
+      test.result.leaks.domNodes.deltaPerIteration,
+      `${test.test.description} - DOM Nodes leaking`
+    ).to.be.at.most(expectations.domNodes ?? 0);
+    expect(
+      test.result.leaks.eventListenersSummary.deltaPerIteration,
+      `${test.test.description} - Event listeners leaking`
+    ).to.be.at.most(expectations.eventListeners ?? 0);
+  });
+}
+
 function formatStacktraces(stacktraces) {
   if (!stacktraces || !stacktraces.length) {
     return "";
@@ -18,36 +61,44 @@ function formatStacktraces(stacktraces) {
   // just show a preview of the stacktraces, the first one is good enough
   const [stacktrace] = stacktraces;
   const { original, pretty } = stacktrace;
-  return pretty || original || "";
+  const repr = pretty || original || "";
+  let str = `<code>${repr
+    .replace(/</g, "\\<")
+    .replace(/\n/g, "<br />")}</code>`;
+  return str;
+}
+
+function arrayToRow(array, isHeader = false) {
+  let row = "| " + array.join(" | ") + " |\n";
+  if (isHeader) {
+    row += arrayToRow(new Array(array.length).fill("---"));
+  }
+  return row;
 }
 
 function formatLeakingObjects(objects) {
-  const tableData = [["Object", "# added", "Retained size increase"]];
+  let str = arrayToRow(["Object", "# added", "Retained size increase"], true);
 
   for (const {
     name,
     retainedSizeDeltaPerIteration,
     countDeltaPerIteration,
   } of objects) {
-    tableData.push([
+    str += arrayToRow([
       name,
       countDeltaPerIteration,
       "+" + prettyBytes(retainedSizeDeltaPerIteration),
     ]);
   }
-  return (
-    `
-Leaking objects:
-
-${formatTable(tableData, TABLE_CONFIG)}
-      `.trim() + "\n\n"
-  );
+  return `\nLeaking objects:\n\n${str}\n\n`;
 }
 
 function formatLeakingEventListeners(listenerSummaries, eventListenersSummary) {
-  const tableData = [["Event", "# added", "Nodes"]];
+  let str = arrayToRow(["Event", "# added", "Nodes"], true);
+  let hasIndividualBreakdowns = false;
 
   for (const { type, deltaPerIteration, leakingNodes } of listenerSummaries) {
+    hasIndividualBreakdowns = true;
     const nodesFormatted = leakingNodes
       .map(({ description, nodeCountDeltaPerIteration }) => {
         return `${description}${
@@ -57,50 +108,41 @@ function formatLeakingEventListeners(listenerSummaries, eventListenersSummary) {
         }`;
       })
       .join(", ");
-    tableData.push([type, deltaPerIteration, nodesFormatted]);
+    str += arrayToRow([type, deltaPerIteration, nodesFormatted]);
   }
 
-  if (tableData.length === 1) {
+  if (hasIndividualBreakdowns) {
     // no individual breakdowns, so just put the total
-    tableData.push([
+    str += arrayToRow([
       "Total",
       eventListenersSummary.deltaPerIteration,
       "(Unknown)",
     ]);
   }
 
-  return (
-    `
-Leaking event listeners (+${eventListenersSummary.deltaPerIteration} total):
-
-${formatTable(tableData, TABLE_CONFIG)}
-      `.trim() + "\n\n"
-  );
+  return `\nLeaking event listeners (+${eventListenersSummary.deltaPerIteration} total):\n\n${str}\n\n`;
 }
 
 function formatLeakingDomNodes(domNodes) {
-  const tableData = [["Description", "# added"]];
+  let str = arrayToRow(["Description", "# added"], true);
 
   for (const { description, deltaPerIteration } of domNodes.nodes) {
-    tableData.push([description, deltaPerIteration]);
+    str += arrayToRow([description, deltaPerIteration]);
   }
 
   if (tableData.length === 1) {
     // no individual breakdowns, so just put the total
-    tableData.push(["Total", domNodes.deltaPerIteration]);
+    str += arrayToRow(["Total", domNodes.deltaPerIteration]);
   }
 
-  return (
-    `
-Leaking DOM nodes (+${domNodes.deltaPerIteration} total):
-
-${formatTable(tableData, TABLE_CONFIG)}
-      `.trim() + "\n\n"
-  );
+  return `\nLeaking DOM nodes (+${domNodes.deltaPerIteration} total):\n\n${str}\n\n`;
 }
 
 function formatLeakingCollections(leakingCollections) {
-  const tableData = [["Type", "Change", "Preview", "Size increased at"]];
+  let str = arrayToRow(
+    ["Type", "Change", "Preview", "Size increased at"],
+    true
+  );
 
   for (const {
     type,
@@ -108,26 +150,20 @@ function formatLeakingCollections(leakingCollections) {
     preview,
     stacktraces,
   } of leakingCollections) {
-    tableData.push([
+    str += arrayToRow([
       type,
       `+${deltaPerIteration}`,
       preview,
       formatStacktraces(stacktraces),
     ]);
   }
-  return (
-    `
-Leaking collections:
-
-${formatTable(tableData, TABLE_CONFIG)}
-      `.trim() + "\n\n"
-  );
+  return `\nLeaking collections:\n\n${str}\n\n`;
 }
 
-export function formatResult({ test, result }) {
+export function formatResultAsMarkdown({ test, result }) {
   let str = "";
 
-  str += `Test         : ${test.description}\n`;
+  str += `<details><summary>${test.description}</summary>\n`;
 
   if (result.failed) {
     str += `Failed       : ${result.error.message}\n${result.error.stack}\n`;
@@ -153,29 +189,37 @@ export function formatResult({ test, result }) {
 
   let snapshots = "";
   if (result.before.heapsnapshot && result.after.heapsnapshot) {
-    snapshots =
-      "\n" +
-      `
-Before: ${result.before.heapsnapshot} (${prettyBytes(
-        result.before.statistics.total
-      )})
-After : ${result.after.heapsnapshot} (${prettyBytes(
-        result.after.statistics.total
-      )}) (${result.numIterations} iterations)
-      `.trim();
+    snapshots = `\n\nBefore: ${result.before.heapsnapshot} (${prettyBytes(
+      result.before.statistics.total
+    )})\nAfter : ${result.after.heapsnapshot} (${prettyBytes(
+      result.after.statistics.total
+    )}) (${result.numIterations} iterations)\n`.trim();
   }
 
-  str += `
-Memory change: ${
+  str += `\nMemory change: ${
     result.deltaPerIteration > 0
       ? "+" + prettyBytes(result.deltaPerIteration)
       : prettyBytes(result.deltaPerIteration)
-  }
-Leak detected: ${result.leaks.detected ? "Yes" : "No"}
-
-${leakTables}
-${snapshots}
-    `.trim();
+  }\nLeak detected: ${
+    result.leaks.detected ? "Yes" : "No"
+  }\n\n${leakTables}\n${snapshots}\n</details>`.trim();
 
   return str;
+}
+
+/**
+ * Test a scenario for memory leaks
+ *
+ * @param {*} scenario Scenario to test
+ * @param {*} options Scenario options: 'iterations', 'expectations'
+ */
+export async function testScenario(scenario, options = {}) {
+  const results = await asyncIterableToArray(
+    findLeaks(URL, {
+      iterations: options.iterations ?? ITERATIONS,
+      scenario,
+    })
+  );
+
+  expectNoLeaks(results, options.expectations ?? []);
 }
