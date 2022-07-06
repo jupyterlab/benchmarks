@@ -62,9 +62,9 @@ function formatStacktraces(stacktraces) {
   const [stacktrace] = stacktraces;
   const { original, pretty } = stacktrace;
   const repr = pretty || original || "";
-  let str = `<code>${repr
+  let str = `<pre>${repr
     .replace(/</g, "\\<")
-    .replace(/\n/g, "<br />")}</code>`;
+    .replace(/\n/g, "<br />")}</pre>`;
   return str;
 }
 
