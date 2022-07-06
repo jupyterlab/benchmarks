@@ -106,6 +106,7 @@ jobs:
         uses: ./benchmarks/.github/actions/memory-leak
         with:
           github_token: "FAKE"
+          server_url: "http-get://localhost:9999/lab"
 
       - name: Kill the server
         if: always()
