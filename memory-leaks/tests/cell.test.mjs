@@ -2,7 +2,7 @@ import { testScenario } from "./utils.mjs";
 import * as addScenario from "./cell.mjs";
 import * as moveScenario from "./cell-motion.mjs";
 
-describe("Cell memory leaks", () => {
+describe("# Cell memory leaks", () => {
   it("Adding a cell", async () => {
     await testScenario(addScenario, {
       expectations: [
