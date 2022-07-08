@@ -1,0 +1,14 @@
+name: JupyterLab Weekly Memory Leak Tests
+
+on:
+  schedule:
+    # Every Sunday at 01:42am
+    - cron: "42 1 * * 0"
+
+jobs:
+  memory-leak-test:
+    # uses: jupyterlab/benchmarks/.github/workflows/run-memory-leak.yml@master
+    uses: ./.github/workflows/run-memory-leak.yml
+    with:
+      repository: jupyterlab/jupyterlab
+      branch: master

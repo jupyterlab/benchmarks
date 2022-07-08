@@ -1,0 +1,58 @@
+name: Run JupyterLab Memory Leak Tests
+description: |
+  Run the JupyterLab memory leak scenarios.
+
+inputs:
+  # Mandatory inputs
+  github_token:
+    description: "The GitHub token to use, must have pull_request:write access"
+    required: true
+
+  # Optional inputs
+  samples:
+    description: "Number of samples to compute"
+    required: false
+    default: "7"
+  server_url:
+    description: The server URL to wait for (see https://github.com/iFaxity/wait-on-action `resource`)
+    required: false
+    default: http-get://localhost:8888
+  git_username:
+    description: The Git Username to Use for the Commit
+    required: false
+    default: github-actions[bot]
+  git_email:
+    description: The Git Email to Use for the Commit
+    required: false
+    default: github-actions[bot]@users.noreply.github.com
+
+runs:
+  using: composite
+  steps:
+    - name: Install fuite
+      shell: bash
+      run: |
+        set -ex
+        npm install
+      working-directory: ${{ github.action_path }}/../../../memory-leaks
+
+    - name: Wait for the server
+      uses: ifaxity/wait-on-action@v1
+      with:
+        resource: ${{ inputs.server_url }}
+        timeout: 360000
+
+    - name: Execute memory leaks test
+      shell: bash
+      env:
+        # How many samples to compute
+        MEMORY_LEAK_NSAMPLES: ${{ inputs.samples }}
+      run: |
+        set -ex
+        npm run test:mocha | tee /tmp/memory-leaks.log
+      working-directory: ${{ github.action_path }}/../../../memory-leaks
+
+    - name: Set job summary
+      if: always()
+      shell: bash
+      run: sed "s/^[[:space:]]*[[:digit:]])[[:space:]].*$//" /tmp/memory-leaks.log >> $GITHUB_STEP_SUMMARY

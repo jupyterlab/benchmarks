@@ -1,0 +1,4 @@
+{
+  "timeout": 1200000,
+  "setup": "./tests/setup.mjs"
+}

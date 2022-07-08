@@ -60,7 +60,6 @@ jobs:
       - name: Install dependencies
         run: |
           set -ex
-          echo "OLD_REF_SHA=$(git log -n1 --format='%H')" >> $GITHUB_ENV
           bash ./scripts/ci_install.sh
           # Build dev mode
           jlpm run build
@@ -127,3 +126,9 @@ jobs:
         run: |
           cat /tmp/jupyterlab_server.log
 
+  memory-leak-test:
+    # uses: jupyterlab/benchmarks/.github/workflows/run-memory-leak.yml@master
+    uses: ./.github/workflows/run-memory-leak.yml
+    with:
+      repository: jupyterlab/jupyterlab
+      branch: master
