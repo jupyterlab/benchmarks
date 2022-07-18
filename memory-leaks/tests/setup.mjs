@@ -1,7 +1,10 @@
+import parse from "parse-url";
 import waitForLocalhost from "wait-for-localhost";
+import { URL } from "./utils.mjs";
 
 before(async () => {
-  console.log("Waiting for localhost:9999");
-  await waitForLocalhost({ path: '/lab', port: 9999, useGet: true });
-  console.log("localhost:9999 is up");
+  const url = parse(URL);
+  console.log(`Waiting for ${url.resource}`);
+  await waitForLocalhost({ path: url.pathname, port: url.port, useGet: true });
+  console.log(`${url.resource} is up`);
 });
