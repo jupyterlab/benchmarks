@@ -2,9 +2,9 @@ import { expect } from "chai";
 import { findLeaks } from "fuite";
 import prettyBytes from "pretty-bytes";
 
-const ITERATIONS = parseInt(process.env.MEMORY_LEAK_NSAMPLES ?? "7", 10);
+export const ITERATIONS = parseInt(process.env.MEMORY_LEAK_NSAMPLES ?? "7", 10);
 
-const URL = process.env.TARGET_URL ?? "http://localhost:9999/lab?reset";
+export const URL = process.env.TARGET_URL ?? "http://localhost:9999/lab?reset";
 
 export async function asyncIterableToArray(iterable) {
   const res = [];
