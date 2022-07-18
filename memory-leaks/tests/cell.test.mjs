@@ -22,7 +22,7 @@ describe("# Cell memory leaks", () => {
         // Code cell
         { objects: 162, collections: 24 },
         // Markdown cell
-        { objects: 98, collections: 20 },
+        { objects: 144, collections: 20 },
         // Raw cell
         { objects: 102, collections: 20 },
       ],
