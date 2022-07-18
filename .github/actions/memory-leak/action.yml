@@ -14,9 +14,9 @@ inputs:
     required: false
     default: "7"
   server_url:
-    description: The server URL to wait for (see https://github.com/iFaxity/wait-on-action `resource`)
+    description: The server URL to wait for (format <hostname:port>)
     required: false
-    default: http-get://localhost:8888
+    default: localhost:8888
   git_username:
     description: The Git Username to Use for the Commit
     required: false
@@ -39,7 +39,7 @@ runs:
     - name: Wait for the server
       uses: ifaxity/wait-on-action@v1
       with:
-        resource: ${{ inputs.server_url }}
+        resource: http-get://${{ inputs.server_url }}
         timeout: 360000
 
     - name: Execute memory leaks test
@@ -47,6 +47,7 @@ runs:
       env:
         # How many samples to compute
         MEMORY_LEAK_NSAMPLES: ${{ inputs.samples }}
+        TARGET_URL: http://${{ inputs.server_url }}/lab?reset
       run: |
         set -ex
         npm run test:mocha | tee /tmp/memory-leaks.log
