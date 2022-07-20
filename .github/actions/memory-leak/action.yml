@@ -25,6 +25,10 @@ inputs:
     description: The Git Email to Use for the Commit
     required: false
     default: github-actions[bot]@users.noreply.github.com
+outputs:
+  report:
+    description: "Memory leak report"
+    value: ${{ steps.reporting.outputs.report }}
 
 runs:
   using: composite
@@ -55,6 +59,7 @@ runs:
 
     - name: Set job summary
       if: always()
+      id: reporting
       shell: bash
       run: |
         sed "s/^[[:space:]]*[[:digit:]])[[:space:]].*$//" /tmp/memory-leaks.log > memory-leak-report.md
