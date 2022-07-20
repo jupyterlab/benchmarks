@@ -96,12 +96,6 @@ jobs:
         run: |
           kill -s SIGKILL $(pgrep jupyter-lab)
 
-      - name: Print memory leak action output
-        if: always()
-        shell: bash
-        run: |
-          echo "${{ steps.memory_leak.outputs.report }}"
-
       - name: Print JupyterLab logs
         if: always()
         run: |
