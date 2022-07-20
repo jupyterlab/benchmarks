@@ -56,4 +56,7 @@ runs:
     - name: Set job summary
       if: always()
       shell: bash
-      run: sed "s/^[[:space:]]*[[:digit:]])[[:space:]].*$//" /tmp/memory-leaks.log >> $GITHUB_STEP_SUMMARY
+      run: |
+        sed "s/^[[:space:]]*[[:digit:]])[[:space:]].*$//" /tmp/memory-leaks.log > memory-leak-report.md
+        cat memory-leak-report.md >> $GITHUB_STEP_SUMMARY
+        echo "::set-output name=report::$(cat memory-leak-report.md)"
