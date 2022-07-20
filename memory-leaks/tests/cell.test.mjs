@@ -9,9 +9,9 @@ describe("# Cell memory leaks", () => {
         // Code cell
         { objects: 1400, collections: 31 },
         // Markdown cell
-        { objects: 1365, collections: 46 },
+        { objects: 1365, collections: 54 },
         // Raw cell
-        { objects: 1046, collections: 46 },
+        { objects: 1046, collections: 54 },
       ],
     });
   });
