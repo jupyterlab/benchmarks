@@ -13,7 +13,6 @@ inputs:
     description: "Uploaded memory leak report"
     required: false
     default: "memory-leak-report"
-    type: string
   samples:
     description: "Number of samples to compute"
     required: false
