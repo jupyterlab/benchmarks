@@ -9,6 +9,11 @@ inputs:
     required: true
 
   # Optional inputs
+  artifacts_name:
+    description: "Uploaded memory leak report"
+    required: false
+    default: "memory-leak-report"
+    type: string
   samples:
     description: "Number of samples to compute"
     required: false
@@ -25,10 +30,6 @@ inputs:
     description: The Git Email to Use for the Commit
     required: false
     default: github-actions[bot]@users.noreply.github.com
-outputs:
-  report:
-    description: "Memory leak report"
-    value: ${{ steps.reporting.outputs.report }}
 
 runs:
   using: composite
@@ -59,9 +60,15 @@ runs:
 
     - name: Set job summary
       if: always()
-      id: reporting
       shell: bash
       run: |
         sed "s/^[[:space:]]*[[:digit:]])[[:space:]].*$//" /tmp/memory-leaks.log > memory-leak-report.md
         cat memory-leak-report.md >> $GITHUB_STEP_SUMMARY
-        echo "::set-output name=report::$(cat memory-leak-report.md)"
+
+    - name: Upload Memory Leak report
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ inputs.artifacts_name }}
+        path: |
+          memory-leak-report.md
