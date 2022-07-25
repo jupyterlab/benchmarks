@@ -259,7 +259,7 @@ jobs:
         run: |
           # Publish image to cml.dev
           echo "" >> ${REPORT}
-          cml-publish ./benchmark-results/lab-benchmark.png --md >> ${REPORT} || true
+          cml-publish ./benchmark-results/lab-benchmark.svg --md >> ${REPORT} || true
           echo "Expected = [${{ env.OLD_REF_SHA }}](https://github.com/jupyterlab/jupyterlab/commit/${{ env.OLD_REF_SHA }}) | Actual = [${{ env.NEW_REF_SHA }}](https://github.com/${{ env.CHALLENGER_REPOSITORY }}/commit/${{ env.NEW_REF_SHA }})" >> ${REPORT}
           echo "[Go to action log](https://github.com/jupyterlab/benchmarks/actions/runs/${{ github.run_id }})" >> ${REPORT}
           if [[ "${{ env.CHALLENGER_REPOSITORY }}" == "jupyterlab/jupyterlab" ]]; then
