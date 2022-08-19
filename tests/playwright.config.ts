@@ -5,9 +5,15 @@ export default {
   reportSlowTests: null,
   timeout: 90000,
   projects: [
+    // JupyterLab 3 and later
     {
       name: "jupyterlab",
       testMatch: "jupyterlab/**",
+    },
+    // JupyterLab 1 or 2
+    {
+      name: "jupyterlab-1-2",
+      testMatch: "jupyterlab-1-2/**",
     },
     {
       name: "testing",
