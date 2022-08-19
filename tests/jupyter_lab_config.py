@@ -22,7 +22,7 @@ c.NotebookApp.token = ""
 c.NotebookApp.password = ""
 c.NotebookApp.disable_check_xsrf = True
 
-# c.LabApp.dev_mode = True
+c.LabApp.dev_mode = True
 c.LabApp.extensions_in_dev_mode = True
 c.LabApp.expose_app_in_browser = True
 
