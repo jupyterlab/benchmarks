@@ -86,7 +86,6 @@ jobs:
       - name: Execute memory leaks test
         uses: ./benchmarks/.github/actions/memory-leak
         with:
-          github_token: "FAKE"
           server_url: "localhost:9999"
 
       - name: Kill the server
