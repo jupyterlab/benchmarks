@@ -2,7 +2,10 @@ import { galata } from "@jupyterlab/galata";
 
 export default {
   label: "large_code_{N}_notebook",
-  waitFor: () => Promise.resolve(void 0),
+  waitFor: ({ widgetID, page }) =>
+    page.waitForSelector(
+      `#${widgetID} >> text=This is line of long text that is intended to fill up the screen;`
+    ),
   notebook: (n: number = 300) => {
     return galata.Notebook.generateNotebook(n, "code", [
       "OUTPUT_LENGTH = 300\n",

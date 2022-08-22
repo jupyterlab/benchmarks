@@ -19,7 +19,7 @@
     "test:report": "http-server ./playwright-report -a localhost -o"
   },
   "devDependencies": {
-    "@jupyterlab/galata": "^4.1.1",
+    "@jupyterlab/galata": "^4.3.5",
     "@playwright/test": "^1.16.0",
     "fkill-cli": "^6.0.1",
     "path": "~0.12.7",

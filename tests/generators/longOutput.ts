@@ -3,44 +3,50 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-import { galata } from '@jupyterlab/galata';
-import NotebookType from './notebookType';
+import { galata } from "@jupyterlab/galata";
+import NotebookType from "./notebookType";
 
-export const DIV_NUMBER = Number(process.env['DIV_NUMBER'] || 100);
+export const DIV_NUMBER = Number(process.env["DIV_NUMBER"] || 100);
 
 export default {
   label: `longOutput - A single output with ${DIV_NUMBER}x{N} divs`,
-  waitFor: async () => null,
+  waitFor: ({ widgetID, page }) =>
+    page
+      .waitForSelector(
+        `#${widgetID} >> text=I am a long string in a div which is repeatedly added to one html object:`
+      )
+      .then(() => null),
   notebook: (n: number) =>
     galata.Notebook.makeNotebook([
       {
-        cell_type: 'code',
+        cell_type: "code",
         execution_count: 1,
         metadata: {},
         outputs: [
           {
             data: {
-              'text/html': [
+              "text/html": [
                 `<div>${Array.from(
                   { length: n * DIV_NUMBER },
                   (_, i) =>
                     `<div>I am a long string in a div which is repeatedly added to one html object: ${i}</div>`
-                ).join('')}</div>`
+                ).join("")}</div>`,
               ],
-              'text/plain': ['<IPython.core.display.HTML object>']
+              "text/plain": ["<IPython.core.display.HTML object>"],
             },
             execution_count: 1,
             metadata: {},
-            output_type: 'execute_result'
-          }
+            output_type: "execute_result",
+          },
         ],
         source: [
-          'from IPython.display import HTML\n',
-          '\n',
-          `HTML(f\'<div>{"".join("<div>I am a long string in a div which is repeatedly added to one html object: %d</div>" % i for i in range(${n *
-            DIV_NUMBER}))}</div>\')`
-        ]
-      }
+          "from IPython.display import HTML\n",
+          "\n",
+          `HTML(f\'<div>{"".join("<div>I am a long string in a div which is repeatedly added to one html object: %d</div>" % i for i in range(${
+            n * DIV_NUMBER
+          }))}</div>\')`,
+        ],
+      },
     ]),
-  search: "long"
+  search: "long",
 } as NotebookType;
