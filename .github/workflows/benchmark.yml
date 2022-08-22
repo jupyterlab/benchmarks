@@ -39,7 +39,7 @@ permissions:
 
 jobs:
   test:
-    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
+    uses: jupyterlab/benchmarks/.github/workflows/run-benchmark.yml@master
     with:
       event: ${{ github.event_name }}
       # Repository to clone for scheduled benchmark

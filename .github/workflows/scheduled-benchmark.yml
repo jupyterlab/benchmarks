@@ -12,7 +12,7 @@ jobs:
   # One job per file to deal with the 6hours limit
   # jobs.<job-id>.strategy is not allowed for reusable workflow; hence the job duplication
   test-codeNotebook:
-    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
+    uses: jupyterlab/benchmarks/.github/workflows/run-benchmark.yml@master
     with:
       # Notebooks to test
       tests: '["codeNotebook"]'
@@ -33,7 +33,7 @@ jobs:
       size: '100'
 
   test-mdNotebook:
-    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
+    uses: jupyterlab/benchmarks/.github/workflows/run-benchmark.yml@master
     with:
       # Notebooks to test
       tests: '["mdNotebook"]'
@@ -54,7 +54,7 @@ jobs:
       size: '100'
 
   test-longOutput:
-    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
+    uses: jupyterlab/benchmarks/.github/workflows/run-benchmark.yml@master
     with:
       # Notebooks to test
       tests: '["longOutput"]'
@@ -75,7 +75,7 @@ jobs:
       size: '100'
 
   test-largeMetadata:
-    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
+    uses: jupyterlab/benchmarks/.github/workflows/run-benchmark.yml@master
     with:
       # Notebooks to test
       tests: '["largeMetadata"]'
@@ -96,7 +96,7 @@ jobs:
       size: '100'
 
   test-errorOutputs:
-    uses: jupyterlab/benchmarks/.github/workflows/run-jupyterlab.yml@master
+    uses: jupyterlab/benchmarks/.github/workflows/run-benchmark.yml@master
     with:
       # Notebooks to test
       tests: '["errorOutputs"]'
