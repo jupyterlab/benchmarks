@@ -3,11 +3,6 @@ description: |
   Run the JupyterLab memory leak scenarios.
 
 inputs:
-  # Mandatory inputs
-  github_token:
-    description: "The GitHub token to use, must have pull_request:write access"
-    required: true
-
   # Optional inputs
   artifacts_name:
     description: "Uploaded memory leak report"
@@ -21,14 +16,6 @@ inputs:
     description: The server URL to wait for (format <hostname:port>)
     required: false
     default: localhost:8888
-  git_username:
-    description: The Git Username to Use for the Commit
-    required: false
-    default: github-actions[bot]
-  git_email:
-    description: The Git Email to Use for the Commit
-    required: false
-    default: github-actions[bot]@users.noreply.github.com
 
 runs:
   using: composite
