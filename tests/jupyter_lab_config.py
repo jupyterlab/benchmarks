@@ -1,26 +1,30 @@
 import getpass
 from tempfile import mkdtemp
 
+use_jupyter_server = True
+try:
+    import jupyterlab
+    major = jupyterlab.__version__.split('.', maxsplit=1)[0]
+    use_jupyter_server = int(major) >= 3
+    MainApp = c.ServerApp if use_jupyter_server else c.NotebookApp
+except ImportError:
+    MainApp = c.ServerApp
+
 # Test if we are running in a docker
 if getpass.getuser() == "jovyan":
-    c.ServerApp.ip = "0.0.0.0"
-    c.NotebookApp.ip = "0.0.0.0"
+    MainApp.ip = "0.0.0.0"
 
-c.ServerApp.port = 9999
-c.NotebookApp.port = 9999
-c.ServerApp.open_browser = False
-c.NotebookApp.open_browser = False
+MainApp.port = 9999
+MainApp.open_browser = False
 
-c.ServerApp.root_dir = mkdtemp(prefix='benchmarks-lab-')
-c.ContentsManager.root_dir = mkdtemp(prefix='benchmarks-lab-')
+if use_jupyter_server:
+    c.ServerApp.root_dir = mkdtemp(prefix='benchmarks-lab-')
+else:
+    c.ContentsManager.root_dir = mkdtemp(prefix='benchmarks-lab-')
 
-c.ServerApp.token = ""
-c.ServerApp.password = ""
-c.ServerApp.disable_check_xsrf = True
-
-c.NotebookApp.token = ""
-c.NotebookApp.password = ""
-c.NotebookApp.disable_check_xsrf = True
+MainApp.token = ""
+MainApp.password = ""
+MainApp.disable_check_xsrf = True
 
 c.LabApp.dev_mode = True
 c.LabApp.extensions_in_dev_mode = True
