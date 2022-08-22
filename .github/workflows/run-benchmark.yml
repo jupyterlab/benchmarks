@@ -227,6 +227,8 @@ jobs:
       - name: Install dependencies
         run: |
           set -ex
+          # Fix for installing JupyterLab 1
+          rm -rf /home/runner/.jupyter || true
           echo "NEW_REF_SHA=$(git log -n1 --format='%H')" >> $GITHUB_ENV
           bash ./scripts/ci_install.sh
           # Build dev mode
