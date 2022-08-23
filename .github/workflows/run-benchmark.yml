@@ -198,6 +198,8 @@ jobs:
       - name: Execute benchmark tests
         continue-on-error: true
         working-directory: benchmarks/tests
+        env:
+          BENCHMARK_REFERENCE: ${{ inputs.event == 'schedule' && 'expected' || inputs.reference_branch }}
         run: |
           set -ex
           # Update test screenshots
@@ -253,6 +255,8 @@ jobs:
       - name: Execute benchmark tests
         continue-on-error: true
         shell: bash
+        env:
+          BENCHMARK_REFERENCE: ${{ inputs.event == 'schedule' && 'actual' || env.CHALLENGER_REF }}
         run: |
           set -ex
           # Update test screenshots
@@ -275,7 +279,7 @@ jobs:
           # Publish image to cml.dev
           echo "" >> ${REPORT}
           cml-publish ./benchmark-results/lab-benchmark.svg --md >> ${REPORT} || true
-          echo "Expected = [${{ env.OLD_REF_SHA }}](https://github.com/jupyterlab/jupyterlab/commit/${{ env.OLD_REF_SHA }}) | Actual = [${{ env.NEW_REF_SHA }}](https://github.com/${{ env.CHALLENGER_REPOSITORY }}/commit/${{ env.NEW_REF_SHA }})" >> ${REPORT}
+          echo "${{ inputs.event == 'schedule' && 'Expected' || inputs.reference_branch }} = [${{ env.OLD_REF_SHA }}](https://github.com/jupyterlab/jupyterlab/commit/${{ env.OLD_REF_SHA }}) | ${{ inputs.event == 'schedule' && 'Actual' || env.CHALLENGER_REF }} = [${{ env.NEW_REF_SHA }}](https://github.com/${{ env.CHALLENGER_REPOSITORY }}/commit/${{ env.NEW_REF_SHA }})" >> ${REPORT}
           echo "[Go to action log](https://github.com/jupyterlab/benchmarks/actions/runs/${{ github.run_id }})" >> ${REPORT}
           if [[ "${{ env.CHALLENGER_REPOSITORY }}" == "jupyterlab/jupyterlab" ]]; then
             echo "[Changelog covered](https://github.com/jupyterlab/jupyterlab/compare/${{ env.OLD_REF_SHA }}...${{ env.NEW_REF_SHA }})" >> ${REPORT}
