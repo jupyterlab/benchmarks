@@ -198,8 +198,6 @@ jobs:
       - name: Execute benchmark tests
         continue-on-error: true
         working-directory: benchmarks/tests
-        env:
-          BENCHMARK_REFERENCE: ${{ inputs.event == 'schedule' && 'expected' || inputs.reference_branch }}
         run: |
           set -ex
           # Update test screenshots
@@ -256,7 +254,8 @@ jobs:
         continue-on-error: true
         shell: bash
         env:
-          BENCHMARK_REFERENCE: ${{ inputs.event == 'schedule' && 'actual' || env.CHALLENGER_REF }}
+          BENCHMARK_REFERENCE: ${{ inputs.event == 'schedule' && 'head' || env.CHALLENGER_REF }}
+          BENCHMARK_EXPECTED_REFERENCE: ${{ inputs.event == 'schedule' && '1 week ago' || inputs.reference_branch }}
         run: |
           set -ex
           # Update test screenshots
