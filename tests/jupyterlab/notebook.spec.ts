@@ -15,28 +15,28 @@ const notebookEnv = process.env.BENCHMARK_NOTEBOOKS;
 const NOTEBOOK_PACKAGES: Array<string> = notebookEnv
   ? JSON.parse(notebookEnv)
   : [
-      "codeNotebook",
-      "mdNotebook",
-      "largeMetadata",
-      "largePlotly",
-      "longOutput",
-      "manyPlotly",
-      "manyOutputs",
-      "errorOutputs",
-    ];
+    "codeNotebook",
+    "mdNotebook",
+    "largeMetadata",
+    "largePlotly",
+    "longOutput",
+    "manyPlotly",
+    "manyOutputs",
+    "errorOutputs",
+  ];
 
 // Steps to test
 const stepsEnv = process.env.BENCHMARK_STEPS;
 const STEPS: Array<string> = stepsEnv
   ? JSON.parse(stepsEnv)
   : [
-      "open",
-      "switch-with-copy",
-      "switch-with-txt",
-      "search",
-      "start-debug",
-      "close",
-    ];
+    "open",
+    "switch-with-copy",
+    "switch-with-txt",
+    "search",
+    "start-debug",
+    "close",
+  ];
 
 const tmpPath = "test-performance";
 const textFile = "lorem_ipsum.txt";
@@ -318,6 +318,12 @@ test.describe("JupyterLab Benchmark", () => {
           !(await page.locator('text=Search Cell Outputs >> input[type="checkbox"]').isChecked())
         ) {
           await page.click("text=Search Cell Outputs");
+
+          // Acknowledge confirmation dialog
+          const confirmation = await page.locator('.jp-Dialog-footer >> button:has-text("Ok")').count();
+          if (confirmation === 1) {
+            await page.locator('.jp-Dialog-footer >> button:has-text("Ok")').click();
+          }
         }
 
         const searchTime = await perf.measure(async () => {
