@@ -152,8 +152,13 @@ test.describe("JupyterLab Benchmark", () => {
 
       // Check the notebook is correctly opened
       let panel = await page.$(
-        '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+        '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-2-1"]'
       );
+      if (!panel) {
+        panel = await page.$(
+          '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+        );
+      }
       // Get only the document node to avoid noise from kernel and debugger in the toolbar
       let documentContent = await panel.$(".jp-Notebook");
       expect(await documentContent.screenshot()).toMatchSnapshot(
@@ -208,8 +213,13 @@ test.describe("JupyterLab Benchmark", () => {
 
           // Check the notebook is correctly opened
           panel = await page.$(
-            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-3"]'
+            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-2-3"]'
           );
+          if (!panel) {
+            panel = await page.$(
+              '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-3"]'
+            );
+          }
           // Get only the document node to avoid noise from kernel and debugger in the toolbar
           documentContent = await panel.$(".jp-Notebook");
           expect(await documentContent.screenshot()).toMatchSnapshot(
@@ -239,8 +249,13 @@ test.describe("JupyterLab Benchmark", () => {
 
           // Check the notebook is correctly opened
           panel = await page.$(
-            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-2-1"]'
           );
+          if (!panel) {
+            panel = await page.$(
+              '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+            );
+          }
           // Get only the document node to avoid noise from kernel and debugger in the toolbar
           documentContent = await panel.$(".jp-Notebook");
           expect(await documentContent.screenshot()).toMatchSnapshot(
@@ -288,8 +303,13 @@ test.describe("JupyterLab Benchmark", () => {
 
           // Check the notebook is correctly opened
           panel = await page.$(
-            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-2-1"]'
           );
+          if (!panel) {
+            panel = await page.$(
+              '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+            );
+          }
           // Get only the document node to avoid noise from kernel and debugger in the toolbar
           documentContent = await panel.$(".jp-Notebook");
           expect(await documentContent.screenshot()).toMatchSnapshot(
