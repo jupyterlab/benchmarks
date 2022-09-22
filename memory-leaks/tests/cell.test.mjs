@@ -16,7 +16,10 @@ describe("# Cell memory leaks", () => {
     });
   });
 
-  it("Drag and drop a cell", async () => {
+  // Currently (as of 2022.09.22) the move cell in JupyterLab is
+  // not a move motion but a delete-insert action as YJs version
+  // supporting motion is not yet used.
+  it.skip("Drag and drop a cell", async () => {
     await testScenario(moveScenario, {
       expectations: [
         // Code cell

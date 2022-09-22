@@ -15,28 +15,28 @@ const notebookEnv = process.env.BENCHMARK_NOTEBOOKS;
 const NOTEBOOK_PACKAGES: Array<string> = notebookEnv
   ? JSON.parse(notebookEnv)
   : [
-      "codeNotebook",
-      "mdNotebook",
-      "largeMetadata",
-      "largePlotly",
-      "longOutput",
-      "manyPlotly",
-      "manyOutputs",
-      "errorOutputs",
-    ];
+    "codeNotebook",
+    "mdNotebook",
+    "largeMetadata",
+    "largePlotly",
+    "longOutput",
+    "manyPlotly",
+    "manyOutputs",
+    "errorOutputs",
+  ];
 
 // Steps to test
 const stepsEnv = process.env.BENCHMARK_STEPS;
 const STEPS: Array<string> = stepsEnv
   ? JSON.parse(stepsEnv)
   : [
-      "open",
-      "switch-with-copy",
-      "switch-with-txt",
-      "search",
-      "start-debug",
-      "close",
-    ];
+    "open",
+    "switch-with-copy",
+    "switch-with-txt",
+    "search",
+    "start-debug",
+    "close",
+  ];
 
 const tmpPath = "test-performance";
 const textFile = "lorem_ipsum.txt";
@@ -152,10 +152,17 @@ test.describe("JupyterLab Benchmark", () => {
 
       // Check the notebook is correctly opened
       let panel = await page.$(
-        '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+        '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-2-1"]'
       );
+      if (!panel) {
+        panel = await page.$(
+          '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+        );
+      }
       // Get only the document node to avoid noise from kernel and debugger in the toolbar
       let documentContent = await panel.$(".jp-Notebook");
+      // Wait for Plotly figures to resize
+      await page.waitForTimeout(150);
       expect(await documentContent.screenshot()).toMatchSnapshot(
         `${file.replace(".", "-")}.png`
       );
@@ -208,10 +215,17 @@ test.describe("JupyterLab Benchmark", () => {
 
           // Check the notebook is correctly opened
           panel = await page.$(
-            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-3"]'
+            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-2-3"]'
           );
+          if (!panel) {
+            panel = await page.$(
+              '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-3"]'
+            );
+          }
           // Get only the document node to avoid noise from kernel and debugger in the toolbar
           documentContent = await panel.$(".jp-Notebook");
+          // Wait for Plotly figures to resize
+          await page.waitForTimeout(150);
           expect(await documentContent.screenshot()).toMatchSnapshot(
             `${file.replace(".", "-")}.png`
           );
@@ -239,10 +253,17 @@ test.describe("JupyterLab Benchmark", () => {
 
           // Check the notebook is correctly opened
           panel = await page.$(
-            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-2-1"]'
           );
+          if (!panel) {
+            panel = await page.$(
+              '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+            );
+          }
           // Get only the document node to avoid noise from kernel and debugger in the toolbar
           documentContent = await panel.$(".jp-Notebook");
+          // Wait for Plotly figures to resize
+          await page.waitForTimeout(150);
           expect(await documentContent.screenshot()).toMatchSnapshot(
             `${file.replace(".", "-")}.png`
           );
@@ -288,10 +309,17 @@ test.describe("JupyterLab Benchmark", () => {
 
           // Check the notebook is correctly opened
           panel = await page.$(
-            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+            '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-2-1"]'
           );
+          if (!panel) {
+            panel = await page.$(
+              '[role="main"] >> .jp-NotebookPanel[aria-labelledby="tab-key-1"]'
+            );
+          }
           // Get only the document node to avoid noise from kernel and debugger in the toolbar
           documentContent = await panel.$(".jp-Notebook");
+          // Wait for Plotly figures to resize
+          await page.waitForTimeout(150);
           expect(await documentContent.screenshot()).toMatchSnapshot(
             `${file.replace(".", "-")}.png`
           );
@@ -318,6 +346,12 @@ test.describe("JupyterLab Benchmark", () => {
           !(await page.locator('text=Search Cell Outputs >> input[type="checkbox"]').isChecked())
         ) {
           await page.click("text=Search Cell Outputs");
+
+          // Acknowledge confirmation dialog
+          const confirmation = await page.locator('.jp-Dialog-footer >> button:has-text("Ok")').count();
+          if (confirmation === 1) {
+            await page.locator('.jp-Dialog-footer >> button:has-text("Ok")').click();
+          }
         }
 
         const searchTime = await perf.measure(async () => {

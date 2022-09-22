@@ -19,7 +19,7 @@ jupyter lab --config memory-leaks/jupyter_lab_config.py
 ```
 cd memory-leaks
 yarn install
-yarn build
+yarn start-jlab &
 yarn test:mocha
 ```
 
