@@ -130,7 +130,7 @@ function formatLeakingDomNodes(domNodes) {
     str += arrayToRow([description, deltaPerIteration]);
   }
 
-  if (tableData.length === 1) {
+  if (str.length === 1) {
     // no individual breakdowns, so just put the total
     str += arrayToRow(["Total", domNodes.deltaPerIteration]);
   }
