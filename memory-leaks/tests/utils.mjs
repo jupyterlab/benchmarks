@@ -125,12 +125,14 @@ function formatLeakingEventListeners(listenerSummaries, eventListenersSummary) {
 
 function formatLeakingDomNodes(domNodes) {
   let str = arrayToRow(["Description", "# added"], true);
+  let hasBreakdowns = false;
 
   for (const { description, deltaPerIteration } of domNodes.nodes) {
+    hasBreakdowns = true;
     str += arrayToRow([description, deltaPerIteration]);
   }
 
-  if (str.length === 1) {
+  if (hasBreakdowns) {
     // no individual breakdowns, so just put the total
     str += arrayToRow(["Total", domNodes.deltaPerIteration]);
   }
