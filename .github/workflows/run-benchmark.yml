@@ -307,7 +307,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const issue_number = 85;
+            const issue_number = 127;
             const report = String(fs.readFileSync('./benchmarks/tests/benchmark-results/lab-benchmark.md'))
 
             await github.rest.issues.createComment({
