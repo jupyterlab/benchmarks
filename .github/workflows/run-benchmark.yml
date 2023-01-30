@@ -69,7 +69,7 @@ permissions:
 
 jobs:
   run-benchmark:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     env:
       # Which browser to use (one of 'chromium', 'firefox', 'webkit')
@@ -131,7 +131,7 @@ jobs:
       # First run the benchmark on the reference
       - name: Checkout reference branch
         if: ${{ inputs.event == 'workflow_dispatch' }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: jupyterlab/jupyterlab
           ref: ${{ inputs.reference_branch }}

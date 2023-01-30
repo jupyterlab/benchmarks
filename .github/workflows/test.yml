@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     env:
       # How many times to switch between each tabs
@@ -16,33 +16,33 @@ jobs:
 
     steps:
       - name: Checkout benchmarks project
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: benchmarks
 
       - name: Install node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "14.x"
+          node-version: "18.x"
 
       - name: Install Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: 3.10
 
       - name: Cache pip on Linux
         uses: actions/cache@v1
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-3.8-${{ hashFiles('**/requirements.txt', 'setup.cfg') }}
+          key: ${{ runner.os }}-pip-3.10-${{ hashFiles('**/requirements.txt', 'setup.cfg') }}
           restore-keys: |
-            ${{ runner.os }}-pip-3.8
+            ${{ runner.os }}-pip-3.10
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
       - name: Cache yarn
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -51,7 +51,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Checkout JupyterLab
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: jupyterlab/jupyterlab
           ref: master
@@ -114,7 +114,7 @@ jobs:
 
       - name: Upload Test assets
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: test-assets
           path: |
