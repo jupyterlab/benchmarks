@@ -138,16 +138,13 @@ test.describe("JupyterLab Benchmark", () => {
       await page.dblclick(`#filebrowser >> text=${tmpPath}`);
 
       const openTime = await perf.measure(async () => {
-        // Open the notebook and wait for the spinner
+        // Open the notebook and wait for the spinner to be hidden
         await Promise.all([
-          page.waitForSelector('[role="main"] >> .jp-SpinnerContent'),
+          page.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
+            state: "hidden",
+          }),
           page.dblclick(`#filebrowser >> text=${filename}.ipynb`),
         ]);
-
-        // Wait for spinner to be hidden
-        await page.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
-          state: "hidden",
-        });
       });
 
       // Check the notebook is correctly opened
@@ -186,16 +183,13 @@ test.describe("JupyterLab Benchmark", () => {
       );
 
       if (STEPS.includes("switch-with-copy")) {
-        // Open copied notebook
+        // Open copied notebook to be hidden
         await Promise.all([
-          page.waitForSelector('[role="main"] >> .jp-SpinnerContent'),
+          page.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
+            state: "hidden",
+          }),
           page.dblclick(`#filebrowser >> text=${filename}_copy.ipynb`),
         ]);
-
-        // Wait for spinner to be hidden
-        await page.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
-          state: "hidden",
-        });
       }
 
       // Switch to test notebook
