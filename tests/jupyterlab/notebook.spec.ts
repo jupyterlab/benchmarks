@@ -140,7 +140,7 @@ test.describe("JupyterLab Benchmark", () => {
       const openTime = await perf.measure(async () => {
         // Open the notebook and wait for the spinner to be hidden
         await Promise.all([
-          page.waitForSelector('[role="main"] >> .jp-Notebook-cell'),
+          page.locator('[role="main"] >> .jp-Notebook-cell').first().waitFor(),
           page.dblclick(`#filebrowser >> text=${filename}.ipynb`),
         ]);
       });
@@ -183,7 +183,7 @@ test.describe("JupyterLab Benchmark", () => {
       if (STEPS.includes("switch-with-copy")) {
         // Open copied notebook to be hidden
         await Promise.all([
-          page.waitForSelector('[role="main"] >> .jp-Notebook-cell'),
+          page.locator('[role="main"] >> .jp-Notebook-cell').first().waitFor(),
           page.dblclick(`#filebrowser >> text=${filename}_copy.ipynb`),
         ]);
       }
