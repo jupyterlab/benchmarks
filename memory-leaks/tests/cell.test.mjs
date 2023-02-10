@@ -7,11 +7,11 @@ describe("# Cell memory leaks", () => {
     await testScenario(addScenario, {
       expectations: [
         // Code cell
-        { objects: 1400, collections: 32 },
+        { objects: 980, collections: 18 },
         // Markdown cell
-        { objects: 1365, collections: 55 },
+        { objects: 656, collections: 28 },
         // Raw cell
-        { objects: 1046, collections: 55 },
+        { objects: 548, collections: 28 },
       ],
     });
   });
