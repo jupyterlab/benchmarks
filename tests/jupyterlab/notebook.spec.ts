@@ -401,14 +401,14 @@ test.describe("JupyterLab Benchmark", () => {
 
       // Shutdown the kernel to be sure it does not get in our way (especially for the close action)
       await page.click('li[role="menuitem"]:has-text("Kernel")');
-      await page.click('ul[role="menu"] >> text=Shut Down All Kernels…');
+      await page.click('.lm-Menu ul[role="menu"] >> text=Shut Down All Kernels…');
       await page.click('.jp-Dialog-footer >> button:has-text("Shut Down All")');
 
       if (STEPS.includes("close")) {
         // Close notebook
         await page.click('li[role="menuitem"]:has-text("File")');
         const closeTime = await perf.measure(async () => {
-          await page.click('ul[role="menu"] >> text=Close Tab');
+          await page.click('.lm-Menu ul[role="menu"] >> text=Close Tab');
           // Revert changes so we don't measure saving
           const dimissButton = page.locator('button:has-text("Discard")');
           if (await dimissButton.isVisible({ timeout: 50 })) {
