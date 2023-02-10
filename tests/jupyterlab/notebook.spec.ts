@@ -338,7 +338,7 @@ test.describe("JupyterLab Benchmark", () => {
       const searchWord = generators[file].search;
       if (searchWord && STEPS.includes("search")) {
         await page.click('li[role="menuitem"]:has-text("Edit")');
-        await page.click('ul[role="menu"] >> text=Find…');
+        await page.click('.lm-Menu ul[role="menu"] >> text=Find…');
 
         // Force searching in cell outputs
         await page.click('button[title="Show Search Filters"]');
