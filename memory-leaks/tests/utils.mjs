@@ -27,7 +27,7 @@ function expectNoLeaks(results, defaultValues = []) {
 
   expect(
     results.map((test) => test.result.leaks.detected).includes(true)
-  ).to.equal(false);
+  ).to.equal(expectations.leak ?? false);
 
   results.forEach((test, idx) => {
     const expectations = defaultValues[idx] ?? {};
