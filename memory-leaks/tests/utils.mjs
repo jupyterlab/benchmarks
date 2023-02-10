@@ -25,12 +25,13 @@ function expectNoLeaks(results, defaultValues = []) {
     console.log(formatResultAsMarkdown(test));
   });
 
-  expect(
-    results.map((test) => test.result.leaks.detected).includes(true)
-  ).to.equal(expectations.leak ?? false);
-
   results.forEach((test, idx) => {
     const expectations = defaultValues[idx] ?? {};
+
+    expect(
+      test.result.leaks.detected
+    ).to.equal(expectations.leak ?? false);
+
     expect(
       test.result.leaks.objects
         .map((obj) => obj.countDeltaPerIteration)
