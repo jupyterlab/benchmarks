@@ -137,17 +137,18 @@ test.describe("JupyterLab Benchmark", () => {
       await page.click("#filebrowser >> .jp-BreadCrumbs-home");
       await page.dblclick(`#filebrowser >> text=${tmpPath}`);
 
+      const spinner = page.locator('[role="main"] >> .jp-SpinnerContent');
+
       const openTime = await perf.measure(async () => {
-        // Open the notebook and wait for the spinner
+        // Open the notebook and wait for the spinner to be hidden
         await Promise.all([
-          page.waitForSelector('[role="main"] >> .jp-SpinnerContent'),
+          page.getByRole('main').locator('.jp-Notebook').locator('visible=true').waitFor(),
           page.dblclick(`#filebrowser >> text=${filename}.ipynb`),
         ]);
 
-        // Wait for spinner to be hidden
-        await page.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
-          state: "hidden",
-        });
+        if ((await spinner.count()) > 0) {
+          spinner.waitFor({ state: "hidden" });
+        }
       });
 
       // Check the notebook is correctly opened
@@ -186,16 +187,15 @@ test.describe("JupyterLab Benchmark", () => {
       );
 
       if (STEPS.includes("switch-with-copy")) {
-        // Open copied notebook
+        // Open copied notebook to be hidden
         await Promise.all([
-          page.waitForSelector('[role="main"] >> .jp-SpinnerContent'),
+          page.getByRole('main').locator('.jp-Notebook').locator('visible=true').waitFor(),
           page.dblclick(`#filebrowser >> text=${filename}_copy.ipynb`),
         ]);
 
-        // Wait for spinner to be hidden
-        await page.waitForSelector('[role="main"] >> .jp-SpinnerContent', {
-          state: "hidden",
-        });
+        if ((await spinner.count()) > 0) {
+          spinner.waitFor({ state: "hidden" });
+        }
       }
 
       // Switch to test notebook
@@ -338,7 +338,7 @@ test.describe("JupyterLab Benchmark", () => {
       const searchWord = generators[file].search;
       if (searchWord && STEPS.includes("search")) {
         await page.click('li[role="menuitem"]:has-text("Edit")');
-        await page.click('ul[role="menu"] >> text=Find…');
+        await page.click('.lm-Menu ul[role="menu"] >> text=Find…');
 
         // Force searching in cell outputs
         await page.click('button[title="Show Search Filters"]');
@@ -401,14 +401,14 @@ test.describe("JupyterLab Benchmark", () => {
 
       // Shutdown the kernel to be sure it does not get in our way (especially for the close action)
       await page.click('li[role="menuitem"]:has-text("Kernel")');
-      await page.click('ul[role="menu"] >> text=Shut Down All Kernels…');
+      await page.click('.lm-Menu ul[role="menu"] >> text=Shut Down All Kernels…');
       await page.click('.jp-Dialog-footer >> button:has-text("Shut Down All")');
 
       if (STEPS.includes("close")) {
         // Close notebook
         await page.click('li[role="menuitem"]:has-text("File")');
         const closeTime = await perf.measure(async () => {
-          await page.click('ul[role="menu"] >> text=Close Tab');
+          await page.click('.lm-Menu ul[role="menu"] >> text=Close Tab');
           // Revert changes so we don't measure saving
           const dimissButton = page.locator('button:has-text("Discard")');
           if (await dimissButton.isVisible({ timeout: 50 })) {
