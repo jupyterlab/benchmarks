@@ -137,12 +137,18 @@ test.describe("JupyterLab Benchmark", () => {
       await page.click("#filebrowser >> .jp-BreadCrumbs-home");
       await page.dblclick(`#filebrowser >> text=${tmpPath}`);
 
+      const spinner = page.locator('[role="main"] >> .jp-SpinnerContent');
+
       const openTime = await perf.measure(async () => {
         // Open the notebook and wait for the spinner to be hidden
         await Promise.all([
           page.getByRole('main').locator('.jp-Notebook').locator('visible=true').waitFor(),
           page.dblclick(`#filebrowser >> text=${filename}.ipynb`),
         ]);
+
+        if ((await spinner.count()) > 0) {
+          spinner.waitFor({ state: "hidden" });
+        }
       });
 
       // Check the notebook is correctly opened
@@ -186,6 +192,10 @@ test.describe("JupyterLab Benchmark", () => {
           page.getByRole('main').locator('.jp-Notebook').locator('visible=true').waitFor(),
           page.dblclick(`#filebrowser >> text=${filename}_copy.ipynb`),
         ]);
+
+        if ((await spinner.count()) > 0) {
+          spinner.waitFor({ state: "hidden" });
+        }
       }
 
       // Switch to test notebook
