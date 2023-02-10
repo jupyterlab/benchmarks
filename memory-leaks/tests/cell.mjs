@@ -45,14 +45,17 @@ export async function iteration(page, data) {
 
   switch (data.type) {
     case "raw":
+      await page.keyboard.press("Escape");
       await page.keyboard.press("R");
       await page.waitForSelector(".jp-RawCell");
       break;
     case "markdown":
+      await page.keyboard.press("Escape");
       await page.keyboard.press("M");
       await page.waitForSelector(".jp-MarkdownCell");
       break;
     case "code":
+      await page.keyboard.press("Escape");
       await page.keyboard.press("C");
       await page.waitForXPath(
         '//div[contains(@class, "jp-CodeCell")][position() = last()]'

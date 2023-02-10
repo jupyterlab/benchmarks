@@ -40,7 +40,7 @@ using:
 npx fuite http://localhost:9999/lab?reset -s memory-leaks/tests/notebook.mjs
 ```
 
-You can run in headless mode with the `-d` flag. And you can change the number
+You can run in headed mode with the `-d` flag. And you can change the number
 of iteration with `-i <number>` option.
 
 > Don't forget the `?reset` query arguments to ensure the workspace is reset between each iteration.
