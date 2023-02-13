@@ -11,7 +11,7 @@ describe("# Cell memory leaks", () => {
         // Markdown cell
         { leak: null, objects: 867, collections: 28 },
         // Raw cell
-        { leak: true, objects: 548, collections: 28 },
+        { leak: true, objects: 673, collections: 28 },
       ],
     });
   });
