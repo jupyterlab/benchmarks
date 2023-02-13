@@ -138,6 +138,10 @@ test.describe("JupyterLab Benchmark", () => {
       await page.dblclick(`#filebrowser >> text=${tmpPath}`);
 
       const spinner = page.locator('[role="main"] >> .jp-SpinnerContent');
+      // Ensure there is no hanging document
+      while ((await spinner.count()) > 0) {
+        await spinner.first().waitFor({ state: "hidden" });
+      }
 
       const openTime = await perf.measure(async () => {
         // Open the notebook and wait for the spinner to be hidden
@@ -147,7 +151,8 @@ test.describe("JupyterLab Benchmark", () => {
         ]);
 
         if ((await spinner.count()) > 0) {
-          spinner.waitFor({ state: "hidden" });
+          // They should be only one document
+          await spinner.waitFor({ state: "hidden" });
         }
       });
 
@@ -193,8 +198,8 @@ test.describe("JupyterLab Benchmark", () => {
           page.dblclick(`#filebrowser >> text=${filename}_copy.ipynb`),
         ]);
 
-        if ((await spinner.count()) > 0) {
-          spinner.waitFor({ state: "hidden" });
+        while ((await spinner.count()) > 0) {
+          await spinner.first().waitFor({ state: "hidden" });
         }
       }
 
