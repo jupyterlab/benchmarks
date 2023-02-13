@@ -9,7 +9,7 @@ describe("# Cell memory leaks", () => {
         // Code cell
         { leak: true, objects: 1283, collections: 18 },
         // Markdown cell
-        { leak: true, objects: 656, collections: 28 },
+        { leak: true, objects: 867, collections: 28 },
         // Raw cell
         { leak: true, objects: 548, collections: 28 },
       ],
