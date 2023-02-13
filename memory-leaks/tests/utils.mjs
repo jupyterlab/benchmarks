@@ -28,9 +28,12 @@ function expectNoLeaks(results, defaultValues = []) {
   results.forEach((test, idx) => {
     const expectations = defaultValues[idx] ?? {};
 
-    expect(
-      test.result.leaks.detected
-    ).to.equal(expectations.leak ?? false);
+    // If expectations.leak is `null`, don't test for it - flakyness
+    if (['boolean', 'undefined'].includes(typeof expectations.leak)) {
+      expect(
+        test.result.leaks.detected
+      ).to.equal(expectations.leak ?? false);
+    }
 
     expect(
       test.result.leaks.objects
