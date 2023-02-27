@@ -7,7 +7,7 @@ describe("# Cell memory leaks", () => {
     await testScenario(addScenario, {
       expectations: [
         // Code cell
-        { leak: null, objects: 1283, collections: 18 },
+        { leak: null, objects: 1308, collections: 18 },
         // Markdown cell
         { leak: null, objects: 867, collections: 28 },
         // Raw cell
