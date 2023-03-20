@@ -64,6 +64,9 @@ on:
         default: "benchmark-assets"
         type: string
 
+env:
+  YARN_ENABLE_IMMUTABLE_INSTALLS: 0
+
 permissions:
   issues: write
 
