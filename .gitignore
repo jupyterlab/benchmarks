@@ -5,7 +5,6 @@ out.*
 *.csv
 *.diff
 
-*.lock
 *.log
 
 build
