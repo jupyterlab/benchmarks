@@ -49,7 +49,7 @@ test.describe('Benchmark using UI Profiler', () => {
     // TODO: open a heavy notebook `all-html-elements.ipynb` in background
     // this should be implemented in jupyterlab-ui-profiler as a new field.
 
-    const result: IBenchmarkResult<ITimingOutcome> = await page.evaluate(
+    const result = await page.evaluate(
       async ([repeats]) => {
         const profiler = getProfiler();
         const result = await profiler.runBenchmark({
@@ -62,7 +62,7 @@ test.describe('Benchmark using UI Profiler', () => {
         return result;
       },
       [benchmark.nSamples]
-    );
+    ) as IBenchmarkResult<ITimingOutcome>;
 
     const times = result.outcome.reference;
     for (let time of times) {

@@ -3,10 +3,15 @@
   "version": "0.2.0",
   "description": "A JupyterLab extension for rendering table files.",
   "homepage": "https://github.com/jupyterlab/benchmarks",
-  "author": {"name": "Project Jupyter Contributors", "email": ""},
-  "contributors": [{
-    "name": "D. E. Shaw & Co., L.P."
-  }],
+  "author": {
+    "name": "Project Jupyter Contributors",
+    "email": ""
+  },
+  "contributors": [
+    {
+      "name": "D. E. Shaw & Co., L.P."
+    }
+  ],
   "license": "BSD-3-Clause",
   "private": true,
   "main": "lib/index.js",

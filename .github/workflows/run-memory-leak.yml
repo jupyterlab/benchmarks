@@ -82,8 +82,7 @@ jobs:
       - name: Launch JupyterLab
         shell: bash
         run: |
-          # Mount a volume to overwrite the server configuration
-          jlpm start-jlab 2>&1 > /tmp/jupyterlab_server.log &
+          yarn start-jlab 2>&1 > /tmp/jupyterlab_server.log &
         working-directory: benchmarks/memory-leaks
 
       - name: Execute memory leaks test

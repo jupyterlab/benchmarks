@@ -1,7 +1,9 @@
 {
   "name": "@jupyterlab/benchmarks",
   "homepage": "https://github.com/jupyterlab/benchmarks",
-  "author": {"name": "Project Jupyter Contributors"},
+  "author": {
+    "name": "Project Jupyter Contributors"
+  },
   "version": "0.1.0",
   "private": true,
   "license": "BSD-3-Clause",
@@ -15,7 +17,6 @@
     "start": "lerna run --scope @jupyterlab/benchmark-tests start-jlab:detached",
     "test": "lerna run --scope @jupyterlab/benchmark-tests test"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/node": "^18.15.3",
     "lerna": "^3.22.1",

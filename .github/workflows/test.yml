@@ -53,12 +53,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Install testing dependencies
-        shell: bash
-        run: |
-          jlpm install
-        working-directory: benchmarks/tests
-
       - name: Checkout JupyterLab
         uses: actions/checkout@v3
         with:
@@ -74,32 +68,51 @@ jobs:
           jlpm run build
         working-directory: reference
 
+      - name: Show jlpm version
+        shell: bash
+        run: |
+          jlpm --version
+        working-directory: benchmarks/tests
+
       - name: Install extensions
         # This is done after installing the reference in order to have jlpm available.
         run: |
           set -ex
           pip install ipywidgets plotly
           pip install -v extensions/fixed-data-table
+          pip install jupyterlab-ui-profiler
 
           jupyter server extension list
           jupyter labextension list
         working-directory: benchmarks
 
+      - name: Show yarn version
+        shell: bash
+        run: |
+          yarn --version
+        working-directory: benchmarks/tests
+
       - name: Launch JupyterLab
         shell: bash
         run: |
-          # Mount a volume to overwrite the server configuration
-          jlpm start-jlab 2>&1 > /tmp/jupyterlab_server.log &
+          yarn start-jlab 2>&1 > /tmp/jupyterlab_server.log &
+        working-directory: benchmarks/tests
+
+      - name: Install testing dependencies
+        shell: bash
+        run: |
+          yarn install
         working-directory: benchmarks/tests
 
       - name: Install browser
         run: |
           set -ex
           # Install only Chromium browser
-          jlpm playwright install chromium
+          yarn playwright install chromium
         working-directory: benchmarks/tests
 
       - name: Wait for JupyterLab
+        id: waitForlab
         uses: ifaxity/wait-on-action@v1
         with:
           resource: http-get://localhost:9999/lab
@@ -110,9 +123,9 @@ jobs:
         run: |
           set -ex
           # Update the snapshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 jlpm run test --project testing -u
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project testing -u
           # Check that all tests pass with updated snapshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 jlpm run test --project testing
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project testing
 
       - name: Kill the server
         if: always()

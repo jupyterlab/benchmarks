@@ -131,12 +131,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Install testing dependencies
-        shell: bash
-        run: |
-          jlpm install
-        working-directory: benchmarks/tests
-
       # First run the benchmark on the reference
       - name: Checkout reference branch
         if: ${{ inputs.event == 'workflow_dispatch' }}
@@ -177,7 +171,7 @@ jobs:
         run: |
           set -ex
           pip install ipywidgets plotly
-          pip install -v extensions/fixed-data-tabletestInfo
+          pip install -v extensions/fixed-data-table
           pip install jupyterlab-ui-profiler
 
           jupyter server extension list
@@ -188,14 +182,20 @@ jobs:
         shell: bash
         run: |
           # Mount a volume to overwrite the server configuration
-          jlpm start-jlab 2>&1 > /tmp/jupyterlab_server_old.log &
+          yarn start-jlab 2>&1 > /tmp/jupyterlab_server_old.log &
+        working-directory: benchmarks/tests
+
+      - name: Install testing dependencies
+        shell: bash
+        run: |
+          yarn install
         working-directory: benchmarks/tests
 
       - name: Install browser
         run: |
           set -ex
           # Install only Chromium browser
-          jlpm playwright install chromium
+          yarn playwright install chromium
         working-directory: benchmarks/tests
 
       - name: Wait for JupyterLab
@@ -210,10 +210,10 @@ jobs:
         run: |
           set -ex
           # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 jlpm run test --project ${{ inputs.reference_project }} -u
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.reference_project }} -u
 
           # -u is needed to generate the benchmark expected file
-          jlpm run test --project ${{ inputs.reference_project }} -u
+          yarn run test --project ${{ inputs.reference_project }} -u
           cp tests-out/lab-benchmark-expected.json /tmp/
 
       - name: Kill the server
@@ -249,8 +249,7 @@ jobs:
       - name: Launch JupyterLab (challenger)
         shell: bash
         run: |
-          # Mount a volume to overwrite the server configuration
-          jlpm start-jlab 2>&1 > /tmp/jupyterlab_server_new.log &
+          yarn start-jlab 2>&1 > /tmp/jupyterlab_server_new.log &
         working-directory: benchmarks/tests
 
       - name: Wait for JupyterLab
@@ -268,13 +267,13 @@ jobs:
         run: |
           set -ex
           # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 jlpm run test --project ${{ inputs.challenger_project }} -u
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.challenger_project }} -u
 
           # Copy reference here otherwise it will use the value from the update screenshots
           # command called just before
           cp /tmp/lab-benchmark-expected.json ./tests-out
 
-          jlpm run test --project ${{ inputs.challenger_project }}
+          yarn run test --project ${{ inputs.challenger_project }}
         working-directory: benchmarks/tests
 
       - name: Generate the report
