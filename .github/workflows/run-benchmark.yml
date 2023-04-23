@@ -131,6 +131,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
+      - name: Install testing dependencies
+        shell: bash
+        run: |
+          jlpm install
+        working-directory: benchmarks/tests
+
       # First run the benchmark on the reference
       - name: Checkout reference branch
         if: ${{ inputs.event == 'workflow_dispatch' }}
@@ -157,7 +163,7 @@ jobs:
           git checkout ${OLD_REF_SHA}
         working-directory: reference
 
-      - name: Install dependencies
+      - name: Install reference
         run: |
           set -ex
           echo "OLD_REF_SHA=$(git log -n1 --format='%H')" >> $GITHUB_ENV
@@ -178,10 +184,9 @@ jobs:
           jupyter labextension list
         working-directory: benchmarks
 
-      - name: Launch JupyterLab
+      - name: Launch JupyterLab (reference)
         shell: bash
         run: |
-          jlpm install
           # Mount a volume to overwrite the server configuration
           jlpm start-jlab 2>&1 > /tmp/jupyterlab_server_old.log &
         working-directory: benchmarks/tests
@@ -228,7 +233,7 @@ jobs:
           ref: ${{ env.CHALLENGER_REF }}
           path: challenger
 
-      - name: Install dependencies
+      - name: Install challenger
         run: |
           set -ex
           # Fix for installing JupyterLab 1
@@ -241,7 +246,7 @@ jobs:
           cp /tmp/lab-benchmark-expected.json ./tests-out
         working-directory: challenger
 
-      - name: Launch JupyterLab
+      - name: Launch JupyterLab (challenger)
         shell: bash
         run: |
           # Mount a volume to overwrite the server configuration
