@@ -6,6 +6,9 @@ on:
   push:
     branches: ['master']
 
+env:
+  YARN_ENABLE_IMMUTABLE_INSTALLS: 0
+
 jobs:
   test:
     runs-on: ubuntu-22.04

@@ -17,6 +17,9 @@ on:
         default: "7"
         type: string
 
+env:
+  YARN_ENABLE_IMMUTABLE_INSTALLS: 0
+
 jobs:
   memory-leak-test:
     runs-on: ubuntu-22.04
