@@ -1,29 +1,18 @@
-import { benchmark, galata, test } from '@jupyterlab/galata';
-import type { ContentsHelper } from '@jupyterlab/galata/lib/contents';
-import type { IUIProfiler, IBenchmarkResult, ITimingOutcome } from '@jupyterlab/ui-profiler'
-import type { MenuOpenScenarioOptions } from '@jupyterlab/ui-profiler/lib/types/_scenario-menu-open';
-import type { ExecutionTimeBenchmarkOptions } from '@jupyterlab/ui-profiler/lib/types/_benchmark-execution';
-import * as path from 'path';
+import { benchmark, galata } from "@jupyterlab/galata";
+import type { ContentsHelper } from "@jupyterlab/galata/lib/contents";
+import type { IBenchmarkResult, ITimingOutcome } from "@jupyterlab/ui-profiler";
+import type { MenuOpenScenarioOptions } from "@jupyterlab/ui-profiler/lib/types/_scenario-menu-open";
+import type { ExecutionTimeBenchmarkOptions } from "@jupyterlab/ui-profiler/lib/types/_benchmark-execution";
+import * as path from "path";
+import { test } from "../fixtures/ui-profiler";
 
-const fileNames = [
-  'gh-9757-reproducer.ipynb',
-  'all-html-elements.ipynb'
-];
+const fileNames = ["gh-9757-reproducer.ipynb", "all-html-elements.ipynb"];
 
-const PROFILER_PLUGIN = '@jupyterlab/ui-profiler:plugin';
-
-
-function getProfiler(): IUIProfiler {
-  return (window as any).jupyterapp._plugins.get(PROFILER_PLUGIN).service;
-}
-
-
-test.describe('Benchmark using UI Profiler', () => {
-
+test.describe("Benchmark using UI Profiler", () => {
   let attachmentCommon: {
-    browser: string,
-    file: string,
-    project: string,
+    browser: string;
+    file: string;
+    project: string;
   };
   let contents: ContentsHelper;
 
@@ -32,37 +21,32 @@ test.describe('Benchmark using UI Profiler', () => {
     contents = galata.newContentsHelper(baseURL);
     for (const fileName of fileNames) {
       await contents.uploadFile(
-        path.resolve(__dirname, `./examples/manual/${fileName}`),
+        path.resolve(__dirname, `../../../examples/manual/${fileName}`),
         `${tmpPath}/${fileName}`
       );
-
     }
     attachmentCommon = {
       browser: browserName,
-      file: 'N/A',
+      file: "N/A",
       project: testInfo.project.name,
     };
   });
 
-  test('open menu', async ({ page, tmpPath }, testInfo) => {
+  test("open menu", async ({ page, tmpPath, profiler }, testInfo) => {
+    await page.notebook.openByPath(`${tmpPath}/gh-9757-reproducer.ipynb`);
 
-    // TODO: open a heavy notebook `all-html-elements.ipynb` in background
-    // this should be implemented in jupyterlab-ui-profiler as a new field.
-
-    const result = await page.evaluate(
-      async ([repeats]) => {
-        const profiler = getProfiler();
-        const result = await profiler.runBenchmark({
-          id: 'menuOpen',
-          options: {"menu": "file"} as MenuOpenScenarioOptions
-        }, {
-          id: 'execution-time',
-          options: {"repeats": repeats} as ExecutionTimeBenchmarkOptions
-        });
-        return result;
+    const result = (await profiler.runBenchmark(
+      {
+        id: "menuOpen",
+        options: { menu: "file" } as MenuOpenScenarioOptions,
       },
-      [benchmark.nSamples]
-    ) as IBenchmarkResult<ITimingOutcome>;
+      {
+        id: "execution-time",
+        options: {
+          repeats: benchmark.nSamples,
+        } as ExecutionTimeBenchmarkOptions,
+      }
+    )) as IBenchmarkResult<ITimingOutcome>;
 
     const times = result.outcome.reference;
     for (let time of times) {
