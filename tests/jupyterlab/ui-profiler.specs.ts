@@ -1,13 +1,16 @@
 import { benchmark, galata } from "@jupyterlab/galata";
 import type { ContentsHelper } from "@jupyterlab/galata/lib/contents";
-import type { IBenchmarkResult, ITimingOutcome } from "@jupyterlab/ui-profiler";
-import type { MenuOpenScenarioOptions } from "@jupyterlab/ui-profiler/lib/types/_scenario-menu-open";
-import type { TabScenarioOptions } from "@jupyterlab/ui-profiler/lib/types/_scenario-tabs";
-import type { SidebarsScenarioOptions } from "@jupyterlab/ui-profiler/lib/types/_scenario-sidebars";
-import type { DebuggerScenarioOptions } from "@jupyterlab/ui-profiler/lib/types/_scenario-debugger";
-import type { CompleterScenarioOptions } from "@jupyterlab/ui-profiler/lib/types/_scenario-completer";
-import type { ScrollScenarioOptions } from "@jupyterlab/ui-profiler/lib/types/_scenario-scroll";
-import type { ExecutionTimeBenchmarkOptions } from "@jupyterlab/ui-profiler/lib/types/_benchmark-execution";
+import type {
+  IBenchmarkResult,
+  ITimingOutcome,
+  MenuOpenScenarioOptions,
+  TabScenarioOptions,
+  SidebarsScenarioOptions,
+  DebuggerScenarioOptions,
+  CompleterScenarioOptions,
+  ScrollScenarioOptions,
+  ExecutionTimeBenchmarkOptions,
+} from "@jupyterlab/ui-profiler";
 import * as path from "path";
 import { test } from "../fixtures/ui-profiler";
 
@@ -160,6 +163,7 @@ test.describe("Benchmark using UI Profiler", () => {
             "z = 1",
           ],
           expectedNumberOfVariables: [1000, 1001],
+          widgetPosition: "tab-after",
         } as DebuggerScenarioOptions as any,
       },
       {
@@ -193,6 +197,7 @@ test.describe("Benchmark using UI Profiler", () => {
             tokenCount: 1000,
             tokenSize: 50,
           },
+          widgetPosition: "tab-after",
         } as CompleterScenarioOptions as any,
       },
       {
@@ -227,6 +232,7 @@ test.describe("Benchmark using UI Profiler", () => {
           cells: 100,
           cellByCell: false,
           path: "",
+          widgetPosition: "tab-after",
         } as ScrollScenarioOptions as any,
       },
       {

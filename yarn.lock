@@ -439,10 +439,11 @@ __metadata:
   resolution: "@jupyterlab/benchmarks-tests@workspace:tests"
   dependencies:
     "@jupyterlab/galata": ^4.3.5
-    "@jupyterlab/ui-profiler": ^0.2.0
+    "@jupyterlab/ui-profiler": ^0.2.1
     "@playwright/test": ^1.30.0
     fkill-cli: ^6.0.1
     path: ~0.12.7
+    prettier: ^2.8.8
     rimraf: ^3.0.2
     typescript: ~4.9.0
   languageName: unknown
@@ -965,13 +966,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyterlab/ui-profiler@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "@jupyterlab/ui-profiler@npm:0.2.0"
+"@jupyterlab/ui-profiler@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "@jupyterlab/ui-profiler@npm:0.2.1"
   dependencies:
     "@jupyterlab/application": ^3.1.0
     "@jupyterlab/json-extension": ^3.5.0
-  checksum: b8a9174a42de00c097d54e5e391ff54cf4af3e24e822a0256e526ed44dbbf7f798d2935ae5801d37e00968b9e60e0bf170d3d8e4ac14b6c53aafc806f21f7c4b
+  checksum: ada2e92480b7e3859a06cbbdf6ed6df79cc535bee28712c9d3112bf98a0a6776446b41b7e2997fba7dbf473da8b849449b6706296556ce9845a43a89477f4266
   languageName: node
   linkType: hard
 
@@ -10048,7 +10049,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.1.1":
+"prettier@npm:^2.1.1, prettier@npm:^2.8.8":
   version: 2.8.8
   resolution: "prettier@npm:2.8.8"
   bin:
