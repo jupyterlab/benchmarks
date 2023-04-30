@@ -173,6 +173,7 @@ jobs:
           pip install ipywidgets plotly
           pip install -v extensions/fixed-data-table
           pip install jupyterlab-ui-profiler
+          jupyter labextension disable @jupyterlab/ui-profiler:user-interface
 
           jupyter server extension list
           jupyter labextension list
