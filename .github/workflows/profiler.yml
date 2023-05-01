@@ -6,9 +6,11 @@ on:
       challenger:
         description: "JupyterLab Git repository with the challenger version (format {owner}/{repo})"
         required: true
+        default: "jupyterlab/jupyterlab"
       challenger_branch:
         description: "Git repository reference to the challenger branch"
         required: true
+        default: "master"
       challenger_project:
         description: "Playwright project to execute (windowingMode JupyterLab 4; renderCellOnIdle: JupyterLab 2.3 or 3.x)"
         required: false
@@ -29,7 +31,7 @@ on:
         required: false
         default: "master"
       reference_project:
-        description: "Playwright project to execute on the reference version (if different from the challenger project)"
+        description: "Playwright project to execute on the reference version"
         required: false
         default: ""
         type: choice
@@ -76,12 +78,11 @@ jobs:
     # uses: jupyterlab/benchmarks/.github/workflows/run-profiler.yml@master
     uses: ./.github/workflows/run-profiler.yml
     with:
-      event: ${{ github.event_name }}
       challenger: ${{ github.event.inputs.challenger || 'jupyterlab/jupyterlab' }}
       challenger_branch: ${{ github.event.inputs.challenger_branch || 'master' }}
       challenger_project: ${{ github.event.inputs.challenger_project || 'jupyterlab' }}
       reference_branch: ${{ github.event.inputs.reference_branch || 'master' }}
-      reference_project: ${{ github.event.inputs.reference_project || github.event.inputs.challenger_project || 'jupyterlab' }}
+      reference_project: ${{ github.event.inputs.reference_project || 'jupyterlab' }}
       browser: ${{ github.event.inputs.browser || 'chromium' }}
       samples: ${{ github.event.inputs.samples || '100' }}
       grep: ${{ github.event.inputs.grep || '' }}

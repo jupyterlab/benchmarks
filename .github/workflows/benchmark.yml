@@ -29,7 +29,7 @@ on:
         required: false
         default: "master"
       reference_project:
-        description: "Playwright project to execute on the reference version (if different from the challenger project)"
+        description: "Playwright project to execute on the reference version"
         required: false
         default: ""
         type: choice
@@ -84,7 +84,7 @@ jobs:
       challenger_branch: ${{ github.event.inputs.challenger_branch || 'master' }}
       challenger_project: ${{ github.event.inputs.challenger_project || 'jupyterlab' }}
       reference_branch: ${{ github.event.inputs.reference_branch || 'master' }}
-      reference_project: ${{ github.event.inputs.reference_project || github.event.inputs.challenger_project || 'jupyterlab' }}
+      reference_project: ${{ github.event.inputs.reference_project || 'jupyterlab' }}
       # Which browser to use (one of 'chromium', 'firefox', 'webkit')
       browser: ${{ github.event.inputs.browser || 'chromium' }}
       # How many samples to compute the statistical distribution
