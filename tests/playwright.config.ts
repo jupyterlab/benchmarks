@@ -1,6 +1,12 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
+const disableNotebookCursorBlinking = {
+  codeCellConfig: { cursorBlinkRate: -1 },
+  markdownCellConfig: { cursorBlinkRate: -1 },
+  rawCellConfig: { cursorBlinkRate: -1 },
+}
+
 export default {
   reportSlowTests: null,
   timeout: 90000,
@@ -32,15 +38,14 @@ export default {
             editorConfig: { cursorBlinkRate: -1 },
           },
           "@jupyterlab/notebook-extension:tracker": {
-            codeCellConfig: { cursorBlinkRate: -1 },
-            markdownCellConfig: { cursorBlinkRate: -1 },
-            rawCellConfig: { cursorBlinkRate: -1 },
+            ...disableNotebookCursorBlinking
           },
         },
       },
     },
     {
-      name: "jlab-no-virtualization",
+      // note: only implemented in JupyterLab 2.3 and 3.x
+      name: "jupyterlab-renderCellOnIdle-on",
       testMatch: "jupyterlab/**",
       use: {
         mockSettings: {
@@ -48,18 +53,82 @@ export default {
             editorConfig: { cursorBlinkRate: -1 },
           },
           "@jupyterlab/notebook-extension:tracker": {
-            codeCellConfig: { cursorBlinkRate: -1 },
-            markdownCellConfig: { cursorBlinkRate: -1 },
-            rawCellConfig: { cursorBlinkRate: -1 },
+            ...disableNotebookCursorBlinking,
+            renderCellOnIdle: true,
+            numberCellsToRenderDirectly: 100,
+          },
+        },
+      },
+    },
+    {
+      // note: only implemented in JupyterLab 2.3 and 3.x
+      name: "jupyterlab-renderCellOnIdle-off",
+      testMatch: "jupyterlab/**",
+      use: {
+        mockSettings: {
+          "@jupyterlab/fileeditor-extension:plugin": {
+            editorConfig: { cursorBlinkRate: -1 },
+          },
+          "@jupyterlab/notebook-extension:tracker": {
+            ...disableNotebookCursorBlinking,
             renderCellOnIdle: false,
             numberCellsToRenderDirectly: 10000000000000,
           },
         },
       },
     },
+    {
+      // note: only implemented in JupyterLab 4
+      name: "jupyterlab-windowingMode-full",
+      testMatch: "jupyterlab/**",
+      use: {
+        mockSettings: {
+          "@jupyterlab/fileeditor-extension:plugin": {
+            editorConfig: { cursorBlinkRate: -1 },
+          },
+          "@jupyterlab/notebook-extension:tracker": {
+            ...disableNotebookCursorBlinking,
+            windowingMode: 'full'
+          },
+        },
+      },
+    },
+    {
+      // note: only implemented in JupyterLab 4
+      name: "jupyterlab-windowingMode-defer",
+      testMatch: "jupyterlab/**",
+      use: {
+        mockSettings: {
+          "@jupyterlab/fileeditor-extension:plugin": {
+            editorConfig: { cursorBlinkRate: -1 },
+          },
+          "@jupyterlab/notebook-extension:tracker": {
+            ...disableNotebookCursorBlinking,
+            windowingMode: 'defer'
+          },
+        },
+      },
+    },
+    {
+      // note: only implemented in JupyterLab 4
+      name: "jupyterlab-windowingMode-none",
+      testMatch: "jupyterlab/**",
+      use: {
+        mockSettings: {
+          "@jupyterlab/fileeditor-extension:plugin": {
+            editorConfig: { cursorBlinkRate: -1 },
+          },
+          "@jupyterlab/notebook-extension:tracker": {
+            ...disableNotebookCursorBlinking,
+            windowingMode: 'none'
+          },
+        },
+      },
+    },
   ],
   reporter: [
-    [process.env.CI ? "dot" : "list"],
+    [process.env.CI ? "github" : "list"],
+    ['html', { open: process.env.CI ? 'never' : 'on-failure' }],
     [
       "@jupyterlab/galata/lib/benchmarkReporter",
       { outputFile: "lab-benchmark.json" },
@@ -71,7 +140,9 @@ export default {
     // headless: false,
     // slowMo: 500,
     // Context options
-    viewport: { width: 1024, height: 768 },
+    // Width of 1366 to ensure the notebook toolbar is visible even
+    // when both sidebars are open
+    viewport: { width: 1366, height: 768 },
     // Artifacts
     video: process.env.PW_VIDEO ? "on" : "off", // "retain-on-failure",
     baseURL: process.env.TARGET_URL ?? 'http://localhost:9999'
