@@ -92,8 +92,6 @@ jobs:
         with:
           python-version: "3.10"
 
-      - uses: iterative/setup-cml@v1
-
       - name: Cache pip on Linux
         uses: actions/cache@v3
         with:
@@ -101,18 +99,6 @@ jobs:
           key: ${{ runner.os }}-pip-3.10-${{ hashFiles('**/requirements.txt', 'setup.cfg') }}
           restore-keys: |
             ${{ runner.os }}-pip-3.10
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - name: Cache yarn
-        uses: actions/cache@v3
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
 
       # First run the benchmark on the reference
       - name: Checkout reference branch
@@ -135,7 +121,6 @@ jobs:
         # This is done after installing the reference in order to have jlpm available.
         run: |
           set -ex
-          pip install ipywidgets plotly
           pip install jupyterlab-ui-profiler
           jupyter labextension disable @jupyterlab/ui-profiler:user-interface
 
@@ -174,21 +159,14 @@ jobs:
         working-directory: benchmarks/tests
         run: |
           set -ex
-          # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.reference_project }} -u --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
-
-          # -u is needed to generate the benchmark expected file
-          yarn run test --project ${{ inputs.reference_project }} -u --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
-          cp tests-out/lab-benchmark-expected.json /tmp/
+          yarn run test jupyterlab/ui-profiler.specs.ts --project ${{ inputs.reference_project }} --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
+          mv playwright-report report-reference
 
       - name: Kill the server
         shell: bash
         run: |
           kill -s SIGKILL $(pgrep jupyter-lab)
           pip uninstall --yes jupyterlab
-
-          # Remove generated test files to keep only one copy from challenger test
-          rm -rf /tmp/benchmarks-*
 
       # Second benchmark run on the challenger
       - name: Checkout challenger
@@ -207,8 +185,6 @@ jobs:
           bash ./scripts/ci_install.sh
           # Build dev mode
           jlpm run build
-          # Copy reference here so if it fails, the workflow will be in error
-          cp /tmp/lab-benchmark-expected.json ./tests-out
         working-directory: challenger
 
       - name: Launch JupyterLab (challenger)
@@ -231,55 +207,9 @@ jobs:
           BENCHMARK_EXPECTED_REFERENCE: ${{ inputs.reference_branch }}
         run: |
           set -ex
-          # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.challenger_project }} -u --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
-
-          # Copy reference here otherwise it will use the value from the update screenshots
-          # command called just before
-          cp /tmp/lab-benchmark-expected.json ./tests-out
-
-          yarn run test --project ${{ inputs.challenger_project }} --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
+          yarn run test jupyterlab/ui-profiler.specs.ts --project ${{ inputs.challenger_project }} --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
+          mv playwright-report report-challenger
         working-directory: benchmarks/tests
-
-      - name: Generate the report
-        env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPORT: ./benchmark-results/lab-benchmark.md
-        shell: bash
-        working-directory: benchmarks/tests
-        run: |
-          # Publish image to cml.dev
-          echo "" >> ${REPORT}
-          # cml-publish ./benchmark-results/lab-benchmark.svg --md >> ${REPORT} || true
-
-          echo "${{ inputs.event == 'schedule' && 'Expected' || inputs.reference_branch }} = [${{ env.OLD_REF_SHA }}](https://github.com/jupyterlab/jupyterlab/commit/${{ env.OLD_REF_SHA }}) | ${{ inputs.event == 'schedule' && 'Actual' || env.CHALLENGER_REF }} = [${{ env.NEW_REF_SHA }}](https://github.com/${{ env.CHALLENGER_REPOSITORY }}/commit/${{ env.NEW_REF_SHA }})" >> ${REPORT}
-          echo "[Go to action log](https://github.com/jupyterlab/benchmarks/actions/runs/${{ github.run_id }})" >> ${REPORT}
-          if [[ "${{ env.CHALLENGER_REPOSITORY }}" == "jupyterlab/jupyterlab" ]]; then
-            echo "[Changelog covered](https://github.com/jupyterlab/jupyterlab/compare/${{ env.OLD_REF_SHA }}...${{ env.NEW_REF_SHA }})" >> ${REPORT}
-          fi
-          echo "" >> ${REPORT}
-
-          # Test if metadata have changed
-          export METADATA_DIFF="/tmp/metadata.diff"
-          diff -u <(jq --sort-keys .metadata benchmark-results/lab-benchmark.json) <(jq --sort-keys .metadata ./tests-out/lab-benchmark-expected.json) > ${METADATA_DIFF} || true
-          if [[ -s ${METADATA_DIFF} ]]; then
-            echo "<details><summary>:exclamation: Test metadata have changed</summary>" >> ${REPORT}
-            echo "" >> ${REPORT}
-            echo "\`\`\`diff" >> ${REPORT}
-            cat ${METADATA_DIFF} >> ${REPORT}
-            echo "\`\`\`" >> ${REPORT}
-            echo "" >> ${REPORT}
-            echo "</details>" >> ${REPORT}
-          fi
-
-          # Copy the reference data to upload it as artifact
-          cp ./tests-out/lab-benchmark-expected.json ./benchmark-results/
-
-      - name: Set job summary
-        if: always()
-        shell: bash
-        run: |
-          cat ./benchmarks/tests/benchmark-results/lab-benchmark.md >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Benchmark Test assets
         if: always()
@@ -287,12 +217,8 @@ jobs:
         with:
           name: ${{ inputs.artifacts_name }}
           path: |
-            benchmarks/tests/benchmark-results
-            benchmarks/tests/test-results/**/*.webm
-            benchmarks/tests/test-results/*-1-*
-            benchmarks/tests/tests-out/**/*.png
-            /tmp/benchmarks-*
-            !/tmp/benchmarks-*/**/.ipynb_checkpoints
+            benchmarks/tests/report-reference
+            benchmarks/tests/report-challenger
 
       - name: Print JupyterLab logs
         if: always()
