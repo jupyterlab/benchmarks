@@ -45,6 +45,9 @@ interface ITestCase {
 const LOREM_IPSUM =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
+const reference =
+  process.env["BENCHMARK_REFERENCE"] ?? benchmark.DEFAULT_REFERENCE;
+
 const scenarios: Record<string, ITestCase> = {
   completer: {
     options: {
@@ -154,6 +157,7 @@ test.describe("Measure execution time", () => {
         tmpPath,
         profiler,
       }, testInfo) => {
+        test.setTimeout((benchmark.nSamples / 10) * 60 * 1000);
         const notebookPath = `${tmpPath}/${file}`;
 
         const scenarioId = scenario.scenarioId ?? id;
@@ -207,12 +211,11 @@ test.describe("Benchmark style sheets @slow", () => {
   for (const [id, scenario] of Object.entries(scenarios)) {
     for (const file of fileNames) {
       test(`${id} (notebook=${file})`, async ({
-        browserName,
         page,
         tmpPath,
         profiler,
       }, testInfo) => {
-        test.setTimeout(10 * 60 * 1000);
+        test.setTimeout((benchmark.nSamples / 10) * 60 * 1000 * 10);
         const notebookPath = `${tmpPath}/${file}`;
 
         const scenarioId = scenario.scenarioId ?? id;
@@ -242,22 +245,10 @@ test.describe("Benchmark style sheets @slow", () => {
           Awaited<ReturnType<typeof styleSheetsBenchmark.run>>
         >;
 
-        const reference = result.outcome.reference;
-        for (let sheet of result.outcome.results) {
-          const sheetId = sheet.source || sheet.content;
-          testInfo.attachments.push(
-            benchmark.addAttachment({
-              benchmark: "style-sheet",
-              browser: browserName,
-              test: `${id}:style-sheet:${sheetId}`,
-              file: file,
-              times: sheet.times,
-              reference: reference,
-              project: testInfo.project.name,
-              profiler: true,
-            })
-          );
-        }
+        testInfo.attach(`${reference}-${id}:style-sheet.json`, {
+          body: JSON.stringify(result),
+          contentType: "application/json",
+        });
       });
     }
   }
