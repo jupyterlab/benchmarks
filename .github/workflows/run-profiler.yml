@@ -37,7 +37,7 @@ on:
       samples:
         description: "Number of samples to compute (individual tests multiply this number by their a test-speicific factor)"
         required: false
-        default: "100"
+        default: "50"
         type: "string"
       artifacts_name:
         description: "Uploaded benchmark assets name"
