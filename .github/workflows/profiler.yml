@@ -57,7 +57,7 @@ on:
       samples:
         description: "Number of samples to compute (individual tests multiply this number by their a test-speicific factor)"
         required: false
-        default: "100"
+        default: "50"
         type: string
       grep:
         description: "Tests to include (grep expression)"
@@ -65,9 +65,9 @@ on:
         default: ""
         type: string
       grep_invert:
-        description: "Tests to skip (grep expression)"
+        description: "Tests to skip (grep expression). Benchmarking individual rules requires a lot of time (reduce number of samples!)"
         required: false
-        default: ""
+        default: "rules"
         type: string
 
 permissions:
@@ -84,7 +84,7 @@ jobs:
       reference_branch: ${{ github.event.inputs.reference_branch || 'master' }}
       reference_project: ${{ github.event.inputs.reference_project || 'jupyterlab' }}
       browser: ${{ github.event.inputs.browser || 'chromium' }}
-      samples: ${{ github.event.inputs.samples || '100' }}
+      samples: ${{ github.event.inputs.samples || '50' }}
       grep: ${{ github.event.inputs.grep || '' }}
       grep_invert: ${{ github.event.inputs.grep_invert || '' }}
       artifacts_name: 'profiler-report'

@@ -12,7 +12,10 @@ import type {
   ExecutionTimeBenchmarkOptions,
   BenchmarkOptions,
 } from "@jupyterlab/ui-profiler";
-import type { styleSheetsBenchmark } from "@jupyterlab/ui-profiler/lib/styleBenchmarks";
+import type {
+  styleSheetsBenchmark,
+  styleRuleBenchmark,
+} from "@jupyterlab/ui-profiler/lib/styleBenchmarks";
 import * as path from "path";
 import { test } from "../fixtures/ui-profiler";
 
@@ -135,6 +138,9 @@ const scenarios: Record<string, ITestCase> = {
 // Upload test notebooks
 test.beforeEach(async ({ baseURL, tmpPath }) => {
   const contents = galata.newContentsHelper(baseURL);
+  if (!(await contents.directoryExists(tmpPath))) {
+    await contents.createDirectory(tmpPath);
+  }
   for (const fileName of fileNames) {
     await contents.uploadFile(
       path.resolve(__dirname, `../../../examples/manual/${fileName}`),
@@ -157,7 +163,8 @@ test.describe("Measure execution time", () => {
         tmpPath,
         profiler,
       }, testInfo) => {
-        test.setTimeout((benchmark.nSamples / 10) * 60 * 1000);
+        // 2 minutes for setup/teardown + 1 minute for each 25 samples
+        test.setTimeout((benchmark.nSamples / 25 + 2) * 60 * 1000);
         const notebookPath = `${tmpPath}/${file}`;
 
         const scenarioId = scenario.scenarioId ?? id;
@@ -215,7 +222,8 @@ test.describe("Benchmark style sheets @slow", () => {
         tmpPath,
         profiler,
       }, testInfo) => {
-        test.setTimeout((benchmark.nSamples / 10) * 60 * 1000 * 10);
+        // 2 minutes for setup/teardown + 1 minute for each 5 samples
+        test.setTimeout((benchmark.nSamples / 5 + 2) * 60 * 1000 * 10);
         const notebookPath = `${tmpPath}/${file}`;
 
         const scenarioId = scenario.scenarioId ?? id;
@@ -246,6 +254,54 @@ test.describe("Benchmark style sheets @slow", () => {
         >;
 
         testInfo.attach(`${reference}-${id}:style-sheet.json`, {
+          body: JSON.stringify(result),
+          contentType: "application/json",
+        });
+      });
+    }
+  }
+});
+
+test.describe("Benchmark style rules @slow", () => {
+  for (const [id, scenario] of Object.entries(scenarios)) {
+    for (const file of fileNames) {
+      test(`${id} (notebook=${file})`, async ({
+        page,
+        tmpPath,
+        profiler,
+      }, testInfo) => {
+        // 2 minutes for setup/teardown + 2 minute for each sample
+        test.setTimeout((benchmark.nSamples * 2 + 2) * 60 * 1000 * 10);
+        const notebookPath = `${tmpPath}/${file}`;
+
+        const scenarioId = scenario.scenarioId ?? id;
+        const openNotebook = scenario.openNotebook ?? true;
+        const multiplier = scenario.sampleMultiplier ?? 1;
+        const options =
+          scenario.options instanceof Function
+            ? scenario.options(notebookPath)
+            : scenario.options;
+
+        if (openNotebook) {
+          await page.notebook.openByPath(notebookPath);
+        }
+
+        const result = (await profiler.runBenchmark(
+          {
+            id: scenarioId,
+            options,
+          },
+          {
+            id: "style-rule",
+            options: {
+              repeats: multiplier * benchmark.nSamples,
+            } as BenchmarkOptions,
+          }
+        )) as IBenchmarkResult<
+          Awaited<ReturnType<typeof styleRuleBenchmark.run>>
+        >;
+
+        testInfo.attach(`${reference}-${id}:style-rule.json`, {
           body: JSON.stringify(result),
           contentType: "application/json",
         });
