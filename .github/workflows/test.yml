@@ -93,16 +93,16 @@ jobs:
           yarn --version
         working-directory: benchmarks/tests
 
-      - name: Launch JupyterLab
-        shell: bash
-        run: |
-          yarn start-jlab 2>&1 > /tmp/jupyterlab_server.log &
-        working-directory: benchmarks/tests
-
       - name: Install testing dependencies
         shell: bash
         run: |
           yarn install
+        working-directory: benchmarks/tests
+
+      - name: Launch JupyterLab
+        shell: bash
+        run: |
+          yarn start-jlab 2>&1 > /tmp/jupyterlab_server.log &
         working-directory: benchmarks/tests
 
       - name: Install browser

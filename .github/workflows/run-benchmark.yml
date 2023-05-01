@@ -184,17 +184,17 @@ jobs:
           jupyter labextension list
         working-directory: benchmarks
 
+      - name: Install testing dependencies
+        shell: bash
+        run: |
+          yarn install
+        working-directory: benchmarks/tests
+
       - name: Launch JupyterLab (reference)
         shell: bash
         run: |
           # Mount a volume to overwrite the server configuration
           yarn start-jlab 2>&1 > /tmp/jupyterlab_server_old.log &
-        working-directory: benchmarks/tests
-
-      - name: Install testing dependencies
-        shell: bash
-        run: |
-          yarn install
         working-directory: benchmarks/tests
 
       - name: Install browser
