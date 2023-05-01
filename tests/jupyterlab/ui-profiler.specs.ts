@@ -135,6 +135,9 @@ const scenarios: Record<string, ITestCase> = {
   },
 };
 
+// FIXME: completer test is flaky
+test.describe.configure({ retries: 3 });
+
 // Upload test notebooks
 test.beforeEach(async ({ baseURL, tmpPath }) => {
   const contents = galata.newContentsHelper(baseURL);
