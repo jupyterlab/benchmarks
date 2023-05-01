@@ -1,4 +1,4 @@
-name: Run JupyterLab Benchmark Tests
+name: Run JupyterLab UI Profiler
 
 on:
   workflow_call:
@@ -10,10 +10,6 @@ on:
         type: string
       challenger_branch:
         description: "Git repository reference to the challenger branch"
-        required: true
-        type: string
-      event:
-        description: "Type of event triggering the workflow (one of 'workflow_dispatch' [default], 'schedule')"
         required: true
         type: string
 
@@ -37,37 +33,27 @@ on:
         description: "Which browser to use (one of 'chromium' [default], 'firefox', 'webkit')"
         required: false
         default: "chromium"
-        type: string
+        type: "string"
       samples:
-        description: "Number of samples to compute"
+        description: "Number of samples to compute (individual tests multiply this number by their a test-speicific factor)"
         required: false
         default: "100"
-        type: string
-      tests:
-        description: 'List of test notebooks to include (available ["codeNotebook", "mdNotebook", "largeMetadata", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"])'
-        required: false
-        default: '["codeNotebook", "mdNotebook", "longOutput", "errorOutputs"]'
-        type: string
-      test_steps:
-        description: 'List of test steps for each notebook (available ["open", "switch-with-copy", "switch-with-txt", "search", "start-debug", "close"])'
-        required: false
-        default: '["open", "switch-with-copy", "switch-with-txt", "close"]'
-        type: string
-      size:
-        description: "Test files size (bigger means larger test files)"
-        required: false
-        default: "100"
-        type: string
+        type: "string"
       artifacts_name:
         description: "Uploaded benchmark assets name"
         required: false
-        default: "benchmark-assets"
-        type: string
+        default: "profiler-assets"
+        type: "string"
+      grep:
+        description: "Tests to include"
+        required: false
+        default: "ui-profiler"
+        type: "string"
       grep_invert:
         description: "Tests to skip"
         required: false
-        default: "@slow"
-        type: string
+        default: ""
+        type: "string"
 
 env:
   YARN_ENABLE_IMMUTABLE_INSTALLS: 0
@@ -76,7 +62,7 @@ permissions:
   issues: write
 
 jobs:
-  run-benchmark:
+  run-profiler:
     runs-on: ubuntu-22.04
 
     env:
@@ -84,14 +70,6 @@ jobs:
       BROWSER_NAME: ${{ inputs.browser }}
       # How many samples to compute the statistical distribution
       BENCHMARK_NUMBER_SAMPLES: ${{ inputs.samples }}
-      # How many times to switch between each tabs
-      BENCHMARK_SWITCHES: 3
-      # The test notebook size
-      BENCHMARK_MAX_N: ${{ inputs.size }}
-      # Notebooks to test
-      BENCHMARK_NOTEBOOKS: ${{ inputs.tests }}
-      # Test steps to measure on each test notebook
-      BENCHMARK_STEPS: ${{ inputs.test_steps }}
 
       # Repository to clone for scheduled benchmark
       CHALLENGER_REPOSITORY: ${{ inputs.challenger }}
@@ -145,23 +123,6 @@ jobs:
           ref: ${{ inputs.reference_branch }}
           path: reference
 
-      - name: Checkout reference branch - schedule
-        if: ${{ inputs.event == 'schedule' }}
-        uses: actions/checkout@v3
-        with:
-          repository: ${{ env.CHALLENGER_REPOSITORY }}
-          ref: ${{ env.CHALLENGER_REF }}
-          path: reference
-          # Need to fetch enough nodes to get the commit of a week ago
-          fetch-depth: 100
-
-      - name: Checkout reference commit - schedule
-        if: ${{ inputs.event == 'schedule' }}
-        run: |
-          export OLD_REF_SHA=$(git log --since="1 week ago" --format='%H' | tail -n1)
-          git checkout ${OLD_REF_SHA}
-        working-directory: reference
-
       - name: Install reference
         run: |
           set -ex
@@ -176,7 +137,6 @@ jobs:
         run: |
           set -ex
           pip install ipywidgets plotly
-          pip install -v extensions/fixed-data-table
           pip install jupyterlab-ui-profiler
           jupyter labextension disable @jupyterlab/ui-profiler:user-interface
 
@@ -216,10 +176,10 @@ jobs:
         run: |
           set -ex
           # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.reference_project }} -u --grep-invert ${{ inputs.grep_invert }}
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.reference_project }} -u --grep-invert ${{ inputs.grep_invert }} --grep ${{ inputs.grep }}
 
           # -u is needed to generate the benchmark expected file
-          yarn run test --project ${{ inputs.reference_project }} -u --grep-invert ${{ inputs.grep_invert }}
+          yarn run test --project ${{ inputs.reference_project }} -u --grep-invert ${{ inputs.grep_invert }} --grep ${{ inputs.grep }}
           cp tests-out/lab-benchmark-expected.json /tmp/
 
       - name: Kill the server
@@ -268,18 +228,18 @@ jobs:
         continue-on-error: true
         shell: bash
         env:
-          BENCHMARK_REFERENCE: ${{ inputs.event == 'schedule' && 'head' || env.CHALLENGER_REF }}
-          BENCHMARK_EXPECTED_REFERENCE: ${{ inputs.event == 'schedule' && '1 week ago' || inputs.reference_branch }}
+          BENCHMARK_REFERENCE: ${{ inputs.challenger_branch }}
+          BENCHMARK_EXPECTED_REFERENCE: ${{ inputs.reference_branch }}
         run: |
           set -ex
           # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.challenger_project }} -u --grep-invert ${{ inputs.grep_invert }}
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.challenger_project }} -u --grep-invert ${{ inputs.grep_invert }} --grep ${{ inputs.grep }}
 
           # Copy reference here otherwise it will use the value from the update screenshots
           # command called just before
           cp /tmp/lab-benchmark-expected.json ./tests-out
 
-          yarn run test --project ${{ inputs.challenger_project }} --grep-invert ${{ inputs.grep_invert }}
+          yarn run test --project ${{ inputs.challenger_project }} --grep-invert ${{ inputs.grep_invert }} --grep ${{ inputs.grep }}
         working-directory: benchmarks/tests
 
       - name: Generate the report
@@ -291,7 +251,8 @@ jobs:
         run: |
           # Publish image to cml.dev
           echo "" >> ${REPORT}
-          cml-publish ./benchmark-results/lab-benchmark.svg --md >> ${REPORT} || true
+          # cml-publish ./benchmark-results/lab-benchmark.svg --md >> ${REPORT} || true
+
           echo "${{ inputs.event == 'schedule' && 'Expected' || inputs.reference_branch }} = [${{ env.OLD_REF_SHA }}](https://github.com/jupyterlab/jupyterlab/commit/${{ env.OLD_REF_SHA }}) | ${{ inputs.event == 'schedule' && 'Actual' || env.CHALLENGER_REF }} = [${{ env.NEW_REF_SHA }}](https://github.com/${{ env.CHALLENGER_REPOSITORY }}/commit/${{ env.NEW_REF_SHA }})" >> ${REPORT}
           echo "[Go to action log](https://github.com/jupyterlab/benchmarks/actions/runs/${{ github.run_id }})" >> ${REPORT}
           if [[ "${{ env.CHALLENGER_REPOSITORY }}" == "jupyterlab/jupyterlab" ]]; then
@@ -320,22 +281,6 @@ jobs:
         shell: bash
         run: |
           cat ./benchmarks/tests/benchmark-results/lab-benchmark.md >> $GITHUB_STEP_SUMMARY
-
-      - name: Publish the report
-        if: ${{ inputs.event == 'schedule' }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const fs = require('fs');
-            const issue_number = 127;
-            const report = String(fs.readFileSync('./benchmarks/tests/benchmark-results/lab-benchmark.md'))
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue_number,
-              body: report
-            });
 
       - name: Upload Benchmark Test assets
         if: always()

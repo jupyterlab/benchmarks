@@ -1,4 +1,4 @@
-name: JupyterLab Benchmark Tests
+name: JupyterLab UI Profiler
 
 on:
   workflow_dispatch:
@@ -53,46 +53,37 @@ on:
           - firefox
           - webkit
       samples:
-        description: "Number of samples to compute"
+        description: "Number of samples to compute (individual tests multiply this number by their a test-speicific factor)"
         required: false
         default: "100"
-      tests:
-        description: 'List of test notebooks to include (available ["codeNotebook", "mdNotebook", "largeMetadata", "largePlotly", "longOutput", "manyPlotly", "manyOutputs", "errorOutputs"])'
+        type: string
+      grep:
+        description: "Tests to include (grep expression)"
         required: false
-        default: '["codeNotebook", "mdNotebook", "longOutput"]'
-      test_steps:
-        description: 'List of test steps for each notebook (available ["open", "switch-with-copy", "switch-with-txt", "search", "start-debug", "close"])'
+        default: ""
+        type: string
+      grep_invert:
+        description: "Tests to skip (grep expression)"
         required: false
-        default: '["open", "switch-with-copy", "switch-with-txt", "close"]'
-      size:
-        description: "Test files size (bigger means larger test files)"
-        required: false
-        default: "100"
+        default: ""
+        type: string
 
 permissions:
   issues: write
 
 jobs:
   test:
-    # uses: jupyterlab/benchmarks/.github/workflows/run-benchmark.yml@master
-    uses: ./.github/workflows/run-benchmark.yml
+    # uses: jupyterlab/benchmarks/.github/workflows/run-profiler.yml@master
+    uses: ./.github/workflows/run-profiler.yml
     with:
       event: ${{ github.event_name }}
-      # Repository to clone for scheduled benchmark
       challenger: ${{ github.event.inputs.challenger || 'jupyterlab/jupyterlab' }}
-      # Branch to checkout for scheduled benchmark
       challenger_branch: ${{ github.event.inputs.challenger_branch || 'master' }}
       challenger_project: ${{ github.event.inputs.challenger_project || 'jupyterlab' }}
       reference_branch: ${{ github.event.inputs.reference_branch || 'master' }}
       reference_project: ${{ github.event.inputs.reference_project || github.event.inputs.challenger_project || 'jupyterlab' }}
-      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
       browser: ${{ github.event.inputs.browser || 'chromium' }}
-      # How many samples to compute the statistical distribution
       samples: ${{ github.event.inputs.samples || '100' }}
-      # Notebooks to test
-      tests: ${{ github.event.inputs.tests || '["codeNotebook", "mdNotebook", "longOutput"]' }}
-      # Test steps to measure on each test notebook
-      test_steps: ${{ github.event.inputs.test_steps || '["open", "switch-with-copy", "switch-with-txt", "close"]' }}
-      # The test notebook size
-      size: ${{ github.event.inputs.size || '100' }}
-      artifacts_name: 'benchmarks-report'
+      grep: ${{ github.event.inputs.grep || '' }}
+      grep_invert: ${{ github.event.inputs.grep_invert || '' }}
+      artifacts_name: 'profiler-report'

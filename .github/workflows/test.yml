@@ -124,9 +124,9 @@ jobs:
         run: |
           set -ex
           # Update the snapshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project testing -u
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project testing -u --grep-invert @slow
           # Check that all tests pass with updated snapshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project testing
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project testing --grep-invert @slow
 
       - name: Kill the server
         if: always()
