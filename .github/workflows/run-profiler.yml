@@ -175,10 +175,10 @@ jobs:
         run: |
           set -ex
           # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.reference_project }} -u --grep-invert ${{ inputs.grep_invert }} --grep ${{ inputs.grep }}
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.reference_project }} -u --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
 
           # -u is needed to generate the benchmark expected file
-          yarn run test --project ${{ inputs.reference_project }} -u --grep-invert ${{ inputs.grep_invert }} --grep ${{ inputs.grep }}
+          yarn run test --project ${{ inputs.reference_project }} -u --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
           cp tests-out/lab-benchmark-expected.json /tmp/
 
       - name: Kill the server
@@ -232,13 +232,13 @@ jobs:
         run: |
           set -ex
           # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.challenger_project }} -u --grep-invert ${{ inputs.grep_invert }} --grep ${{ inputs.grep }}
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.challenger_project }} -u --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
 
           # Copy reference here otherwise it will use the value from the update screenshots
           # command called just before
           cp /tmp/lab-benchmark-expected.json ./tests-out
 
-          yarn run test --project ${{ inputs.challenger_project }} --grep-invert ${{ inputs.grep_invert }} --grep ${{ inputs.grep }}
+          yarn run test --project ${{ inputs.challenger_project }} --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
         working-directory: benchmarks/tests
 
       - name: Generate the report
