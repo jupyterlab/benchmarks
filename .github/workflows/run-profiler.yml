@@ -1,0 +1,227 @@
+name: Run JupyterLab UI Profiler
+
+on:
+  workflow_call:
+    inputs:
+      # Mandatory inputs
+      challenger:
+        description: "JupyterLab Git repository with the challenger version (format {owner}/{repo})"
+        required: true
+        type: string
+      challenger_branch:
+        description: "Git repository reference to the challenger branch"
+        required: true
+        type: string
+
+      # Optional inputs
+      challenger_project:
+        description: "Playwright project to execute on the challenger version"
+        required: false
+        default: "jupyterlab"
+        type: "string"
+      reference_branch:
+        description: "Reference branch on the JupyterLab repository (default: master)"
+        required: false
+        default: "master"
+        type: string
+      reference_project:
+        description: "Playwright project to execute on the reference version"
+        required: false
+        default: "jupyterlab"
+        type: "string"
+      browser:
+        description: "Which browser to use (one of 'chromium' [default], 'firefox', 'webkit')"
+        required: false
+        default: "chromium"
+        type: "string"
+      samples:
+        description: "Number of samples to compute (individual tests multiply this number by their a test-speicific factor)"
+        required: false
+        default: "50"
+        type: "string"
+      artifacts_name:
+        description: "Uploaded benchmark assets name"
+        required: false
+        default: "profiler-assets"
+        type: "string"
+      grep:
+        description: "Tests to include"
+        required: false
+        default: "ui-profiler"
+        type: "string"
+      grep_invert:
+        description: "Tests to skip"
+        required: false
+        default: ""
+        type: "string"
+
+env:
+  YARN_ENABLE_IMMUTABLE_INSTALLS: 0
+
+permissions:
+  issues: write
+
+jobs:
+  run-profiler:
+    runs-on: ubuntu-22.04
+
+    env:
+      # Which browser to use (one of 'chromium', 'firefox', 'webkit')
+      BROWSER_NAME: ${{ inputs.browser }}
+      # How many samples to compute the statistical distribution
+      BENCHMARK_NUMBER_SAMPLES: ${{ inputs.samples }}
+
+      # Repository to clone for scheduled benchmark
+      CHALLENGER_REPOSITORY: ${{ inputs.challenger }}
+      # Branch to checkout for scheduled benchmark
+      CHALLENGER_REF: ${{ inputs.challenger_branch }}
+
+    steps:
+      - name: Checkout benchmarks project
+        uses: actions/checkout@v3
+        with:
+          path: benchmarks
+
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Cache pip on Linux
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-3.10-${{ hashFiles('**/requirements.txt', 'setup.cfg') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-3.10
+
+      # First run the benchmark on the reference
+      - name: Checkout reference branch
+        uses: actions/checkout@v3
+        with:
+          repository: jupyterlab/jupyterlab
+          ref: ${{ inputs.reference_branch }}
+          path: reference
+
+      - name: Install reference
+        run: |
+          set -ex
+          echo "OLD_REF_SHA=$(git log -n1 --format='%H')" >> $GITHUB_ENV
+          bash ./scripts/ci_install.sh
+          # Build dev mode
+          jlpm run build
+        working-directory: reference
+
+      - name: Install extensions
+        # This is done after installing the reference in order to have jlpm available.
+        run: |
+          set -ex
+          pip install jupyterlab-ui-profiler
+          jupyter labextension disable @jupyterlab/ui-profiler:user-interface
+
+          jupyter server extension list
+          jupyter labextension list
+        working-directory: benchmarks
+
+      - name: Install testing dependencies
+        shell: bash
+        run: |
+          yarn install
+        working-directory: benchmarks/tests
+
+      - name: Launch JupyterLab (reference)
+        shell: bash
+        run: |
+          # Mount a volume to overwrite the server configuration
+          yarn start-jlab 2>&1 > /tmp/jupyterlab_server_old.log &
+        working-directory: benchmarks/tests
+
+      - name: Install browser
+        run: |
+          set -ex
+          # Install only Chromium browser
+          yarn playwright install chromium
+        working-directory: benchmarks/tests
+
+      - name: Wait for JupyterLab
+        uses: ifaxity/wait-on-action@v1
+        with:
+          resource: http-get://localhost:9999/lab
+          timeout: 360000
+
+      - name: Execute benchmark tests (reference)
+        continue-on-error: true
+        working-directory: benchmarks/tests
+        run: |
+          set -ex
+          yarn run test jupyterlab/ui-profiler.specs.ts --project ${{ inputs.reference_project }} --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
+          mv playwright-report report-reference
+
+      - name: Kill the server
+        shell: bash
+        run: |
+          kill -s SIGKILL $(pgrep jupyter-lab)
+          pip uninstall --yes jupyterlab
+
+      # Second benchmark run on the challenger
+      - name: Checkout challenger
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.CHALLENGER_REPOSITORY }}
+          ref: ${{ env.CHALLENGER_REF }}
+          path: challenger
+
+      - name: Install challenger
+        run: |
+          set -ex
+          # Fix for installing JupyterLab 1
+          rm -rf /home/runner/.jupyter || true
+          echo "NEW_REF_SHA=$(git log -n1 --format='%H')" >> $GITHUB_ENV
+          bash ./scripts/ci_install.sh
+          # Build dev mode
+          jlpm run build
+        working-directory: challenger
+
+      - name: Launch JupyterLab (challenger)
+        shell: bash
+        run: |
+          yarn start-jlab 2>&1 > /tmp/jupyterlab_server_new.log &
+        working-directory: benchmarks/tests
+
+      - name: Wait for JupyterLab
+        uses: ifaxity/wait-on-action@v1
+        with:
+          resource: http-get://localhost:9999/lab
+          timeout: 360000
+
+      - name: Execute benchmark tests (challenger)
+        continue-on-error: true
+        shell: bash
+        env:
+          BENCHMARK_REFERENCE: ${{ inputs.challenger_branch }}
+          BENCHMARK_EXPECTED_REFERENCE: ${{ inputs.reference_branch }}
+        run: |
+          set -ex
+          yarn run test jupyterlab/ui-profiler.specs.ts --project ${{ inputs.challenger_project }} --grep-invert '${{ inputs.grep_invert }}' --grep '${{ inputs.grep }}'
+          mv playwright-report report-challenger
+        working-directory: benchmarks/tests
+
+      - name: Upload Benchmark Test assets
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.artifacts_name }}
+          path: |
+            benchmarks/tests/report-reference
+            benchmarks/tests/report-challenger
+
+      - name: Print JupyterLab logs
+        if: always()
+        run: |
+          cat /tmp/jupyterlab_server_old.log
+          cat /tmp/jupyterlab_server_new.log

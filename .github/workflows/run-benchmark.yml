@@ -63,6 +63,14 @@ on:
         required: false
         default: "benchmark-assets"
         type: string
+      grep_invert:
+        description: "Tests to skip"
+        required: false
+        default: "@slow"
+        type: string
+
+env:
+  YARN_ENABLE_IMMUTABLE_INSTALLS: 0
 
 permissions:
   issues: write
@@ -154,7 +162,7 @@ jobs:
           git checkout ${OLD_REF_SHA}
         working-directory: reference
 
-      - name: Install dependencies
+      - name: Install reference
         run: |
           set -ex
           echo "OLD_REF_SHA=$(git log -n1 --format='%H')" >> $GITHUB_ENV
@@ -169,24 +177,31 @@ jobs:
           set -ex
           pip install ipywidgets plotly
           pip install -v extensions/fixed-data-table
+          pip install jupyterlab-ui-profiler
+          jupyter labextension disable @jupyterlab/ui-profiler:user-interface
 
           jupyter server extension list
           jupyter labextension list
         working-directory: benchmarks
 
-      - name: Launch JupyterLab
+      - name: Install testing dependencies
         shell: bash
         run: |
-          jlpm install
+          yarn install
+        working-directory: benchmarks/tests
+
+      - name: Launch JupyterLab (reference)
+        shell: bash
+        run: |
           # Mount a volume to overwrite the server configuration
-          jlpm start-jlab 2>&1 > /tmp/jupyterlab_server_old.log &
+          yarn start-jlab 2>&1 > /tmp/jupyterlab_server_old.log &
         working-directory: benchmarks/tests
 
       - name: Install browser
         run: |
           set -ex
           # Install only Chromium browser
-          jlpm playwright install chromium
+          yarn playwright install chromium
         working-directory: benchmarks/tests
 
       - name: Wait for JupyterLab
@@ -195,16 +210,16 @@ jobs:
           resource: http-get://localhost:9999/lab
           timeout: 360000
 
-      - name: Execute benchmark tests
+      - name: Execute benchmark tests (reference)
         continue-on-error: true
         working-directory: benchmarks/tests
         run: |
           set -ex
           # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 jlpm run test --project ${{ inputs.reference_project }} -u
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.reference_project }} -u --grep-invert '${{ inputs.grep_invert }}'
 
           # -u is needed to generate the benchmark expected file
-          jlpm run test --project ${{ inputs.reference_project }} -u
+          yarn run test --project ${{ inputs.reference_project }} -u --grep-invert '${{ inputs.grep_invert }}'
           cp tests-out/lab-benchmark-expected.json /tmp/
 
       - name: Kill the server
@@ -224,7 +239,7 @@ jobs:
           ref: ${{ env.CHALLENGER_REF }}
           path: challenger
 
-      - name: Install dependencies
+      - name: Install challenger
         run: |
           set -ex
           # Fix for installing JupyterLab 1
@@ -237,11 +252,10 @@ jobs:
           cp /tmp/lab-benchmark-expected.json ./tests-out
         working-directory: challenger
 
-      - name: Launch JupyterLab
+      - name: Launch JupyterLab (challenger)
         shell: bash
         run: |
-          # Mount a volume to overwrite the server configuration
-          jlpm start-jlab 2>&1 > /tmp/jupyterlab_server_new.log &
+          yarn start-jlab 2>&1 > /tmp/jupyterlab_server_new.log &
         working-directory: benchmarks/tests
 
       - name: Wait for JupyterLab
@@ -250,7 +264,7 @@ jobs:
           resource: http-get://localhost:9999/lab
           timeout: 360000
 
-      - name: Execute benchmark tests
+      - name: Execute benchmark tests (challenger)
         continue-on-error: true
         shell: bash
         env:
@@ -259,13 +273,13 @@ jobs:
         run: |
           set -ex
           # Update test screenshots
-          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 jlpm run test --project ${{ inputs.challenger_project }} -u
+          BENCHMARK_NUMBER_SAMPLES=1 PW_VIDEO=1 yarn run test --project ${{ inputs.challenger_project }} -u --grep-invert '${{ inputs.grep_invert }}'
 
           # Copy reference here otherwise it will use the value from the update screenshots
           # command called just before
           cp /tmp/lab-benchmark-expected.json ./tests-out
 
-          jlpm run test --project ${{ inputs.challenger_project }}
+          yarn run test --project ${{ inputs.challenger_project }} --grep-invert '${{ inputs.grep_invert }}'
         working-directory: benchmarks/tests
 
       - name: Generate the report
@@ -300,6 +314,12 @@ jobs:
 
           # Copy the reference data to upload it as artifact
           cp ./tests-out/lab-benchmark-expected.json ./benchmark-results/
+
+      - name: Set job summary
+        if: always()
+        shell: bash
+        run: |
+          cat ./benchmarks/tests/benchmark-results/lab-benchmark.md >> $GITHUB_STEP_SUMMARY
 
       - name: Publish the report
         if: ${{ inputs.event == 'schedule' }}

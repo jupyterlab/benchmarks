@@ -29,6 +29,7 @@ MainApp.disable_check_xsrf = True
 c.LabApp.dev_mode = True
 c.LabApp.extensions_in_dev_mode = True
 c.LabApp.expose_app_in_browser = True
+c.LabApp.skip_dev_build = True
 
 c.RetroApp.expose_app_in_browser = True
 

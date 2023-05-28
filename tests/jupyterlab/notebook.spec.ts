@@ -168,7 +168,7 @@ test.describe("JupyterLab Benchmark", () => {
       // Get only the document node to avoid noise from kernel and debugger in the toolbar
       let documentContent = await panel.$(".jp-Notebook");
       // Wait for Plotly figures to resize
-      await page.waitForTimeout(150);
+      await page.waitForTimeout(300);
       expect(await documentContent.screenshot()).toMatchSnapshot(
         `${file.replace(".", "-")}.png`
       );
@@ -230,7 +230,7 @@ test.describe("JupyterLab Benchmark", () => {
           // Get only the document node to avoid noise from kernel and debugger in the toolbar
           documentContent = await panel.$(".jp-Notebook");
           // Wait for Plotly figures to resize
-          await page.waitForTimeout(150);
+          await page.waitForTimeout(300);
           expect(await documentContent.screenshot()).toMatchSnapshot(
             `${file.replace(".", "-")}.png`
           );
@@ -268,7 +268,7 @@ test.describe("JupyterLab Benchmark", () => {
           // Get only the document node to avoid noise from kernel and debugger in the toolbar
           documentContent = await panel.$(".jp-Notebook");
           // Wait for Plotly figures to resize
-          await page.waitForTimeout(150);
+          await page.waitForTimeout(300);
           expect(await documentContent.screenshot()).toMatchSnapshot(
             `${file.replace(".", "-")}.png`
           );
@@ -324,7 +324,7 @@ test.describe("JupyterLab Benchmark", () => {
           // Get only the document node to avoid noise from kernel and debugger in the toolbar
           documentContent = await panel.$(".jp-Notebook");
           // Wait for Plotly figures to resize
-          await page.waitForTimeout(150);
+          await page.waitForTimeout(300);
           expect(await documentContent.screenshot()).toMatchSnapshot(
             `${file.replace(".", "-")}.png`
           );
