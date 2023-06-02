@@ -1,0 +1,112 @@
+name: Markdown parser tests
+
+on:
+  pull_request:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout benchmarks project
+        uses: actions/checkout@v2
+        with:
+          path: benchmarks
+
+      # - name: Install node
+      #   uses: actions/setup-node@v2
+      #   with:
+      #     node-version: "14.x"
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Cache pip on Linux
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-3.8-${{ hashFiles('**/requirements.txt', 'setup.cfg') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-3.8
+
+      # - name: Get yarn cache directory path
+      #   id: yarn-cache-dir-path
+      #   run: echo "::set-output name=dir::$(yarn cache dir)"
+      # - name: Cache yarn
+      #   uses: actions/cache@v1
+      #   id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      #   with:
+      #     path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+      #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        working-directory: benchmarks/markdown-parser
+        run: |
+          set -ex
+          python -m pip install -r requirements.txt
+          python -m playwright install chromium
+
+      # - name: Checkout JupyterLab
+      #   uses: actions/checkout@v2
+      #   with:
+      #     repository: jupyterlab/jupyterlab
+      #     ref: master
+      #     path: reference
+
+      # - name: Install dependencies
+      #   run: |
+      #     set -ex
+      #     echo "OLD_REF_SHA=$(git log -n1 --format='%H')" >> $GITHUB_ENV
+      #     bash ./scripts/ci_install.sh
+      #     # Build dev mode
+      #     jlpm run build
+      #   working-directory: reference
+
+      - name: Launch JupyterLab
+        shell: bash
+        run: |
+          set -ex
+          python -m jupyterlab --config jupyter_lab_config.py 2>&1 > /tmp/jupyterlab_server.log &
+        working-directory: benchmarks/markdown-parser
+
+      - name: Wait for JupyterLab
+        uses: ifaxity/wait-on-action@v1
+        with:
+          resource: http-get://localhost:9999/lab
+          timeout: 360000
+
+      - name: Tests
+        working-directory: benchmarks/markdown-parser
+        run: |
+          set -ex
+          mkdir -p reports
+          # For now limit ot JupyterLab vs GFM
+          pytest -rap -vv --rootdir "$PWD" --base-url "http://localhost:9999" --report-dir "$PWD/reports" tests/test_jupyterlab.py
+
+      - name: Upload pytest reports
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: markdown-parser-report-${{ github.run_number }}
+          path: |
+            benchmarks/markdown-parser/reports
+
+      - name: Kill the server
+        if: always()
+        shell: bash
+        run: |
+          kill -s SIGKILL $(pgrep jupyter-lab)
+
+      - name: Print JupyterLab logs
+        if: always()
+        run: |
+          echo "::group::Server log"
+          cat /tmp/jupyterlab_server.log
+          echo "::endgroup::"
