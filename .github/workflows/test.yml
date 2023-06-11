@@ -57,7 +57,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: jupyterlab/jupyterlab
-          ref: master
+          ref: main
           path: reference
 
       - name: Install dependencies
@@ -153,4 +153,4 @@ jobs:
     uses: ./.github/workflows/run-memory-leak.yml
     with:
       repository: jupyterlab/jupyterlab
-      branch: master
+      branch: main

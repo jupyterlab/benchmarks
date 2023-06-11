@@ -24,9 +24,9 @@ on:
         default: "jupyterlab"
         type: "string"
       reference_branch:
-        description: "Reference branch on the JupyterLab repository (default: master)"
+        description: "Reference branch on the JupyterLab repository (default: main)"
         required: false
-        default: "master"
+        default: "main"
         type: string
       reference_project:
         description: "Playwright project to execute on the reference version"

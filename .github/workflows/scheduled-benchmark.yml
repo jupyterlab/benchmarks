@@ -21,8 +21,8 @@ jobs:
       # Repository to clone for scheduled benchmark
       challenger: 'jupyterlab/jupyterlab'
       # Branch to checkout for scheduled benchmark
-      challenger_branch: 'master'
-      reference_branch: 'master'
+      challenger_branch: 'main'
+      reference_branch: 'main'
       # Which browser to use (one of 'chromium', 'firefox', 'webkit')
       browser: 'chromium'
       # How many samples to compute the statistical distribution
@@ -42,8 +42,8 @@ jobs:
       # Repository to clone for scheduled benchmark
       challenger: 'jupyterlab/jupyterlab'
       # Branch to checkout for scheduled benchmark
-      challenger_branch: 'master'
-      reference_branch: 'master'
+      challenger_branch: 'main'
+      reference_branch: 'main'
       # Which browser to use (one of 'chromium', 'firefox', 'webkit')
       browser: 'chromium'
       # How many samples to compute the statistical distribution
@@ -63,8 +63,8 @@ jobs:
       # Repository to clone for scheduled benchmark
       challenger: 'jupyterlab/jupyterlab'
       # Branch to checkout for scheduled benchmark
-      challenger_branch: 'master'
-      reference_branch: 'master'
+      challenger_branch: 'main'
+      reference_branch: 'main'
       # Which browser to use (one of 'chromium', 'firefox', 'webkit')
       browser: 'chromium'
       # How many samples to compute the statistical distribution
@@ -84,8 +84,8 @@ jobs:
       # Repository to clone for scheduled benchmark
       challenger: 'jupyterlab/jupyterlab'
       # Branch to checkout for scheduled benchmark
-      challenger_branch: 'master'
-      reference_branch: 'master'
+      challenger_branch: 'main'
+      reference_branch: 'main'
       # Which browser to use (one of 'chromium', 'firefox', 'webkit')
       browser: 'chromium'
       # How many samples to compute the statistical distribution
@@ -105,8 +105,8 @@ jobs:
       # Repository to clone for scheduled benchmark
       challenger: 'jupyterlab/jupyterlab'
       # Branch to checkout for scheduled benchmark
-      challenger_branch: 'master'
-      reference_branch: 'master'
+      challenger_branch: 'main'
+      reference_branch: 'main'
       # Which browser to use (one of 'chromium', 'firefox', 'webkit')
       browser: 'chromium'
       # How many samples to compute the statistical distribution

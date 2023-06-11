@@ -23,5 +23,5 @@ jobs:
     uses: ./.github/workflows/run-memory-leak.yml
     with:
       repository: ${{ github.event.inputs.repository || 'jupyterlab/jupyterlab' }}
-      branch: ${{ github.event.inputs.branch || 'master' }}
+      branch: ${{ github.event.inputs.branch || 'main' }}
       samples: ${{ github.event.inputs.samples || '7' }}

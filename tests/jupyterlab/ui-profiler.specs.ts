@@ -1,4 +1,4 @@
-import { benchmark, galata } from "@jupyterlab/galata";
+import { benchmark, galata, IJupyterLabPageFixture } from "@jupyterlab/galata";
 import { JSONObject } from "@lumino/coreutils";
 import type {
   IBenchmarkResult,
@@ -157,6 +157,21 @@ test.afterEach(async ({ tmpPath, baseURL }) => {
   await contents.deleteDirectory(tmpPath);
 });
 
+async function acceptKernelDialog(page: IJupyterLabPageFixture) {
+  const dialogLocator = page.locator(".jp-Dialog");
+  try {
+    // Wait up to three seconds for the kernel selection dialog to appear
+    await dialogLocator.waitFor({ timeout: 3000 });
+  } catch {
+    // no-op
+  }
+  // If the kernel dialog shows up, accept default kernel
+  if (await dialogLocator.isVisible()) {
+    await page.click(".jp-Dialog .jp-mod-accept");
+    await dialogLocator.waitFor({ state: "detached" });
+  }
+}
+
 test.describe("Measure execution time", () => {
   for (const [id, scenario] of Object.entries(scenarios)) {
     for (const file of fileNames) {
@@ -180,6 +195,7 @@ test.describe("Measure execution time", () => {
 
         if (openNotebook) {
           await page.notebook.openByPath(notebookPath);
+          await acceptKernelDialog(page);
         }
 
         const result = (await profiler.runBenchmark(
@@ -206,9 +222,18 @@ test.describe("Measure execution time", () => {
               time: time,
               project: testInfo.project.name,
               profiler: true,
+              granular: true,
             })
           );
         }
+        testInfo.attach(`${reference}-${id}:execution-time.json`, {
+          body: JSON.stringify({
+            ...result,
+            reference,
+            backgroundTab: file,
+          }),
+          contentType: "application/json",
+        });
       });
     }
   }
@@ -239,6 +264,7 @@ test.describe("Benchmark style sheets @slow", () => {
 
         if (openNotebook) {
           await page.notebook.openByPath(notebookPath);
+          await acceptKernelDialog(page);
         }
 
         const result = (await profiler.runBenchmark(
@@ -257,7 +283,11 @@ test.describe("Benchmark style sheets @slow", () => {
         >;
 
         testInfo.attach(`${reference}-${id}:style-sheet.json`, {
-          body: JSON.stringify(result),
+          body: JSON.stringify({
+            ...result,
+            reference,
+            backgroundTab: file,
+          }),
           contentType: "application/json",
         });
       });
@@ -287,6 +317,7 @@ test.describe("Benchmark style rules @slow", () => {
 
         if (openNotebook) {
           await page.notebook.openByPath(notebookPath);
+          await acceptKernelDialog(page);
         }
 
         const result = (await profiler.runBenchmark(
@@ -305,7 +336,11 @@ test.describe("Benchmark style rules @slow", () => {
         >;
 
         testInfo.attach(`${reference}-${id}:style-rule.json`, {
-          body: JSON.stringify(result),
+          body: JSON.stringify({
+            ...result,
+            reference,
+            backgroundTab: file,
+          }),
           contentType: "application/json",
         });
       });
