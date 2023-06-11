@@ -21,6 +21,11 @@ namespace Statistic {
     return sum(numbers) / numbers.length;
   }
 
+  export function round(n: number, precision = 0): number {
+    const factor = Math.pow(10, precision);
+    return Math.round(n * factor) / factor;
+  }
+
   export function sum(numbers: number[]): number {
     if (numbers.length === 0) {
       return 0;
@@ -92,8 +97,8 @@ class UIProfilerReporter implements Reporter {
   async onEnd(result: FullResult) {
     console.log(`Finished the run: ${result.status}`);
 
-    const dir = 'results'
-    if (!fs.existsSync(dir)){
+    const dir = "results";
+    if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir);
     }
 
@@ -101,7 +106,7 @@ class UIProfilerReporter implements Reporter {
     for (const attachment of this._attachments) {
       // `uploadArtifact` forbids colons in file names
       const path = attachment.name.replace(":", "_");
-      fs.writeFileSync(dir + '/' + path, JSON.stringify(attachment));
+      fs.writeFileSync(dir + "/" + path, JSON.stringify(attachment));
       references.add(attachment.reference);
     }
     if (references.size > 1) {
@@ -118,26 +123,32 @@ class UIProfilerReporter implements Reporter {
     const timeMeasurements = this._attachments.filter(
       (a) => a.benchmark === "execution-time"
     );
-    const scenarios = timeMeasurements.map((a) => a.scenario);
-    const backgrounds = timeMeasurements.map((a) => a.backgroundTab);
+    const scenarios = [...new Set(timeMeasurements.map((a) => a.scenario))];
+    const backgrounds = [
+      ...new Set(timeMeasurements.map((a) => a.backgroundTab)),
+    ];
 
     summary.addTable([
-      backgrounds.map((b) => {
-        return { data: b, header: true };
-      }),
-      ...scenarios.map((s) =>
-        backgrounds.map((b) => {
+      [
+        { data: "scenario", header: true },
+        ...backgrounds.map((b) => {
+          return { data: b, header: true };
+        }),
+      ],
+      ...scenarios.map((s) => {
+        const row = backgrounds.map((b) => {
           const result = this._attachments.find(
             (a) => a.backgroundTab === b && a.scenario === s
           );
           const times = result.outcome.results[0].times;
           return (
-            Statistic.mean(times).toString() +
+            Statistic.round(Statistic.mean(times), 2).toString() +
             " ± " +
-            Statistic.standardDeviation(times).toString()
+            Statistic.round(Statistic.standardDeviation(times), 2).toString()
           );
-        })
-      ),
+        });
+        return [s, ...row];
+      }),
     ]);
     await summary.write();
   }

@@ -230,7 +230,7 @@ test.describe("Measure execution time", () => {
           body: JSON.stringify({
             ...result,
             reference,
-            backgroundTab: notebookPath,
+            backgroundTab: file,
           }),
           contentType: "application/json",
         });
@@ -286,7 +286,7 @@ test.describe("Benchmark style sheets @slow", () => {
           body: JSON.stringify({
             ...result,
             reference,
-            backgroundTab: notebookPath,
+            backgroundTab: file,
           }),
           contentType: "application/json",
         });
@@ -339,7 +339,7 @@ test.describe("Benchmark style rules @slow", () => {
           body: JSON.stringify({
             ...result,
             reference,
-            backgroundTab: notebookPath,
+            backgroundTab: file,
           }),
           contentType: "application/json",
         });
