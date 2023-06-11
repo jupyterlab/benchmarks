@@ -25,9 +25,9 @@ on:
           - retrolab
           - testing
       reference_branch:
-        description: "Reference branch on the JupyterLab repository (default: master)"
+        description: "Reference branch on the JupyterLab repository (default: main)"
         required: false
-        default: "master"
+        default: "main"
       reference_project:
         description: "Playwright project to execute on the reference version"
         required: false
@@ -81,9 +81,9 @@ jobs:
       # Repository to clone for scheduled benchmark
       challenger: ${{ github.event.inputs.challenger || 'jupyterlab/jupyterlab' }}
       # Branch to checkout for scheduled benchmark
-      challenger_branch: ${{ github.event.inputs.challenger_branch || 'master' }}
+      challenger_branch: ${{ github.event.inputs.challenger_branch || 'main' }}
       challenger_project: ${{ github.event.inputs.challenger_project || 'jupyterlab' }}
-      reference_branch: ${{ github.event.inputs.reference_branch || 'master' }}
+      reference_branch: ${{ github.event.inputs.reference_branch || 'main' }}
       reference_project: ${{ github.event.inputs.reference_project || 'jupyterlab' }}
       # Which browser to use (one of 'chromium', 'firefox', 'webkit')
       browser: ${{ github.event.inputs.browser || 'chromium' }}

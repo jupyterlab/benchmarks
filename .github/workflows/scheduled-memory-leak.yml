@@ -11,4 +11,4 @@ jobs:
     uses: ./.github/workflows/run-memory-leak.yml
     with:
       repository: jupyterlab/jupyterlab
-      branch: master
+      branch: main
