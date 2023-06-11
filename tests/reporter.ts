@@ -101,8 +101,10 @@ class UIProfilerReporter implements Reporter {
 
     const references = new Set<string>();
     for (const attachment of this._attachments) {
-      fs.writeFileSync(attachment.name, JSON.stringify(attachment));
-      files.push(attachment.name);
+      // `uploadArtifact` forbids colons in file names
+      const path = attachment.name.replace(":", "_");
+      fs.writeFileSync(path, JSON.stringify(attachment));
+      files.push(path);
       references.add(attachment.reference);
     }
     if (references.size > 1) {
