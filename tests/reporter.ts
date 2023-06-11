@@ -8,7 +8,7 @@ import {
 } from "@playwright/test/reporter";
 import * as fs from "fs";
 
-import { summary, notice } from "@actions/core";
+import { summary, notice, error } from "@actions/core";
 import * as artifact from "@actions/artifact";
 
 import type { IBenchmarkResult } from "@jupyterlab/ui-profiler";
@@ -27,6 +27,19 @@ namespace Statistic {
       return 0;
     }
     return numbers.reduce((a, b) => a + b);
+  }
+
+  /**
+   * Implements corrected sample standard deviation.
+   */
+  export function standardDeviation(numbers: number[]): number {
+    if (numbers.length === 0) {
+      return NaN;
+    }
+    const m = mean(numbers);
+    return Math.sqrt(
+      (sum(numbers.map((n) => Math.pow(n - m, 2))) * 1) / (numbers.length - 1)
+    );
   }
 }
 
@@ -77,7 +90,7 @@ class UIProfilerReporter implements Reporter {
     }
   }
 
-  onEnd(result: FullResult) {
+  async onEnd(result: FullResult) {
     console.log(`Finished the run: ${result.status}`);
     const artifactClient = artifact.create();
     const rootDirectory = ".";
@@ -101,7 +114,16 @@ class UIProfilerReporter implements Reporter {
     this._reference = reference;
 
     const artifactName = "UI profiler " + reference;
-    artifactClient.uploadArtifact(artifactName, files, rootDirectory, options);
+    const uploadResult = await artifactClient.uploadArtifact(
+      artifactName,
+      files,
+      rootDirectory,
+      options
+    );
+
+    if (uploadResult.failedItems.length > 0) {
+      error("Upload of some artifacts failed");
+    }
 
     // Add summary table showing average execution time per scenario (rows) per notebook (columns)
     summary.addHeading(this._reference);
@@ -122,10 +144,15 @@ class UIProfilerReporter implements Reporter {
             (a) => a.backgroundTab === b && a.scenario === s
           );
           const times = result.outcome.results[0].times;
-          return Statistic.mean(times).toString();
+          return (
+            Statistic.mean(times).toString() +
+            " ± " +
+            Statistic.standardDeviation(times).toString()
+          );
         })
       ),
     ]);
+    await summary.write();
   }
 
   printsToStdio() {
