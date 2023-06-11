@@ -133,6 +133,10 @@ export default {
       "@jupyterlab/galata/lib/benchmarkReporter",
       { outputFile: "lab-benchmark.json" },
     ],
+    [
+      "./reporter", {}
+    ],
+    ['json', {  outputFile: 'test-results.json' }]
   ],
   use: {
     // Browser options

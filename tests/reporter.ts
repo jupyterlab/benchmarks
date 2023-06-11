@@ -1,0 +1,136 @@
+import {
+  FullConfig,
+  FullResult,
+  Reporter,
+  Suite,
+  TestCase,
+  TestResult,
+} from "@playwright/test/reporter";
+import * as fs from "fs";
+
+import { summary, notice } from "@actions/core";
+import * as artifact from "@actions/artifact";
+
+import type { IBenchmarkResult } from "@jupyterlab/ui-profiler";
+
+// TODO: use `Statistic` from ui-profiler?
+namespace Statistic {
+  export function mean(numbers: number[]): number {
+    if (numbers.length === 0) {
+      return NaN;
+    }
+    return sum(numbers) / numbers.length;
+  }
+
+  export function sum(numbers: number[]): number {
+    if (numbers.length === 0) {
+      return 0;
+    }
+    return numbers.reduce((a, b) => a + b);
+  }
+}
+
+interface IAttachment extends IBenchmarkResult {
+  reference: string;
+  granular?: boolean;
+  backgroundTab: string;
+  name: string;
+}
+
+class UIProfilerReporter implements Reporter {
+  constructor(options: {}) {}
+  private _attachments: IAttachment[] = [];
+  private _reference: string = "unknown";
+
+  onBegin(config: FullConfig, suite: Suite) {
+    console.log(`Starting the run with ${suite.allTests().length} tests`);
+  }
+
+  onTestBegin(test: TestCase, result: TestResult) {
+    console.log(`Starting test ${test.title}`);
+  }
+
+  onTestEnd(test: TestCase, result: TestResult) {
+    console.log(`Finished test ${test.title}: ${result.status}`);
+    if (result.status !== "passed") {
+      return;
+    }
+    const attachments = result.attachments
+      .map((raw) => {
+        const json = JSON.parse(
+          raw.body?.toString() ?? "{}"
+        ) as any as IAttachment;
+        return { ...json, name: raw.name };
+      })
+      .filter((a) => !a.granular && a.reference);
+
+    for (const attachment of attachments) {
+      this._attachments.push(attachment);
+      notice(
+        attachment.benchmark +
+          " of " +
+          attachment.scenario +
+          " completed in " +
+          attachment.outcome.totalTime / 1000 +
+          "s"
+      );
+    }
+  }
+
+  onEnd(result: FullResult) {
+    console.log(`Finished the run: ${result.status}`);
+    const artifactClient = artifact.create();
+    const rootDirectory = ".";
+    const options = {
+      continueOnError: true,
+    };
+    const files: string[] = [];
+
+    const references = new Set<string>();
+    for (const attachment of this._attachments) {
+      fs.writeFileSync(attachment.name, JSON.stringify(attachment));
+      files.push(attachment.name);
+      references.add(attachment.reference);
+    }
+    if (references.size > 1) {
+      throw new Error("More than one reference versions is not supported");
+    } else if (references.size == 0) {
+      throw new Error("No results to report");
+    }
+    const reference = references.values().next().value;
+    this._reference = reference;
+
+    const artifactName = "UI profiler " + reference;
+    artifactClient.uploadArtifact(artifactName, files, rootDirectory, options);
+
+    // Add summary table showing average execution time per scenario (rows) per notebook (columns)
+    summary.addHeading(this._reference);
+
+    const timeMeasurements = this._attachments.filter(
+      (a) => a.benchmark === "execution-time"
+    );
+    const scenarios = timeMeasurements.map((a) => a.scenario);
+    const backgrounds = timeMeasurements.map((a) => a.backgroundTab);
+
+    summary.addTable([
+      backgrounds.map((b) => {
+        return { data: b, header: true };
+      }),
+      ...scenarios.map((s) =>
+        backgrounds.map((b) => {
+          const result = this._attachments.find(
+            (a) => a.backgroundTab === b && a.scenario === s
+          );
+          const times = result.outcome.results[0].times;
+          return Statistic.mean(times).toString();
+        })
+      ),
+    ]);
+  }
+
+  printsToStdio() {
+    return false;
+  }
+}
+
+export default UIProfilerReporter;

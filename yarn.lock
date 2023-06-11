@@ -5,6 +5,37 @@ __metadata:
   version: 6
   cacheKey: 8
 
+"@actions/artifact@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@actions/artifact@npm:1.1.1"
+  dependencies:
+    "@actions/core": ^1.9.1
+    "@actions/http-client": ^2.0.1
+    tmp: ^0.2.1
+    tmp-promise: ^3.0.2
+  checksum: 45e170dc64a1023c29a3cfd74407cb3efcf7b4ac3b764f231ed7f3b18d7684eb4459e80ef610dc5859454d9b57df8565ac4cfe9610dc1e6e86b2d21657685517
+  languageName: node
+  linkType: hard
+
+"@actions/core@npm:^1.10.0, @actions/core@npm:^1.9.1":
+  version: 1.10.0
+  resolution: "@actions/core@npm:1.10.0"
+  dependencies:
+    "@actions/http-client": ^2.0.1
+    uuid: ^8.3.2
+  checksum: 0a75621e007ab20d887434cdd165f0b9036f14c22252a2faed33543d8b9d04ec95d823e69ca636a25245574e4585d73e1e9e47a845339553c664f9f2c9614669
+  languageName: node
+  linkType: hard
+
+"@actions/http-client@npm:^2.0.1":
+  version: 2.1.0
+  resolution: "@actions/http-client@npm:2.1.0"
+  dependencies:
+    tunnel: ^0.0.6
+  checksum: 25a72a952cc95fb4b3ab086da73a5754dd0957c206637cace69be2e16f018cc1b3d3c40d3bcf89ffd8a5929d5e8445594b498b50db306a50ad7536023f8e3800
+  languageName: node
+  linkType: hard
+
 "@babel/code-frame@npm:7.12.11":
   version: 7.12.11
   resolution: "@babel/code-frame@npm:7.12.11"
@@ -438,6 +469,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@jupyterlab/benchmarks-tests@workspace:tests"
   dependencies:
+    "@actions/artifact": ^1.1.1
+    "@actions/core": ^1.10.0
     "@jupyterlab/galata": ^4.3.5
     "@jupyterlab/ui-profiler": ^0.2.1
     "@playwright/test": ^1.30.0
@@ -10891,7 +10924,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:^3.0.2":
+"rimraf@npm:^3.0.0, rimraf@npm:^3.0.2":
   version: 3.0.2
   resolution: "rimraf@npm:3.0.2"
   dependencies:
@@ -12061,12 +12094,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tmp-promise@npm:^3.0.2":
+  version: 3.0.3
+  resolution: "tmp-promise@npm:3.0.3"
+  dependencies:
+    tmp: ^0.2.0
+  checksum: f854f5307dcee6455927ec3da9398f139897faf715c5c6dcee6d9471ae85136983ea06662eba2edf2533bdcb0fca66d16648e79e14381e30c7fb20be9c1aa62c
+  languageName: node
+  linkType: hard
+
 "tmp@npm:^0.0.33":
   version: 0.0.33
   resolution: "tmp@npm:0.0.33"
   dependencies:
     os-tmpdir: ~1.0.2
   checksum: 902d7aceb74453ea02abbf58c203f4a8fc1cead89b60b31e354f74ed5b3fb09ea817f94fb310f884a5d16987dd9fa5a735412a7c2dd088dd3d415aa819ae3a28
+  languageName: node
+  linkType: hard
+
+"tmp@npm:^0.2.0, tmp@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "tmp@npm:0.2.1"
+  dependencies:
+    rimraf: ^3.0.0
+  checksum: 8b1214654182575124498c87ca986ac53dc76ff36e8f0e0b67139a8d221eaecfdec108c0e6ec54d76f49f1f72ab9325500b246f562b926f85bcdfca8bf35df9e
   languageName: node
   linkType: hard
 
@@ -12226,6 +12277,13 @@ __metadata:
   dependencies:
     safe-buffer: ^5.0.1
   checksum: 05f6510358f8afc62a057b8b692f05d70c1782b70db86d6a1e0d5e28a32389e52fa6e7707b6c5ecccacc031462e4bc35af85ecfe4bbc341767917b7cf6965711
+  languageName: node
+  linkType: hard
+
+"tunnel@npm:^0.0.6":
+  version: 0.0.6
+  resolution: "tunnel@npm:0.0.6"
+  checksum: c362948df9ad34b649b5585e54ce2838fa583aa3037091aaed66793c65b423a264e5229f0d7e9a95513a795ac2bd4cb72cda7e89a74313f182c1e9ae0b0994fa
   languageName: node
   linkType: hard
 
@@ -12613,6 +12671,15 @@ __metadata:
   bin:
     uuid: ./bin/uuid
   checksum: 58de2feed61c59060b40f8203c0e4ed7fd6f99d42534a499f1741218a1dd0c129f4aa1de797bcf822c8ea5da7e4137aa3673431a96dae729047f7aca7b27866f
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "uuid@npm:8.3.2"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
   languageName: node
   linkType: hard
 
