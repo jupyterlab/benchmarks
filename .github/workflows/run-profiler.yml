@@ -44,6 +44,11 @@ on:
         required: false
         default: "profiler-assets"
         type: "string"
+      results_name:
+        description: "Uploaded results name"
+        required: false
+        default: "profiler-results"
+        type: "string"
       grep:
         description: "Tests to include"
         required: false
@@ -219,6 +224,14 @@ jobs:
           path: |
             benchmarks/tests/report-reference
             benchmarks/tests/report-challenger
+
+      - name: Upload UI Profiler assets
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.results_name }}
+          path: |
+            benchmarks/tests/results/
 
       - name: Print JupyterLab logs
         if: always()

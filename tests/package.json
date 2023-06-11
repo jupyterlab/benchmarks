@@ -29,7 +29,6 @@
     "typescript": "~4.9.0"
   },
   "dependencies": {
-    "@actions/artifact": "^1.1.1",
     "@actions/core": "^1.10.0"
   }
 }

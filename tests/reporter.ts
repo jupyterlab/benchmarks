@@ -9,7 +9,6 @@ import {
 import * as fs from "fs";
 
 import { summary, notice, error } from "@actions/core";
-import * as artifact from "@actions/artifact";
 
 import type { IBenchmarkResult } from "@jupyterlab/ui-profiler";
 
@@ -92,19 +91,17 @@ class UIProfilerReporter implements Reporter {
 
   async onEnd(result: FullResult) {
     console.log(`Finished the run: ${result.status}`);
-    const artifactClient = artifact.create();
-    const rootDirectory = ".";
-    const options = {
-      continueOnError: true,
-    };
-    const files: string[] = [];
+
+    const dir = 'results'
+    if (!fs.existsSync(dir)){
+      fs.mkdirSync(dir);
+    }
 
     const references = new Set<string>();
     for (const attachment of this._attachments) {
       // `uploadArtifact` forbids colons in file names
       const path = attachment.name.replace(":", "_");
-      fs.writeFileSync(path, JSON.stringify(attachment));
-      files.push(path);
+      fs.writeFileSync(dir + '/' + path, JSON.stringify(attachment));
       references.add(attachment.reference);
     }
     if (references.size > 1) {
@@ -114,18 +111,6 @@ class UIProfilerReporter implements Reporter {
     }
     const reference = references.values().next().value;
     this._reference = reference;
-
-    const artifactName = "UI profiler " + reference;
-    const uploadResult = await artifactClient.uploadArtifact(
-      artifactName,
-      files,
-      rootDirectory,
-      options
-    );
-
-    if (uploadResult.failedItems.length > 0) {
-      error("Upload of some artifacts failed");
-    }
 
     // Add summary table showing average execution time per scenario (rows) per notebook (columns)
     summary.addHeading(this._reference);
